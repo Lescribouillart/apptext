@@ -123,6 +123,9 @@ async function initEditor() {
     const cardSearchInput = document.getElementById('cardSearchInput');
     const bottomTabs = document.querySelectorAll('.bottom-tab');
     const formatSelect = document.getElementById('formatSelect');
+    const globalSearchInput = document.getElementById('globalSearchInput');
+    const searchResultsList = document.getElementById('searchResultsList');
+    const cardsScreenList = document.getElementById('cardsScreenList');
     const textColor = document.getElementById('textColor');
     const bgColor = document.getElementById('bgColor');
         const textColorBtn = document.getElementById('textColorBtn');
@@ -436,49 +439,120 @@ async function initEditor() {
         });
     }
 
+    const appScreens = {
+        editor: document.getElementById('screen-editor'),
+        search: document.getElementById('screen-search'),
+        theme: document.getElementById('screen-theme'),
+        cards: document.getElementById('screen-cards')
+    };
+
+    function setRoute(route) {
+        Object.entries(appScreens).forEach(([key, screen]) => {
+            if (!screen) return;
+            screen.classList.toggle('active', key === route);
+        });
+
+        bottomTabs.forEach((button) => {
+            button.classList.toggle('active', button.dataset.route === route);
+        });
+
+        if (route === 'editor') {
+            document.getElementById('editor')?.focus();
+        }
+
+        if (route === 'search') {
+            globalSearchInput?.focus();
+            renderSearchResults();
+        }
+
+        if (route === 'cards') {
+            renderCardsScreen();
+        }
+    }
+
+    function renderSearchResults() {
+        if (!searchResultsList) return;
+        const query = (globalSearchInput?.value || '').trim().toLowerCase();
+
+        _dbGetAll().then((articles) => {
+            const filtered = !query
+                ? articles
+                : articles.filter((article) => {
+                    const haystack = `${article.subject || ''} ${article.preview || ''} ${article.content || ''}`.toLowerCase();
+                    return haystack.includes(query);
+                });
+
+            if (!filtered.length) {
+                searchResultsList.innerHTML = '<div class="screen-empty">Aucun résultat</div>';
+                return;
+            }
+
+            searchResultsList.innerHTML = filtered.map((article) => `
+                <button class="screen-item" type="button" data-article-id="${article.id}">
+                    <span class="screen-item-title">${escapeHtml(article.subject || 'Sans titre')}</span>
+                    <span class="screen-item-meta">${escapeHtml(article.date || '')}</span>
+                </button>
+            `).join('');
+
+            searchResultsList.querySelectorAll('.screen-item').forEach((button) => {
+                button.addEventListener('click', async () => {
+                    const articleId = Number(button.dataset.articleId);
+                    await loadArticleFromList(articleId);
+                    setRoute('editor');
+                });
+            });
+        });
+    }
+
+    function renderCardsScreen() {
+        if (!cardsScreenList) return;
+
+        _dbGetAll().then((articles) => {
+            if (!articles.length) {
+                cardsScreenList.innerHTML = '<div class="screen-empty">Aucune carte enregistrée</div>';
+                return;
+            }
+
+            cardsScreenList.innerHTML = articles.map((article) => `
+                <button class="screen-item card-item" type="button" data-article-id="${article.id}">
+                    <span class="screen-item-title">${escapeHtml(article.subject || 'Sans titre')}</span>
+                    <span class="screen-item-meta">${escapeHtml(article.preview || '')}</span>
+                </button>
+            `).join('');
+
+            cardsScreenList.querySelectorAll('.screen-item').forEach((button) => {
+                button.addEventListener('click', async () => {
+                    const articleId = Number(button.dataset.articleId);
+                    await loadArticleFromList(articleId);
+                    setRoute('editor');
+                });
+            });
+        });
+    }
+
     bottomTabs.forEach((tab) => {
         tab.addEventListener('click', () => {
-            const nav = tab.dataset.nav;
-            bottomTabs.forEach((btn) => btn.classList.toggle('active', btn === tab));
-
-            switch (nav) {
-                case 'home':
-                    document.querySelector('.sidebar')?.classList.remove('open');
-                    document.getElementById('editor')?.focus();
-                    break;
-
-                case 'search':
-                    document.querySelector('.sidebar')?.classList.add('open');
-                    cardSearchInput?.focus();
-                    break;
-
-                case 'cards':
-                    document.querySelector('.sidebar')?.classList.add('open');
-                    cardSearchInput?.focus();
-                    break;
-
-                case 'mode':
-                    toggleDarkMode();
-                    const modeButton = document.querySelector('.bottom-tab-mode');
-                    if (modeButton) {
-                        modeButton.classList.add('flash');
-                        setTimeout(() => modeButton.classList.remove('flash'), 220);
-                    }
-                    break;
-
-                case 'music':
-                    const player = document.getElementById('scPlayer');
-                    if (player) {
-                        player.classList.toggle('minimized');
-                        const toggle = document.getElementById('youtubeToggle');
-                        if (toggle) toggle.textContent = player.classList.contains('minimized') ? '+' : '−';
-                    }
-                    break;
-
-                default:
-                    break;
-            }
+            const route = tab.dataset.route;
+            setRoute(route);
         });
+    });
+
+    if (globalSearchInput) {
+        globalSearchInput.addEventListener('input', renderSearchResults);
+    }
+
+    document.getElementById('themeLightBtn')?.addEventListener('click', () => {
+        document.body.classList.remove('dark-mode');
+        localStorage.setItem('scribouillart_dark_mode', 'false');
+        updateDarkModeIcons();
+        setRoute('theme');
+    });
+
+    document.getElementById('themeDarkBtn')?.addEventListener('click', () => {
+        document.body.classList.add('dark-mode');
+        localStorage.setItem('scribouillart_dark_mode', 'true');
+        updateDarkModeIcons();
+        setRoute('theme');
     });
 
     // Sélecteur de format de paragraphe
