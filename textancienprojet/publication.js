@@ -120,6 +120,8 @@ async function initEditor() {
     const newArticleBtn = document.getElementById('newArticleBtn');
     const articlesList = document.getElementById('articlesList');
     const darkModeToggle = document.getElementById('darkModeToggle');
+    const cardSearchInput = document.getElementById('cardSearchInput');
+    const bottomTabs = document.querySelectorAll('.bottom-tab');
     const formatSelect = document.getElementById('formatSelect');
     const textColor = document.getElementById('textColor');
     const bgColor = document.getElementById('bgColor');
@@ -406,6 +408,69 @@ async function initEditor() {
     // Bouton Mode Nuit
     darkModeToggle.addEventListener('click', () => {
         toggleDarkMode();
+    });
+
+    function applyCardSearchFilter() {
+        if (!cardSearchInput || !articlesList) return;
+
+        const query = cardSearchInput.value.trim().toLowerCase();
+        const cards = articlesList.querySelectorAll('.article-card-item');
+        let visibleCount = 0;
+
+        cards.forEach((card) => {
+            const text = (card.textContent || '').toLowerCase();
+            const matches = !query || text.includes(query);
+            card.style.display = matches ? '' : 'none';
+            if (matches) visibleCount += 1;
+        });
+
+        const emptyState = articlesList.querySelector('.no-articles');
+        if (emptyState) {
+            emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
+        }
+    }
+
+    if (cardSearchInput) {
+        cardSearchInput.addEventListener('input', () => {
+            applyCardSearchFilter();
+        });
+    }
+
+    bottomTabs.forEach((tab) => {
+        tab.addEventListener('click', () => {
+            const nav = tab.dataset.nav;
+            bottomTabs.forEach((btn) => btn.classList.toggle('active', btn === tab));
+
+            if (nav === 'cards') {
+                document.querySelector('.sidebar')?.classList.add('open');
+                cardSearchInput?.focus();
+            }
+            if (nav === 'home') {
+                document.querySelector('.sidebar')?.classList.remove('open');
+                const editor = document.getElementById('editor');
+                editor?.focus();
+            }
+            if (nav === 'search') {
+                document.querySelector('.sidebar')?.classList.add('open');
+                cardSearchInput?.focus();
+            }
+            if (nav === 'mode') {
+                toggleDarkMode();
+                const modeButton = document.querySelector('.bottom-tab-mode');
+                if (modeButton) {
+                    modeButton.classList.add('flash');
+                    setTimeout(() => modeButton.classList.remove('flash'), 220);
+                }
+            }
+            if (nav === 'music') {
+                const player = document.getElementById('scPlayer');
+                if (player) {
+                    player.classList.toggle('minimized');
+                    const toggle = document.getElementById('youtubeToggle');
+                    if (toggle) toggle.textContent = player.classList.contains('minimized') ? '+' : '−';
+                }
+            }
+        });
     });
 
     // Sélecteur de format de paragraphe
@@ -1324,10 +1389,13 @@ async function initEditor() {
                 ? `--card-color: ${cardColor}; background: linear-gradient(90deg, ${hexToRgba(cardColor, 0.22)} 0%, var(--editor-bg-tertiary) 38%);`
                 : `--card-color: transparent; background: var(--editor-bg-tertiary);`;
 
+            const subject = escapeHtml(article.subject || 'Sans titre');
+            const preview = escapeHtml(article.preview || 'Sans contenu');
+
             return `
                 <div class="article-card-item ${article.id === currentArticleId ? 'active' : ''} ${article.color ? 'has-color' : ''}" data-id="${article.id}" style="${cardStyle}">
-                    <div class="article-card-subject">${escapeHtml(article.subject)}</div>
-                    <div class="article-card-preview">${escapeHtml(article.preview)}</div>
+                    <div class="article-card-subject">${subject}</div>
+                    <div class="article-card-preview">${preview}</div>
                     <div class="article-card-footer">
                         <span class="article-card-date">${article.date}</span>
                         <div class="article-card-actions">
@@ -1352,7 +1420,12 @@ async function initEditor() {
         articlesList.querySelectorAll('.article-card-item').forEach(card => {
             card.addEventListener('click', async () => {
                 const id = parseInt(card.dataset.id);
+                document.querySelector('.sidebar')?.classList.remove('open');
                 await loadArticleFromList(id);
+                document.querySelector('[data-nav="home"]')?.classList.add('active');
+                document.querySelectorAll('.bottom-tab').forEach((btn) => {
+                    if (btn.dataset.nav !== 'home') btn.classList.remove('active');
+                });
             });
         });
 
@@ -1362,6 +1435,8 @@ async function initEditor() {
                 await deleteArticleFromList(id);
             });
         });
+
+        applyCardSearchFilter();
 
         articlesList.querySelectorAll('.article-card-color').forEach(btn => {
             btn.addEventListener('click', async (event) => {

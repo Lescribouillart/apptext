@@ -116,8 +116,11 @@
             <!-- Barre latérale des articles -->
             <aside class="sidebar">
                 <div class="sidebar-header">
-                    <h2 class="sidebar-title">Mes feuillets</h2>
+                    <h2 class="sidebar-title">Mes cartes</h2>
                     <button class="new-article-btn" id="newArticleBtn" title="Nouvel article">+</button>
+                </div>
+                <div class="card-search-wrap">
+                    <input type="search" id="cardSearchInput" class="card-search" placeholder="Rechercher une carte..." aria-label="Rechercher une carte" />
                 </div>
                 <div class="articles-list" id="articlesList">
                     <div class="no-articles">Aucun article sauvegardé</div>
@@ -299,6 +302,30 @@
 
         </div>
     </main>
+
+    <nav class="bottom-nav" aria-label="Navigation principale">
+        <button class="bottom-tab active" type="button" data-nav="home" aria-label="Édition du texte">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10.5V19h14v-8.5"/><path d="M9 19v-6h6v6"/></svg>
+            <span>Accueil</span>
+        </button>
+        <button class="bottom-tab" type="button" data-nav="search" aria-label="Recherche">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6"/><path d="m16 16 5 5"/></svg>
+            <span>Recherche</span>
+        </button>
+        <button class="bottom-tab bottom-tab-mode" type="button" data-nav="mode" aria-label="Mode jour nuit">
+            <svg class="nav-mode-sun" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M4.93 4.93l1.77 1.77M17.3 17.3l1.77 1.77M2 12h2.5M19.5 12H22M4.93 19.07l1.77-1.77M17.3 6.7l1.77-1.77"/></svg>
+            <svg class="nav-mode-moon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
+            <span>Mode</span>
+        </button>
+        <button class="bottom-tab" type="button" data-nav="cards" aria-label="Gérer les cartes">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5h13A2.5 2.5 0 0 1 21 7.5v9A2.5 2.5 0 0 1 18.5 19h-13A2.5 2.5 0 0 1 3 16.5v-9Z"/><path d="M7 9h10M7 13h6"/></svg>
+            <span>Cartes</span>
+        </button>
+        <button class="bottom-tab" type="button" data-nav="music" aria-label="Musique">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l10-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="16" cy="16" r="3"/></svg>
+            <span>Musique</span>
+        </button>
+    </nav>
 
     <footer class="footer">
         <div class="container">
