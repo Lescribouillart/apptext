@@ -37,10 +37,34 @@ function isCapacitorApp() {
 function hideSplash() {
     var splash = document.getElementById('appSplash');
     if (!splash) return;
+    if (splash.dataset.hidden === 'true') return;
+    splash.dataset.hidden = 'true';
     splash.classList.add('is-hidden');
+    var bar = splash.querySelector('.splash-loader-bar');
+    if (bar) {
+        bar.style.transition = 'none';
+        bar.style.width = '100%';
+    }
     setTimeout(function() {
         splash.style.display = 'none';
     }, 300);
+}
+
+function startSplashLoading() {
+    if (window.__textSplashStarted) return;
+    window.__textSplashStarted = true;
+
+    var splash = document.getElementById('appSplash');
+    if (!splash) return;
+
+    var bar = splash.querySelector('.splash-loader-bar');
+    if (!bar) return;
+
+    bar.style.transition = 'width 2.8s ease-out';
+    bar.style.width = '0%';
+    requestAnimationFrame(function() {
+        bar.style.width = '100%';
+    });
 }
 
 function getInstallInstructions() {
@@ -84,8 +108,13 @@ function setupUpdateButton(registration) {
 
 // ─── Splash d'ouverture unique (sans écran PWA) ───
 (function() {
+    if (window.__textSplashTimer) return;
+
     var splash = document.getElementById('appSplash');
     if (splash) {
-        setTimeout(hideSplash, 4200);
+        startSplashLoading();
+        window.__textSplashTimer = setTimeout(function() {
+            hideSplash();
+        }, 4200);
     }
 })();
