@@ -120,6 +120,8 @@ async function initEditor() {
     const newArticleBtn = document.getElementById('newArticleBtn');
     const articlesList = document.getElementById('articlesList');
     const darkModeToggle = document.getElementById('darkModeToggle');
+    const navModeSun = document.querySelector('.nav-mode-sun');
+    const navModeMoon = document.querySelector('.nav-mode-moon');
     const cardSearchInput = document.getElementById('cardSearchInput');
     const bottomTabs = document.querySelectorAll('.bottom-tab');
     const formatSelect = document.getElementById('formatSelect');
@@ -409,9 +411,11 @@ async function initEditor() {
     });
 
     // Bouton Mode Nuit
-    darkModeToggle.addEventListener('click', () => {
-        toggleDarkMode();
-    });
+    if (darkModeToggle) {
+        darkModeToggle.addEventListener('click', () => {
+            toggleDarkMode();
+        });
+    }
 
     function applyCardSearchFilter() {
         if (!cardSearchInput || !articlesList) return;
@@ -1098,24 +1102,31 @@ async function initEditor() {
         saveBtn.title = 'Enregistrer l\'article';
     }
 
+    function updateDarkModeIcons() {
+        const isDarkMode = document.body.classList.contains('dark-mode');
+
+        if (navModeSun) {
+            navModeSun.style.display = isDarkMode ? 'none' : 'block';
+        }
+        if (navModeMoon) {
+            navModeMoon.style.display = isDarkMode ? 'block' : 'none';
+        }
+
+        if (darkModeToggle) {
+            const moonIcon = darkModeToggle.querySelector('.moon-icon');
+            const sunIcon = darkModeToggle.querySelector('.sun-icon');
+            if (moonIcon) moonIcon.style.display = isDarkMode ? 'none' : 'block';
+            if (sunIcon) sunIcon.style.display = isDarkMode ? 'block' : 'none';
+        }
+    }
+
     /**
      * Bascule entre le mode clair et le mode nuit
      */
     function toggleDarkMode() {
         const body = document.body;
         const isDarkMode = body.classList.toggle('dark-mode');
-        
-        const moonIcon = darkModeToggle.querySelector('.moon-icon');
-        const sunIcon = darkModeToggle.querySelector('.sun-icon');
-        
-        if (isDarkMode) {
-            moonIcon.style.display = 'none';
-            sunIcon.style.display = 'block';
-        } else {
-            moonIcon.style.display = 'block';
-            sunIcon.style.display = 'none';
-        }
-        
+        updateDarkModeIcons();
         localStorage.setItem('scribouillart_dark_mode', isDarkMode ? 'true' : 'false');
     }
 
@@ -1124,14 +1135,12 @@ async function initEditor() {
      */
     function loadDarkModePreference() {
         const isDarkMode = localStorage.getItem('scribouillart_dark_mode') === 'true';
-        
+
         if (isDarkMode) {
             document.body.classList.add('dark-mode');
-            const moonIcon = darkModeToggle.querySelector('.moon-icon');
-            const sunIcon = darkModeToggle.querySelector('.sun-icon');
-            moonIcon.style.display = 'none';
-            sunIcon.style.display = 'block';
         }
+
+        updateDarkModeIcons();
     }
 
     /**
