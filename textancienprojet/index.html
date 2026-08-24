@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text - L'éditeur</title>
+    <meta name="theme-color" content="#2f2e3a">
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" href="assets/icons/text.png" type="image/png">
+    <link rel="apple-touch-icon" href="assets/icons/text.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="editor-page">
+    <div id="appSplash" class="app-splash" aria-live="polite" aria-label="Chargement de l'application">
+        <div class="splash-content">
+            <div class="splash-logo-wrap">
+                <img src="assets/icons/text.png" alt="Logo Text" class="splash-logo" />
+            </div>
+            <div class="splash-loader" aria-hidden="true">
+                <span class="splash-loader-bar"></span>
+            </div>
+        </div>
+    </div>
+
+    <a href="#main-content" class="skip-link">Aller au contenu principal</a>
+    <header class="header">
+        <div class="container header-inner">
+            <div class="header-brand-block" aria-label="Nom de l'application">
+                <a href="./" class="header-brand" aria-label="Accueil Text">
+                    <h1 class="logo">Text</h1>
+                    <img class="header-brand-icon" src="assets/icons/text.png" alt="Logo Text" />
+                </a>
+                <p class="tagline">L'éditeur</p>
+            </div>
+
+            <div class="header-actions" aria-label="Actions du header">
+                <button class="dark-mode-toggle" id="darkModeToggle" title="Basculer en mode nuit" aria-label="Basculer en mode nuit">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="moon-icon">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="sun-icon" style="display: none;">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main" id="main-content">
+        <!-- Barre supérieure avec toolbar intégrée -->
+        <div class="top-bar">
+            <!-- Lecteur YouTube compact -->
+            <div class="top-bar-youtube">
+                <div id="ytApiContainer" style="position:absolute;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;"></div>
+                <!-- Lecteur custom style SoundCloud -->
+                <div class="sc-player" id="scPlayer">
+                    <button class="sc-skip-btn" id="scPrevBtn" title="Piste précédente" aria-label="Piste précédente">
+                        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="currentColor">
+                            <path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/>
+                        </svg>
+                    </button>
+                    <button class="sc-play-btn" id="scPlayBtn" title="Lecture / Pause" aria-label="Lecture / Pause">
+                        <svg class="sc-icon-play" viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M8 5v14l11-7z"/></svg>
+                        <svg class="sc-icon-pause" viewBox="0 0 24 24" fill="currentColor" width="20" height="20" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                    </button>
+                    <button class="sc-skip-btn" id="scNextBtn" title="Piste suivante" aria-label="Piste suivante">
+                        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="currentColor">
+                            <path d="M6 18l8.5-6L6 6v12zm8.5-6v6H17V6h-2.5z"/>
+                        </svg>
+                    </button>
+                    <a class="sc-thumb-link" id="scThumbLink" href="https://www.youtube.com/watch?v=XSXEaikz0Bc" target="_blank" rel="noopener noreferrer" title="Ouvrir sur YouTube">
+                        <img class="sc-thumb" id="scThumb" src="https://img.youtube.com/vi/XSXEaikz0Bc/default.jpg" alt="miniature">
+                    </a>
+                    <div class="sc-info">
+                        <div class="sc-title-wrap">
+                            <span class="sc-title">Lofi Hip Hop Radio</span>
+                        </div>
+                        <div class="sc-wave">
+                            <div class="sc-bars" id="scBars">
+                                <span></span><span></span><span></span><span></span><span></span><span></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sc-right">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16" style="flex-shrink:0;color:#ffffff;"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+                        <input type="range" class="sc-volume" id="scVolume" min="0" max="100" value="80" title="Volume">
+                    </div>
+                    <div class="sc-actions">
+                        <button class="sc-action-btn" id="youtubeAddBtn" title="Ajouter une piste">+</button>
+                        <button class="sc-action-btn" id="youtubeManageBtn" title="Gérer les pistes">
+                            <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                        </button>
+                        <button class="sc-action-btn" id="youtubeToggle" title="Réduire/Agrandir">−</button>
+                    </div>
+                </div>
+            </div>
+            <!-- Boutons d'action -->
+            <div class="top-bar-actions">
+                <button class="wp-button sidebar-toggle-btn" id="sidebarToggleBtn" title="Afficher/masquer les articles">Articles</button>
+                <button class="wp-button" id="loadBtn">Importer</button>
+                <button class="wp-button" id="addBtn">Ajouter</button>
+                <button class="wp-button" id="saveAsBtn">Enregistrer sous</button>
+                <button class="wp-button primary" id="saveBtn">Enregistrer</button>
+            </div>
+        </div>
+
+        <div class="editor-container" id="editorContainer">
+            <!-- Barre latérale des articles -->
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <h2 class="sidebar-title">Mes feuillets</h2>
+                    <button class="new-article-btn" id="newArticleBtn" title="Nouvel article">+</button>
+                </div>
+                <div class="articles-list" id="articlesList">
+                    <div class="no-articles">Aucun article sauvegardé</div>
+                </div>
+            </aside>
+
+            <!-- Zone principale de l'éditeur -->
+            <div class="editor-main">
+                <div class="editor-wrapper">
+                    <!-- Informations de l'article -->
+                    <div class="article-info">
+                        <input 
+                            type="text" 
+                            id="articleSubject" 
+                            class="article-subject" 
+                            placeholder="Ajouter un titre"
+                            maxlength="100"
+                        >
+                    </div>
+
+                    <!-- Barre d'outils style OpenOffice Writer -->
+                    <div class="toolbar editor-toolbar oo-toolbar">
+
+                        <!-- Groupe 1 : Style de paragraphe -->
+                        <select class="toolbar-select oo-select-style" id="formatSelect" title="Style de paragraphe">
+                            <option value="p">Paragraphe</option>
+                            <option value="h1">Titre 1</option>
+                            <option value="h2">Titre 2</option>
+                            <option value="h3">Titre 3</option>
+                            <option value="h4">Titre 4</option>
+                            <option value="h5">Titre 5</option>
+                            <option value="h6">Titre 6</option>
+                            <option value="blockquote">Citation</option>
+                            <option value="pre">Code</option>
+                        </select>
+
+                        <div class="toolbar-separator"></div>
+
+                        <!-- Groupe 2 : Police & Taille -->
+                        <select class="toolbar-select oo-select-font" id="fontFamilySelect" title="Police de caractères">
+                            <option value="">Police par défaut</option>
+                            <option value="Arial, sans-serif">Arial</option>
+                            <option value="'Times New Roman', serif">Times New Roman</option>
+                            <option value="'Courier New', monospace">Courier New</option>
+                            <option value="Georgia, serif">Georgia</option>
+                            <option value="Verdana, sans-serif">Verdana</option>
+                            <option value="Helvetica, sans-serif">Helvetica</option>
+                            <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
+                        </select>
+                        <select class="toolbar-select oo-select-size" id="fontSizeSelect" title="Taille de police">
+                            <option value="1">8pt</option>
+                            <option value="2">10pt</option>
+                            <option value="3" selected>12pt</option>
+                            <option value="4">14pt</option>
+                            <option value="5">18pt</option>
+                            <option value="6">24pt</option>
+                            <option value="7">36pt</option>
+                        </select>
+
+                        <div class="toolbar-separator"></div>
+
+                        <!-- Groupe 3 : Mise en forme du texte -->
+                        <button class="toolbar-btn oo-btn" data-command="bold" title="Gras (Ctrl+B)">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M15.6 10.79c.97-.67 1.65-1.77 1.65-2.79 0-2.26-1.75-4-4-4H7v14h7.04c2.09 0 3.71-1.7 3.71-3.79 0-1.52-.86-2.82-2.15-3.42zM10 6.5h3c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-3v-3zm3.5 9H10v-3h3.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5z"/></svg>
+                        </button>
+                        <button class="toolbar-btn oo-btn" data-command="italic" title="Italique (Ctrl+I)">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M10 4v3h2.21l-3.42 8H6v3h8v-3h-2.21l3.42-8H18V4h-8z"/></svg>
+                        </button>
+                        <button class="toolbar-btn oo-btn" data-command="underline" title="Souligné (Ctrl+U)">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 17c3.31 0 6-2.69 6-6V3h-2.5v8c0 1.93-1.57 3.5-3.5 3.5S8.5 12.93 8.5 11V3H6v8c0 3.31 2.69 6 6 6zm-7 2v2h14v-2H5z"/></svg>
+                        </button>
+                        <button class="toolbar-btn oo-btn" data-command="strikeThrough" title="Barré">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M10 19h4v-3h-4v3zM5 4v3h5v3h4V7h5V4H5zM3 14h18v-2H3v2z"/></svg>
+                        </button>
+
+                        <div class="toolbar-separator"></div>
+
+                        <!-- Groupe 4 : Couleurs -->
+                        <div class="color-picker-wrapper oo-color-wrap">
+                                <button class="toolbar-btn oo-btn oo-color-btn" id="textColorBtn" type="button" title="Couleur du texte">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M11.14 3L5.5 21h2.11l1.3-4h6.18l1.3 4h2.11L12.86 3h-1.72zm-1.62 12 2.48-7.64L14.48 15H9.52z"/></svg>
+                                <span class="oo-color-bar" id="textColorBar" style="background:#000000"></span>
+                            </button>
+                            <input type="color" id="textColor" class="color-input" value="#000000">
+                        </div>
+                        <div class="color-picker-wrapper oo-color-wrap">
+                                <button class="toolbar-btn oo-btn oo-color-btn" id="bgColorBtn" type="button" title="Couleur de surbrillance">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M16.56 8.94L7.62 0 6.21 1.41l2.38 2.38-5.15 5.15c-.59.59-.59 1.54 0 2.12l5.5 5.5c.29.29.68.44 1.06.44s.77-.15 1.06-.44l5.5-5.5c.59-.58.59-1.53 0-2.12zM5.21 10 10 5.21 14.79 10H5.21zM19 11.5s-2 2.17-2 3.5c0 1.1.9 2 2 2s2-.9 2-2c0-1.33-2-3.5-2-3.5z"/><rect x="0" y="20" width="24" height="4" fill="currentColor" opacity=".36"/></svg>
+                                <span class="oo-color-bar" id="bgColorBar" style="background:#ffff00"></span>
+                            </button>
+                            <input type="color" id="bgColor" class="color-input" value="#ffff00">
+                        </div>
+
+                        <div class="toolbar-separator"></div>
+
+                        <!-- Groupe 5 : Alignement -->
+                        <button class="toolbar-btn oo-btn" data-command="justifyLeft" title="Aligner à gauche (Ctrl+L)">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M15 15H3v2h12v-2zm0-8H3v2h12V7zM3 13h18v-2H3v2zm0 8h18v-2H3v2zM3 3v2h18V3H3z"/></svg>
+                        </button>
+                        <button class="toolbar-btn oo-btn" data-command="justifyCenter" title="Centrer (Ctrl+E)">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M7 15v2h10v-2H7zm-4 6h18v-2H3v2zm0-8h18v-2H3v2zm4-6v2h10V7H7zM3 3v2h18V3H3z"/></svg>
+                        </button>
+                        <button class="toolbar-btn oo-btn" data-command="justifyRight" title="Aligner à droite (Ctrl+R)">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M3 21h18v-2H3v2zm6-4h12v-2H9v2zm-6-4h18v-2H3v2zm6-4h12V7H9v2zM3 3v2h18V3H3z"/></svg>
+                        </button>
+                        <button class="toolbar-btn oo-btn" data-command="justifyFull" title="Justifier (Ctrl+J)">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M3 21h18v-2H3v2zm0-4h18v-2H3v2zm0-4h18v-2H3v2zm0-4h18V7H3v2zm0-6v2h18V3H3z"/></svg>
+                        </button>
+
+                        <div class="toolbar-separator"></div>
+
+                        <!-- Groupe 6 : Listes & Retraits -->
+                        <button class="toolbar-btn oo-btn" data-command="insertUnorderedList" title="Liste à puces">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M4 10.5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5zm0-6c-.83 0-1.5.67-1.5 1.5S3.17 7.5 4 7.5 5.5 6.83 5.5 6 4.83 4.5 4 4.5zm0 12c-.83 0-1.5.68-1.5 1.5s.68 1.5 1.5 1.5 1.5-.68 1.5-1.5-.67-1.5-1.5-1.5zM7 19h14v-2H7v2zm0-6h14v-2H7v2zm0-8v2h14V5H7z"/></svg>
+                        </button>
+                        <button class="toolbar-btn oo-btn" data-command="insertOrderedList" title="Liste numérotée">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M2 17h2v.5H3v1h1v.5H2v1h3v-4H2v1zm1-9h1V4H2v1h1v3zm-1 3h1.8L2 13.1v.9h3v-1H3.2L5 10.9V10H2v1zm5-6v2h14V5H7zm0 14h14v-2H7v2zm0-6h14v-2H7v2z"/></svg>
+                        </button>
+                        <button class="toolbar-btn oo-btn" data-command="outdent" title="Réduire le retrait">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M11 17h10v-2H11v2zm-8-5 4 4V8l-4 4zm0 9h18v-2H3v2zM3 3v2h18V3H3zm8 6h10V7H11v2zm0 4h10v-2H11v2z"/></svg>
+                        </button>
+                        <button class="toolbar-btn oo-btn" data-command="indent" title="Augmenter le retrait">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M3 21h18v-2H3v2zM3 8v8l4-4-4-4zm8 9h10v-2H11v2zM3 3v2h18V3H3zm8 6h10V7H11v2zm0 4h10v-2H11v2z"/></svg>
+                        </button>
+
+                        <div class="toolbar-separator"></div>
+
+                        <!-- Groupe 7 : Lien / Image -->
+                        <button class="toolbar-btn oo-btn" id="linkBtn" title="Insérer un lien (Ctrl+K)">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
+                        </button>
+                        <button class="toolbar-btn oo-btn" id="unlinkBtn" data-command="unlink" title="Supprimer le lien">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M17 7h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1 0 1.43-.98 2.63-2.31 2.98l1.46 1.46C20.59 15.99 22 14.17 22 12c0-2.76-2.24-5-5-5zm-1 4h-2.19l2 2H16v-2zM2 4.27l3.11 3.11C3.29 8.12 2 9.91 2 12c0 2.76 2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1 0-1.59 1.21-2.9 2.76-3.07L8.73 11H8v2h2.73l2 2H8v1.9h3.27L13 18.73V17h4l1.73 1.73L20 17.46 3.27 2.73 2 4.27z"/></svg>
+                        </button>
+                        <button class="toolbar-btn oo-btn" id="imageBtn" title="Insérer une image">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                        </button>
+
+                        <div class="toolbar-separator"></div>
+
+                        <!-- Groupe 8 : Annuler / Rétablir / Nettoyer / Source -->
+                        <button class="toolbar-btn oo-btn" data-command="undo" title="Annuler (Ctrl+Z)">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/></svg>
+                        </button>
+                        <button class="toolbar-btn oo-btn" data-command="redo" title="Rétablir (Ctrl+Y)">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M18.4 10.6C16.55 8.99 14.15 8 11.5 8c-4.65 0-8.58 3.03-9.96 7.22L3.9 16c1.05-3.19 4.05-5.5 7.6-5.5 1.95 0 3.73.72 5.12 1.88L13 16h9V7l-3.6 3.6z"/></svg>
+                        </button>
+                        <button class="toolbar-btn oo-btn" id="clearStyleBtn" data-command="removeFormat" title="Effacer le style">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M3.27 5 2 6.27l6.97 6.97L6.5 19h3l1.57-3.66L16.73 21 18 19.73 3.27 5zM6 5v.18L8.82 8h2.4l-.72 1.68 2.1 2.1L14.21 8H20V5H6z"/></svg>
+                        </button>
+                        <button class="toolbar-btn oo-btn" id="sourceBtn" title="Code source HTML">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M9.4 16.6 4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0 4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
+                        </button>
+
+                        <div class="toolbar-separator toolbar-end-separator"></div>
+                        <button class="toolbar-btn oo-btn organize-toolbar-btn" id="organizeToolbarBtn" type="button" title="Organiser les boutons de la barre d'outils" aria-label="Organiser les boutons de la barre d'outils">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 6h8v2H8zm0 5h8v2H8zm0 5h8v2H8zM4 6h2v2H4zm0 5h2v2H4zm0 5h2v2H4z"/></svg>
+                        </button>
+
+                    </div>
+
+                    <!-- Zone d'édition -->
+                    <div class="editor-area" id="editor" contenteditable="true">
+                        <p>Commencez à écrire ou tapez / pour choisir un bloc</p>
+                    </div>
+
+                    <!-- Compteur de mots et de signes -->
+                    <div class="word-counter">
+                        <span id="statWords">0 mot</span>
+                        <span class="word-counter-sep">·</span>
+                        <span id="statChars">0 signe</span>
+                    </div>
+
+                    <!-- Zone de sortie -->
+                    <div class="status-message" id="statusMessage"></div>
+                </div>
+            </div>
+
+
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p class="footer-copyright">© 2026 Text — Tous droits réservés</p>
+        </div>
+    </footer>
+
+    <!-- Librairie pour importer les fichiers Word .docx -->
+    <script src="https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js"></script>
+    <!-- Librairie pour décompresser les fichiers .odt (OpenDocument) -->
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+    <!-- Export Word .docx -->
+    <script src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js"></script>
+
+    <script src="publication.js"></script>
+    <script src="pwa.js"></script>
+    <script src="musique.js"></script>
+    <!-- API IFrame YouTube pour piloter volume + lecture -->
+    <script src="https://www.youtube.com/iframe_api"></script>
+</body>
+</html>
+

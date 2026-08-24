@@ -1,0 +1,9 @@
+node_modules/
+.DS_Store
+Thumbs.db
+npm-debug.log*
+android/.gradle/
+android/**/build/
+android/local.properties
+android/.idea/
+android/*.iml
