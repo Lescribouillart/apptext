@@ -1288,6 +1288,26 @@ body.dark-mode .article-card-move-down:hover {
     stroke: #f3f6f9;
 }
 
+.bottom-tab[data-nav="home"].active {
+    color: #d7f4ff;
+}
+
+.bottom-tab[data-nav="search"].active {
+    color: #d5e7ff;
+}
+
+.bottom-tab[data-nav="cards"].active {
+    color: #dfffe7;
+}
+
+.bottom-tab[data-nav="mode"].active {
+    color: #ffe7a8;
+}
+
+.bottom-tab[data-nav="music"].active {
+    color: #f3d8ff;
+}
+
 .bottom-tab-mode {
     position: relative;
 }

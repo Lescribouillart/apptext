@@ -441,34 +441,42 @@ async function initEditor() {
             const nav = tab.dataset.nav;
             bottomTabs.forEach((btn) => btn.classList.toggle('active', btn === tab));
 
-            if (nav === 'cards') {
-                document.querySelector('.sidebar')?.classList.add('open');
-                cardSearchInput?.focus();
-            }
-            if (nav === 'home') {
-                document.querySelector('.sidebar')?.classList.remove('open');
-                const editor = document.getElementById('editor');
-                editor?.focus();
-            }
-            if (nav === 'search') {
-                document.querySelector('.sidebar')?.classList.add('open');
-                cardSearchInput?.focus();
-            }
-            if (nav === 'mode') {
-                toggleDarkMode();
-                const modeButton = document.querySelector('.bottom-tab-mode');
-                if (modeButton) {
-                    modeButton.classList.add('flash');
-                    setTimeout(() => modeButton.classList.remove('flash'), 220);
-                }
-            }
-            if (nav === 'music') {
-                const player = document.getElementById('scPlayer');
-                if (player) {
-                    player.classList.toggle('minimized');
-                    const toggle = document.getElementById('youtubeToggle');
-                    if (toggle) toggle.textContent = player.classList.contains('minimized') ? '+' : '−';
-                }
+            switch (nav) {
+                case 'home':
+                    document.querySelector('.sidebar')?.classList.remove('open');
+                    document.getElementById('editor')?.focus();
+                    break;
+
+                case 'search':
+                    document.querySelector('.sidebar')?.classList.add('open');
+                    cardSearchInput?.focus();
+                    break;
+
+                case 'cards':
+                    document.querySelector('.sidebar')?.classList.add('open');
+                    cardSearchInput?.focus();
+                    break;
+
+                case 'mode':
+                    toggleDarkMode();
+                    const modeButton = document.querySelector('.bottom-tab-mode');
+                    if (modeButton) {
+                        modeButton.classList.add('flash');
+                        setTimeout(() => modeButton.classList.remove('flash'), 220);
+                    }
+                    break;
+
+                case 'music':
+                    const player = document.getElementById('scPlayer');
+                    if (player) {
+                        player.classList.toggle('minimized');
+                        const toggle = document.getElementById('youtubeToggle');
+                        if (toggle) toggle.textContent = player.classList.contains('minimized') ? '+' : '−';
+                    }
+                    break;
+
+                default:
+                    break;
             }
         });
     });
