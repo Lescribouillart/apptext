@@ -343,6 +343,25 @@ body:not(.dark-mode) .sidebar {
     border-right-color: var(--editor-border-color);
 }
 
+body:not(.dark-mode) .editor-toolbar {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: rgba(148, 163, 184, 0.28);
+    box-shadow: 0 -8px 20px rgba(15, 23, 42, 0.06);
+}
+
+body:not(.dark-mode) .toolbar-btn,
+body:not(.dark-mode) .toolbar-select,
+body:not(.dark-mode) .toolbar-toggle-btn,
+body:not(.dark-mode) .organize-toolbar-btn {
+    color: var(--editor-text-primary);
+}
+
+body:not(.dark-mode) .toolbar-btn:hover,
+body:not(.dark-mode) .toolbar-toggle-btn:hover {
+    background: rgba(34, 113, 177, 0.08);
+    border-color: rgba(34, 113, 177, 0.22);
+}
+
 body:not(.dark-mode) .article-card-item {
     background: rgba(255, 255, 255, 0.75);
     border-color: var(--editor-border-color);
