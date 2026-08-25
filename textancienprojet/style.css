@@ -1423,7 +1423,7 @@ body.dark-mode .article-card-move-down:hover {
 
 .theme-toggle-switch {
     position: relative;
-    width: 280px;
+    width: 220px;
     height: 72px;
     border-radius: 999px;
     background: linear-gradient(180deg, #d9d9d9 0%, #c5c7cc 100%);
