@@ -299,10 +299,17 @@ body:not(.dark-mode) {
     --editor-accent-hover: #135e96;
 }
 
-body.dark-mode .article-subject,
-body.dark-mode .editor-area,
-body.dark-mode .editor-area * {
+body.dark-mode .article-subject {
     color: #E5E0E0;
+}
+
+body:not(.dark-mode) .editor-area,
+body:not(.dark-mode) .editor-area *,
+body:not(.dark-mode) .editor-area [contenteditable="true"],
+body:not(.dark-mode) .editor-area [contenteditable="plaintext-only"],
+body:not(.dark-mode) .editor-area [role="textbox"] {
+    color: #111111 !important;
+    -webkit-text-fill-color: #111111 !important;
 }
 
 body:not(.dark-mode) .top-bar {
