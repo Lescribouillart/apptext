@@ -1446,8 +1446,17 @@ body.dark-mode .article-card-move-down:hover {
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 44px;
+    height: 44px;
     color: #1c1c1c;
     transition: opacity 0.2s ease, color 0.2s ease;
+}
+
+.theme-toggle-sun svg,
+.theme-toggle-moon svg {
+    width: 24px;
+    height: 24px;
+    display: block;
 }
 
 .theme-toggle-moon {
