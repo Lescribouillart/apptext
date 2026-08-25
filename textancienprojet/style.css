@@ -731,6 +731,16 @@ body.dark-mode .article-card-delete:hover {
     align-items: center;
     flex-wrap: wrap;
     justify-content: flex-end;
+    width: 100%;
+}
+
+.top-bar-actions .wp-button:nth-child(1),
+.top-bar-actions .wp-button:nth-child(2) {
+    margin-right: 0;
+}
+
+.top-bar-actions .add-icon-btn {
+    margin-left: auto;
 }
 
 .toolbar {
