@@ -181,7 +181,19 @@ function updateTrackTitle() {
         titleEl.title = track.title;
     }
     var thumb = document.getElementById('scThumb');
-    if (thumb) thumb.src = 'https://img.youtube.com/vi/' + track.id + '/default.jpg';
+    if (thumb) {
+        var candidates = ['maxresdefault.jpg', 'sddefault.jpg', 'hqdefault.jpg', 'default.jpg'];
+        var currentIndex = 0;
+        function setThumbCandidate() {
+            if (currentIndex >= candidates.length) return;
+            thumb.src = 'https://img.youtube.com/vi/' + track.id + '/' + candidates[currentIndex];
+            currentIndex += 1;
+        }
+        thumb.onerror = function() {
+            setThumbCandidate();
+        };
+        setThumbCandidate();
+    }
     var thumbLink = document.getElementById('scThumbLink');
     if (thumbLink) thumbLink.href = 'https://www.youtube.com/watch?v=' + track.id;
 }
