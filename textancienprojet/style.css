@@ -1284,6 +1284,15 @@ body.dark-mode .article-card-move-down:hover {
     width: 16px;
     height: 16px;
     object-fit: contain;
+    transition: filter 0.2s ease;
+}
+
+body.dark-mode .add-icon-btn img {
+    filter: brightness(0) invert(1);
+}
+
+body:not(.dark-mode) .add-icon-btn img {
+    filter: brightness(0);
 }
 
 .wp-button:hover {
