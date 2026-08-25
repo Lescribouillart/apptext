@@ -234,7 +234,18 @@ async function initEditor() {
     if (toolbar) {
         let dragState = null;
 
+        const isScrollbarInteraction = (event) => {
+            const rect = toolbar.getBoundingClientRect();
+            const nearBottomEdge = toolbar.scrollWidth > toolbar.clientWidth && event.clientY >= rect.bottom - 14;
+            const nearRightEdge = toolbar.scrollHeight > toolbar.clientHeight && event.clientX >= rect.right - 14;
+            return nearBottomEdge || nearRightEdge;
+        };
+
         toolbar.addEventListener('pointerdown', (event) => {
+            if (isScrollbarInteraction(event)) {
+                return;
+            }
+
             if (event.target.closest('.toolbar-btn, .toolbar-select, input, button, select')) {
                 return;
             }

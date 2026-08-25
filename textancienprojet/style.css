@@ -780,7 +780,10 @@ body.dark-mode .article-card-delete:hover {
     box-shadow: 0 -8px 20px rgba(0, 0, 0, 0.12);
     user-select: none;
     backdrop-filter: blur(8px);
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+    -ms-overflow-style: auto;
     order: 2;
 }
 
@@ -874,9 +877,10 @@ body.dark-mode .article-card-delete:hover {
 
 /* ─── Barre d'outils style OpenOffice ─── */
 .oo-toolbar {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 2px;
     padding: 0.35rem 0.5rem;
+    white-space: nowrap;
 }
 
 .oo-btn {
