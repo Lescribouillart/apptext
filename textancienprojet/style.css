@@ -1645,6 +1645,7 @@ body:not(.dark-mode) .add-icon-btn img {
 .bottom-tab[data-route="search"].active { color: #d5e7ff; }
 .bottom-tab[data-route="theme"].active { color: #ffe7a8; }
 .bottom-tab[data-route="cards"].active { color: #dfffe7; }
+.bottom-tab[data-route="music"].active { color: #f2d9ff; }
 
 .bottom-tab-mode { position: relative; }
 .bottom-tab-mode.flash { transform: scale(0.95); color: #c8efff; }
@@ -1702,6 +1703,20 @@ body:not(.dark-mode) .add-icon-btn img {
     flex-direction: column;
     gap: 4px;
     flex-shrink: 0;
+}
+
+.music-screen-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 180px;
+    padding: 1rem;
+}
+
+.music-screen-player {
+    width: min(100%, 560px);
+    display: flex;
+    justify-content: center;
 }
 
 /* ── Lecteur audio custom style SoundCloud ── */
@@ -2038,6 +2053,17 @@ body:not(.dark-mode) .add-icon-btn img {
 
     .top-bar-youtube {
         display: none;
+    }
+
+    .screen-music .top-bar-youtube,
+    .music-screen-player {
+        display: flex;
+    }
+
+    .music-screen-player .sc-player {
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
     }
 
     .editor-wrapper {

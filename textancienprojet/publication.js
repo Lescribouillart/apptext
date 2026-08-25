@@ -540,7 +540,8 @@ async function initEditor() {
         editor: document.getElementById('screen-editor'),
         search: document.getElementById('screen-search'),
         theme: document.getElementById('screen-theme'),
-        cards: document.getElementById('screen-cards')
+        cards: document.getElementById('screen-cards'),
+        music: document.getElementById('screen-music')
     };
 
     function setRoute(route) {
