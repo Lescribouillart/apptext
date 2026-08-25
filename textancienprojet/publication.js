@@ -662,29 +662,62 @@ async function initEditor() {
             return;
         }
 
-        editor.focus();
-
+        const lowerQuery = query.toLowerCase();
         const selection = window.getSelection();
-        if (selection && editor.contains(selection.anchorNode)) {
-            const currentRange = selection.rangeCount ? selection.getRangeAt(0) : null;
-            if (currentRange && editor.contains(currentRange.startContainer)) {
-                currentRange.collapse(false);
+        let foundRange = null;
+
+        const walkTextNodes = (node) => {
+            if (node.nodeType !== Node.TEXT_NODE) return null;
+            const text = node.nodeValue || '';
+            const index = text.toLowerCase().indexOf(lowerQuery);
+            if (index >= 0) {
+                const range = document.createRange();
+                range.setStart(node, index);
+                range.setEnd(node, index + query.length);
+                return range;
+            }
+            return null;
+        };
+
+        const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT);
+        let currentNode;
+        while ((currentNode = walker.nextNode())) {
+            const range = walkTextNodes(currentNode);
+            if (range) {
+                foundRange = range;
+                break;
             }
         }
 
-        const found = window.find(query, false, false, false, false, false, false);
-        if (!found) {
-            const statusMessage = document.getElementById('statusMessage');
-            if (statusMessage) {
-                statusMessage.textContent = `Aucun résultat pour : "${query}"`;
-                statusMessage.classList.add('is-error');
-            }
-        } else {
+        if (foundRange) {
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(foundRange);
+            foundRange.startContainer.parentElement?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            editor.focus();
             const statusMessage = document.getElementById('statusMessage');
             if (statusMessage) {
                 statusMessage.textContent = `Recherche : "${query}"`;
                 statusMessage.classList.remove('is-error');
             }
+            return;
+        }
+
+        const fallbackFound = window.find(query, false, false, false, true, false, false);
+        if (fallbackFound) {
+            editor.focus();
+            const statusMessage = document.getElementById('statusMessage');
+            if (statusMessage) {
+                statusMessage.textContent = `Recherche : "${query}"`;
+                statusMessage.classList.remove('is-error');
+            }
+            return;
+        }
+
+        const statusMessage = document.getElementById('statusMessage');
+        if (statusMessage) {
+            statusMessage.textContent = `Aucun résultat pour : "${query}"`;
+            statusMessage.classList.add('is-error');
         }
         editor.focus();
     }
