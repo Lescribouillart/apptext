@@ -230,6 +230,85 @@ async function initEditor() {
         organizeToolbarBtn.setAttribute('aria-pressed', 'false');
     }
 
+    const toolbar = document.querySelector('.editor-toolbar');
+    if (toolbar) {
+        let dragState = null;
+
+        toolbar.addEventListener('pointerdown', (event) => {
+            if (event.target.closest('.toolbar-btn, .toolbar-select, input, button, select')) {
+                return;
+            }
+
+            if (toolbar.classList.contains('is-dragging')) {
+                return;
+            }
+
+            const editorWrapper = toolbar.closest('.editor-wrapper');
+            if (!editorWrapper) return;
+
+            const rect = toolbar.getBoundingClientRect();
+            const wrapperRect = editorWrapper.getBoundingClientRect();
+
+            dragState = {
+                offsetX: event.clientX - rect.left,
+                offsetY: event.clientY - rect.top,
+                wrapperRect,
+                originLeft: rect.left - wrapperRect.left,
+                originTop: rect.top - wrapperRect.top
+            };
+
+            toolbar.setPointerCapture?.(event.pointerId);
+            toolbar.classList.add('is-dragging');
+            toolbar.style.position = 'absolute';
+            toolbar.style.left = `${dragState.originLeft}px`;
+            toolbar.style.top = `${dragState.originTop}px`;
+            toolbar.style.width = `${rect.width}px`;
+        });
+
+        toolbar.addEventListener('pointermove', (event) => {
+            if (!dragState || !toolbar.classList.contains('is-dragging')) {
+                return;
+            }
+
+            const editorWrapper = toolbar.closest('.editor-wrapper');
+            if (!editorWrapper) return;
+
+            const wrapperRect = editorWrapper.getBoundingClientRect();
+            const clampedLeft = Math.min(
+                Math.max(event.clientX - wrapperRect.left - dragState.offsetX, 0),
+                wrapperRect.width - toolbar.offsetWidth
+            );
+            const clampedTop = Math.min(
+                Math.max(event.clientY - wrapperRect.top - dragState.offsetY, 0),
+                wrapperRect.height - toolbar.offsetHeight
+            );
+
+            toolbar.style.left = `${clampedLeft}px`;
+            toolbar.style.top = `${clampedTop}px`;
+        });
+
+        toolbar.addEventListener('pointerup', () => {
+            if (!dragState) return;
+            toolbar.classList.remove('is-dragging');
+            toolbar.style.position = '';
+            toolbar.style.left = '';
+            toolbar.style.top = '';
+            toolbar.style.width = '';
+            dragState = null;
+        });
+
+        toolbar.addEventListener('pointerleave', () => {
+            if (dragState && toolbar.classList.contains('is-dragging')) {
+                toolbar.classList.remove('is-dragging');
+                toolbar.style.position = '';
+                toolbar.style.left = '';
+                toolbar.style.top = '';
+                toolbar.style.width = '';
+                dragState = null;
+            }
+        });
+    }
+
     const toolbarReorderableButtons = document.querySelectorAll('.editor-toolbar .toolbar-btn:not(#organizeToolbarBtn)');
     toolbarReorderableButtons.forEach(btn => {
         btn.addEventListener('dragstart', (event) => {
