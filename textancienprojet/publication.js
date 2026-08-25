@@ -130,6 +130,7 @@ async function initEditor() {
     const cardsScreenList = document.getElementById('cardsScreenList');
     const toolbarSearchInput = document.getElementById('toolbarSearchInput');
     const toolbarSearchBtn = document.getElementById('toolbarSearchBtn');
+    const toolbarToggleBtn = document.getElementById('toolbarToggleBtn');
     const textColor = document.getElementById('textColor');
     const bgColor = document.getElementById('bgColor');
         const textColorBtn = document.getElementById('textColorBtn');
@@ -690,6 +691,14 @@ async function initEditor() {
         });
     }
 
+    if (toolbarToggleBtn && toolbar) {
+        toolbarToggleBtn.addEventListener('click', () => {
+            const isCollapsed = toolbar.classList.toggle('collapsed');
+            toolbarToggleBtn.setAttribute('title', isCollapsed ? 'Afficher la barre d’outils' : 'Masquer la barre d’outils');
+            toolbarToggleBtn.setAttribute('aria-label', isCollapsed ? 'Afficher la barre d’outils' : 'Masquer la barre d’outils');
+        });
+    }
+
     // Sélecteur de format de paragraphe
     formatSelect.addEventListener('change', (e) => {
         const format = e.target.value;
@@ -931,16 +940,18 @@ async function initEditor() {
     editor.addEventListener('focus', saveEditorSelection);
 
     // Bouton Enregistrer : enregistre dans la colonne "Mes articles" (mise à jour ou création)
-    saveBtn.addEventListener('click', async () => {
-        const subject = articleSubject.value.trim();
-        if (!subject) {
-            showStatus('\u26a0\ufe0f Veuillez saisir un objet pour l\'article', 'error');
-            return;
-        }
-        await saveArticleToList(subject, editor.innerHTML);
-        markAsSaved();
-        showStatus('\u2713 Article enregistr\u00e9 dans "Mes articles"', 'success');
-    });
+    if (saveBtn) {
+        saveBtn.addEventListener('click', async () => {
+            const subject = articleSubject.value.trim();
+            if (!subject) {
+                showStatus('\u26a0\ufe0f Veuillez saisir un objet pour l\'article', 'error');
+                return;
+            }
+            await saveArticleToList(subject, editor.innerHTML);
+            markAsSaved();
+            showStatus('\u2713 Article enregistr\u00e9 dans "Mes articles"', 'success');
+        });
+    }
 
     // Bouton Enregistrer sous : export .txt / .docx sur le PC
     if (saveAsBtn) {

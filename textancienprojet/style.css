@@ -816,6 +816,27 @@ body.dark-mode .article-card-delete:hover {
     margin-left: 0;
 }
 
+.toolbar-toggle-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.12);
+    color: var(--editor-text-primary);
+    transition: background 0.2s ease;
+}
+
+.toolbar-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.09);
+}
+
+.editor-toolbar.collapsed {
+    padding-top: 0.3rem;
+    padding-bottom: 0.3rem;
+    justify-content: flex-end;
+}
+
+.editor-toolbar.collapsed > *:not(.toolbar-toggle-btn) {
+    display: none;
+}
+
 .organize-toolbar-btn:hover,
 .organize-toolbar-btn.active {
     background: var(--editor-accent-color);
