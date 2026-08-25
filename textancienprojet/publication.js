@@ -128,6 +128,8 @@ async function initEditor() {
     const globalSearchInput = document.getElementById('globalSearchInput');
     const searchResultsList = document.getElementById('searchResultsList');
     const cardsScreenList = document.getElementById('cardsScreenList');
+    const toolbarSearchInput = document.getElementById('toolbarSearchInput');
+    const toolbarSearchBtn = document.getElementById('toolbarSearchBtn');
     const textColor = document.getElementById('textColor');
     const bgColor = document.getElementById('bgColor');
         const textColorBtn = document.getElementById('textColorBtn');
@@ -649,6 +651,43 @@ async function initEditor() {
     const themeToggleBtn = document.getElementById('themeToggleBtn');
     if (themeToggleBtn) {
         themeToggleBtn.classList.toggle('is-dark', document.body.classList.contains('dark-mode'));
+    }
+
+    function triggerToolbarSearch() {
+        const query = (toolbarSearchInput?.value || '').trim();
+        if (!query) {
+            editor.focus();
+            return;
+        }
+
+        const found = window.find(query, false, false, false, false, false, false);
+        if (!found) {
+            const statusMessage = document.getElementById('statusMessage');
+            if (statusMessage) {
+                statusMessage.textContent = `Aucun résultat pour : "${query}"`;
+                statusMessage.classList.add('is-error');
+            }
+        } else {
+            const statusMessage = document.getElementById('statusMessage');
+            if (statusMessage) {
+                statusMessage.textContent = `Recherche : "${query}"`;
+                statusMessage.classList.remove('is-error');
+            }
+        }
+        editor.focus();
+    }
+
+    if (toolbarSearchBtn) {
+        toolbarSearchBtn.addEventListener('click', triggerToolbarSearch);
+    }
+
+    if (toolbarSearchInput) {
+        toolbarSearchInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                triggerToolbarSearch();
+            }
+        });
     }
 
     // Sélecteur de format de paragraphe
