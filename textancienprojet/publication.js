@@ -545,19 +545,21 @@ async function initEditor() {
         globalSearchInput.addEventListener('input', renderSearchResults);
     }
 
-    document.getElementById('themeLightBtn')?.addEventListener('click', () => {
-        document.body.classList.remove('dark-mode');
-        localStorage.setItem('scribouillart_dark_mode', 'false');
+    document.getElementById('themeToggleBtn')?.addEventListener('click', () => {
+        const isDarkMode = document.body.classList.toggle('dark-mode');
+        localStorage.setItem('scribouillart_dark_mode', String(isDarkMode));
         updateDarkModeIcons();
         setRoute('theme');
+        const toggleBtn = document.getElementById('themeToggleBtn');
+        if (toggleBtn) {
+            toggleBtn.classList.toggle('is-dark', isDarkMode);
+        }
     });
 
-    document.getElementById('themeDarkBtn')?.addEventListener('click', () => {
-        document.body.classList.add('dark-mode');
-        localStorage.setItem('scribouillart_dark_mode', 'true');
-        updateDarkModeIcons();
-        setRoute('theme');
-    });
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+    if (themeToggleBtn) {
+        themeToggleBtn.classList.toggle('is-dark', document.body.classList.contains('dark-mode'));
+    }
 
     // Sélecteur de format de paragraphe
     formatSelect.addEventListener('change', (e) => {
