@@ -662,6 +662,16 @@ async function initEditor() {
             return;
         }
 
+        editor.focus();
+
+        const selection = window.getSelection();
+        if (selection && editor.contains(selection.anchorNode)) {
+            const currentRange = selection.rangeCount ? selection.getRangeAt(0) : null;
+            if (currentRange && editor.contains(currentRange.startContainer)) {
+                currentRange.collapse(false);
+            }
+        }
+
         const found = window.find(query, false, false, false, false, false, false);
         if (!found) {
             const statusMessage = document.getElementById('statusMessage');
