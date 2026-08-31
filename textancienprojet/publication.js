@@ -654,8 +654,7 @@ async function initEditor() {
 
         if (isOpen && settingsContent) {
             requestAnimationFrame(() => {
-                const bottomGap = 28;
-                settingsContent.scrollTop = Math.max(0, settingsContent.scrollHeight - settingsContent.clientHeight + bottomGap);
+                settingsContent.scrollTop = 0;
             });
         }
     }
