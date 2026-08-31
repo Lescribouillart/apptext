@@ -1859,6 +1859,54 @@ body:not(.dark-mode) .add-icon-btn img {
     border-radius: 12px;
 }
 
+.licenses-panel {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 18px;
+    padding: 1.1rem 1rem;
+    color: var(--editor-text-primary);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+}
+
+.licenses-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    margin-bottom: 0.8rem;
+}
+
+.licenses-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    letter-spacing: -0.04em;
+}
+
+.licenses-header span {
+    color: var(--editor-text-secondary);
+    font-size: 0.95rem;
+}
+
+.licenses-body h4 {
+    margin: 0 0 0.8rem;
+    font-size: 1.05rem;
+}
+
+.licenses-body ul {
+    margin: 0 0 0.8rem;
+    padding-left: 1.25rem;
+    color: var(--editor-text-primary);
+    line-height: 1.7;
+}
+
+.licenses-body p {
+    margin: 0;
+    color: var(--editor-text-secondary);
+    line-height: 1.7;
+}
+
 .theme-screen {
     display: flex;
     align-items: center;

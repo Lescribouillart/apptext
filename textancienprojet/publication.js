@@ -540,6 +540,7 @@ async function initEditor() {
         editor: document.getElementById('screen-editor'),
         search: document.getElementById('screen-search'),
         theme: document.getElementById('screen-theme'),
+        licenses: document.getElementById('screen-licenses'),
         cards: document.getElementById('screen-cards'),
         music: document.getElementById('screen-music')
     };
@@ -768,38 +769,8 @@ async function initEditor() {
                 }
 
                 if (key === 'licenses') {
-                    const overlay = document.createElement('div');
-                    overlay.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.55); display:flex; align-items:center; justify-content:center; z-index:2000;';
-
-                    const modal = document.createElement('div');
-                    modal.style.cssText = 'width:min(90vw, 520px); max-height:80vh; overflow:auto; background:#1c1f27; border:1px solid rgba(255,255,255,0.08); border-radius:18px; box-shadow:0 20px 50px rgba(0,0,0,0.35); color:#f4f7fb; padding:24px 22px; font-family:Arial, "Segoe UI", sans-serif;';
-
-                    modal.innerHTML = `
-                        <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:16px;">
-                            <h3 style="margin:0; font-size:1.2rem; color:#f4f7fb;">Licences</h3>
-                            <button type="button" id="licensesCloseBtn" style="border:none; background:rgba(255,255,255,0.08); color:#fff; border-radius:10px; width:32px; height:32px; cursor:pointer; font-size:1.1rem;">×</button>
-                        </div>
-                        <div style="font-size:0.95rem; line-height:1.7; color:#dfe7f6; white-space:pre-line;">
-Text
-Version: 1.0.0
-
-Propriétés de la licence
-- Logiciel développé pour l’édition et la gestion de textes.
-- Utilisation locale et personnelle.
-- Certaines icônes et éléments visuels peuvent provenir de ressources tierces et restent soumis à leurs propres licences.
-
-Ce logiciel est fourni tel quel, sans garantie explicite ou implicite.
-                        </div>
-                    `;
-
-                    overlay.appendChild(modal);
-                    document.body.appendChild(overlay);
-
-                    const close = () => overlay.remove();
-                    modal.querySelector('#licensesCloseBtn')?.addEventListener('click', close);
-                    overlay.addEventListener('click', (event) => {
-                        if (event.target === overlay) close();
-                    });
+                    setSettingsOpen(false);
+                    setRoute('licenses');
                     return;
                 }
 
