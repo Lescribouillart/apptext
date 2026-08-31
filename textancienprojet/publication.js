@@ -541,6 +541,7 @@ async function initEditor() {
         search: document.getElementById('screen-search'),
         theme: document.getElementById('screen-theme'),
         licenses: document.getElementById('screen-licenses'),
+        updates: document.getElementById('screen-updates'),
         cards: document.getElementById('screen-cards'),
         music: document.getElementById('screen-music')
     };
@@ -550,6 +551,7 @@ async function initEditor() {
     const settingsBtn = document.querySelector('.settings-btn');
     const settingsContent = document.querySelector('.settings-content');
     const licensesBackBtn = document.getElementById('licensesBackBtn');
+    const updatesBackBtn = document.getElementById('updatesBackBtn');
 
     const settingsState = {
         spellcheck: true,
@@ -652,16 +654,7 @@ async function initEditor() {
         const updateBtn = document.querySelector('[data-setting="updates"]');
         if (!updateBtn) return;
 
-        const updateStatus = localStorage.getItem('textplaystore_update_status') || 'up-to-date';
-        const label = updateStatus === 'available' ? 'Disponible' : 'À jour';
-        const statusLabel = updateBtn.querySelector('.update-status-label');
-
-        if (statusLabel) {
-            statusLabel.textContent = label;
-            return;
-        }
-
-        updateBtn.innerHTML = `${label} <span>›</span>`;
+        updateBtn.innerHTML = '<span>›</span>';
     }
 
     function checkForAppUpdate() {
@@ -819,11 +812,8 @@ async function initEditor() {
                 }
 
                 if (key === 'updates') {
-                    const status = checkForAppUpdate();
-                    const message = status === 'available'
-                        ? 'Une mise à jour est disponible dans le Play Store.'
-                        : 'Votre application est à jour.';
-                    window.alert(message);
+                    setSettingsOpen(false);
+                    setRoute('updates');
                     return;
                 }
 
@@ -847,6 +837,11 @@ async function initEditor() {
     });
 
     licensesBackBtn?.addEventListener('click', () => {
+        setRoute('editor');
+        setSettingsOpen(true);
+    });
+
+    updatesBackBtn?.addEventListener('click', () => {
         setRoute('editor');
         setSettingsOpen(true);
     });
@@ -985,6 +980,19 @@ async function initEditor() {
         applySettingsState();
     }
 
+    function refreshUpdatesScreen() {
+        const statusValue = document.getElementById('updatesStatusValue');
+        const updatesStateText = document.getElementById('updatesStateText');
+        if (!statusValue || !updatesStateText) return;
+
+        const status = checkForAppUpdate();
+        const isAvailable = status === 'available';
+        statusValue.textContent = isAvailable ? 'Disponible' : 'À jour';
+        updatesStateText.textContent = isAvailable
+            ? 'Une mise à jour est disponible dans le Play Store.'
+            : 'Votre application est à jour.';
+    }
+
     dyslexiaToggleBtn?.addEventListener('click', () => {
         const enabled = localStorage.getItem('textplaystore_dyslexia_mode') === 'true';
         const nextState = !enabled;
@@ -994,6 +1002,7 @@ async function initEditor() {
     });
 
     applyDyslexiaMode();
+    refreshUpdatesScreen();
 
     function triggerToolbarSearch() {
         const query = (toolbarSearchInput?.value || '').trim();

@@ -1879,7 +1879,8 @@ body:not(.dark-mode) .add-icon-btn img {
     border-radius: 12px;
 }
 
-.licenses-panel {
+.licenses-panel,
+.updates-panel {
     background: rgba(255,255,255,0.03);
     border: 1px solid rgba(255,255,255,0.08);
     border-radius: 18px;
@@ -1888,7 +1889,8 @@ body:not(.dark-mode) .add-icon-btn img {
     box-shadow: 0 10px 30px rgba(0,0,0,0.18);
 }
 
-.licenses-header {
+.licenses-header,
+.updates-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -1898,33 +1900,44 @@ body:not(.dark-mode) .add-icon-btn img {
     margin-bottom: 0.8rem;
 }
 
-.licenses-header h3 {
+.licenses-header h3,
+.updates-header h3 {
     margin: 0;
     font-size: 1.5rem;
     letter-spacing: -0.04em;
 }
 
-.licenses-header span {
+.licenses-header span,
+.updates-header span {
     color: var(--editor-text-secondary);
     font-size: 0.95rem;
 }
 
-.licenses-body h4 {
+.licenses-body h4,
+.updates-body h4 {
     margin: 0 0 0.8rem;
     font-size: 1.05rem;
 }
 
-.licenses-body ul {
+.licenses-body ul,
+.updates-body ul {
     margin: 0 0 0.8rem;
     padding-left: 1.25rem;
     color: var(--editor-text-primary);
     line-height: 1.7;
 }
 
-.licenses-body p {
+.licenses-body p,
+.updates-body p {
     margin: 0;
     color: var(--editor-text-secondary);
     line-height: 1.7;
+}
+
+.updates-state {
+    color: var(--editor-text-primary);
+    font-size: 1.05rem;
+    margin-bottom: 0.6rem !important;
 }
 
 .theme-screen {
