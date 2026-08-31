@@ -865,6 +865,25 @@ async function initEditor() {
         themeToggleBtn.classList.toggle('is-dark', document.body.classList.contains('dark-mode'));
     }
 
+    const dyslexiaToggleBtn = document.getElementById('dyslexiaToggleBtn');
+    function applyDyslexiaMode() {
+        const enabled = localStorage.getItem('textplaystore_dyslexia_mode') === 'true';
+        document.body.classList.toggle('dyslexia-mode', enabled);
+        if (dyslexiaToggleBtn) {
+            dyslexiaToggleBtn.setAttribute('aria-pressed', String(enabled));
+            dyslexiaToggleBtn.setAttribute('aria-label', enabled ? 'Désactiver le mode dyslexie' : 'Activer le mode dyslexie');
+        }
+    }
+
+    dyslexiaToggleBtn?.addEventListener('click', () => {
+        const enabled = localStorage.getItem('textplaystore_dyslexia_mode') === 'true';
+        const nextState = !enabled;
+        localStorage.setItem('textplaystore_dyslexia_mode', String(nextState));
+        applyDyslexiaMode();
+    });
+
+    applyDyslexiaMode();
+
     function triggerToolbarSearch() {
         const query = (toolbarSearchInput?.value || '').trim();
         if (!query) {
