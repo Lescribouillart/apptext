@@ -549,6 +549,7 @@ async function initEditor() {
     const settingsCloseBtn = document.getElementById('settingsCloseBtn');
     const settingsBtn = document.querySelector('.settings-btn');
     const settingsContent = document.querySelector('.settings-content');
+    const licensesBackBtn = document.getElementById('licensesBackBtn');
 
     const settingsState = {
         spellcheck: true,
@@ -791,6 +792,11 @@ async function initEditor() {
 
     settingsBtn?.addEventListener('click', () => {
         setSettingsOpen(true);
+    });
+
+    licensesBackBtn?.addEventListener('click', () => {
+        setSettingsOpen(true);
+        setRoute('editor');
     });
 
     settingsCloseBtn?.addEventListener('click', () => {

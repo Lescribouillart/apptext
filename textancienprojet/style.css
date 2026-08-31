@@ -1783,6 +1783,26 @@ body:not(.dark-mode) .add-icon-btn img {
     border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
+.screen-header-with-back {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+}
+
+.screen-back-btn {
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.04);
+    color: var(--editor-text-primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
 .screen-header h2 {
     font-size: 1.8rem;
     letter-spacing: -0.04em;
