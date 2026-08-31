@@ -593,9 +593,18 @@ async function initEditor() {
     function syncThemeLabel() {
         const themeBtn = document.querySelector('[data-setting="theme"]');
         if (!themeBtn) return;
-        const state = getSettings();
-        const themeName = state.theme === 'light' ? 'Clair' : 'Sombre';
+        const isDarkMode = document.body.classList.contains('dark-mode');
+        const themeName = isDarkMode ? 'Sombre' : 'Clair';
         themeBtn.innerHTML = `${themeName} <span>›</span>`;
+    }
+
+    function syncThemeControls() {
+        const isDarkMode = document.body.classList.contains('dark-mode');
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        if (themeToggleBtn) {
+            themeToggleBtn.classList.toggle('is-dark', isDarkMode);
+        }
+        syncThemeLabel();
     }
 
     function syncFontSizeLabel() {
@@ -642,6 +651,7 @@ async function initEditor() {
         document.body.classList.toggle('light-mode', state.theme === 'light');
         document.body.classList.toggle('dyslexia-mode', localStorage.getItem('textplaystore_dyslexia_mode') === 'true' || !!state.dyslexia);
         localStorage.setItem('scribouillart_dark_mode', String(state.theme === 'dark'));
+        syncThemeControls();
 
         const editor = document.getElementById('editor');
         if (editor) {
@@ -891,15 +901,11 @@ async function initEditor() {
     }
 
     document.getElementById('themeToggleBtn')?.addEventListener('click', () => {
-        const isDarkMode = document.body.classList.toggle('dark-mode');
-        document.body.classList.toggle('light-mode', !isDarkMode);
-        localStorage.setItem('scribouillart_dark_mode', String(isDarkMode));
+        const nextTheme = document.body.classList.contains('dark-mode') ? 'light' : 'dark';
+        saveSettings({ theme: nextTheme });
+        applySettingsState();
         updateDarkModeIcons();
         setRoute('theme');
-        const toggleBtn = document.getElementById('themeToggleBtn');
-        if (toggleBtn) {
-            toggleBtn.classList.toggle('is-dark', isDarkMode);
-        }
     });
 
     const themeToggleBtn = document.getElementById('themeToggleBtn');
