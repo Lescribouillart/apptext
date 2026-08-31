@@ -752,6 +752,8 @@ async function initEditor() {
     });
 
     function setRoute(route) {
+        setSettingsOpen(false);
+
         Object.entries(appScreens).forEach(([key, screen]) => {
             if (!screen) return;
             screen.classList.toggle('active', key === route);

@@ -573,12 +573,13 @@ body.editor-page .sidebar.open {
     position: fixed;
     inset: 0;
     background: rgba(10, 12, 16, 0.82);
-    z-index: 1200;
+    z-index: 1000;
     display: flex;
     align-items: stretch;
     justify-content: center;
     opacity: 1;
     visibility: visible;
+    pointer-events: auto;
     transition: opacity 0.2s ease, visibility 0.2s ease;
 }
 
@@ -601,6 +602,7 @@ body.editor-page .sidebar.open {
     flex-direction: column;
     max-height: 100vh;
     overflow: hidden;
+    pointer-events: auto;
 }
 
 body.light-mode .settings-panel {
