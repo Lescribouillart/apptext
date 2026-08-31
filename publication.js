@@ -654,7 +654,7 @@ async function initEditor() {
         const updateBtn = document.querySelector('[data-setting="updates"]');
         if (!updateBtn) return;
 
-        updateBtn.innerHTML = '<span>›</span>';
+        updateBtn.innerHTML = '<span class="settings-label">Mises à jour</span><span class="settings-arrow">›</span>';
     }
 
     function checkForAppUpdate() {
