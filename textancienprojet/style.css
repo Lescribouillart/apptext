@@ -594,16 +594,22 @@ body.editor-page .sidebar.open {
     border-right: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.03);
     color: #f3f4f6;
-    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    max-height: 100vh;
 }
 
 .settings-header {
+    position: sticky;
+    top: 0;
+    z-index: 2;
     display: flex;
     align-items: center;
     gap: 0.75rem;
     padding: 1rem 1rem 0.9rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    background: rgba(255, 255, 255, 0.01);
+    background: rgba(25, 27, 33, 0.98);
+    backdrop-filter: blur(8px);
 }
 
 .settings-back-btn {
@@ -632,6 +638,8 @@ body.editor-page .sidebar.open {
 
 .settings-content {
     padding: 0.9rem 0.9rem 2rem;
+    overflow-y: auto;
+    flex: 1 1 auto;
 }
 
 .settings-group {
