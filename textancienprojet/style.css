@@ -640,13 +640,14 @@ body.editor-page .sidebar.open {
 }
 
 .settings-content {
-    padding: 0.9rem 0.9rem 2rem;
+    padding: 0.9rem 0.9rem calc(3.5rem + env(safe-area-inset-bottom));
     flex: 1 1 auto;
     min-height: 0;
     overflow-y: auto;
     overscroll-behavior: contain;
     scrollbar-width: thin;
     scrollbar-color: rgba(255,255,255,0.2) transparent;
+    scroll-padding-bottom: 3rem;
 }
 
 .settings-content::-webkit-scrollbar {
@@ -773,6 +774,10 @@ body.editor-page .sidebar.open {
 .settings-meta {
     color: rgba(255, 255, 255, 0.72);
     font-size: 0.95rem;
+}
+
+.settings-group-footer {
+    padding-bottom: 1rem;
 }
 
 .settings-group-footer .settings-value {

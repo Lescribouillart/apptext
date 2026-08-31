@@ -547,12 +547,20 @@ async function initEditor() {
     const settingsOverlay = document.getElementById('settingsOverlay');
     const settingsCloseBtn = document.getElementById('settingsCloseBtn');
     const settingsBtn = document.querySelector('.settings-btn');
+    const settingsContent = document.querySelector('.settings-content');
 
     function setSettingsOpen(isOpen) {
         if (!settingsOverlay) return;
         settingsOverlay.classList.toggle('hidden', !isOpen);
         settingsOverlay.setAttribute('aria-hidden', String(!isOpen));
         document.body.classList.toggle('settings-open', isOpen);
+
+        if (isOpen && settingsContent) {
+            requestAnimationFrame(() => {
+                const bottomGap = 28;
+                settingsContent.scrollTop = Math.max(0, settingsContent.scrollHeight - settingsContent.clientHeight + bottomGap);
+            });
+        }
     }
 
     settingsBtn?.addEventListener('click', () => {
