@@ -287,6 +287,7 @@ body.dark-mode {
     --editor-accent-hover: #4a8ec2;
 }
 
+body.light-mode,
 body:not(.dark-mode) {
     --editor-bg-primary: #f5f7fa;
     --editor-bg-secondary: #ffffff;
@@ -600,6 +601,62 @@ body.editor-page .sidebar.open {
     flex-direction: column;
     max-height: 100vh;
     overflow: hidden;
+}
+
+body.light-mode .settings-panel {
+    background: linear-gradient(180deg, rgba(245, 247, 250, 0.98) 0%, rgba(233, 238, 244, 0.98) 100%);
+    border-left-color: rgba(15, 23, 42, 0.08);
+    border-right-color: rgba(15, 23, 42, 0.08);
+    box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.04);
+    color: #1f2937;
+}
+
+body.light-mode .settings-header {
+    background: rgba(255, 255, 255, 0.72);
+    border-bottom-color: rgba(15, 23, 42, 0.08);
+}
+
+body.light-mode .settings-back-btn {
+    color: #1f2937;
+}
+
+body.light-mode .settings-back-btn:hover {
+    background: rgba(15, 23, 42, 0.06);
+}
+
+body.light-mode .settings-header h2,
+body.light-mode .settings-label,
+body.light-mode .settings-value,
+body.light-mode .settings-value span {
+    color: #1f2937;
+}
+
+body.light-mode .settings-group h3 {
+    color: rgba(31, 41, 55, 0.58);
+}
+
+body.light-mode .settings-hint {
+    color: rgba(31, 41, 55, 0.62);
+}
+
+body.light-mode .settings-row {
+    background: rgba(255, 255, 255, 0.28);
+}
+
+body.light-mode .settings-group + .settings-group {
+    border-top-color: rgba(15, 23, 42, 0.08);
+}
+
+body.light-mode .settings-content::-webkit-scrollbar-thumb {
+    background: rgba(31, 41, 55, 0.26);
+}
+
+body.light-mode .switch {
+    background: rgba(15, 23, 42, 0.15);
+}
+
+body.light-mode .switch.is-on {
+    background: #5fa7ff;
 }
 
 .settings-header {

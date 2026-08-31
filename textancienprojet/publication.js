@@ -848,6 +848,7 @@ async function initEditor() {
 
     document.getElementById('themeToggleBtn')?.addEventListener('click', () => {
         const isDarkMode = document.body.classList.toggle('dark-mode');
+        document.body.classList.toggle('light-mode', !isDarkMode);
         localStorage.setItem('scribouillart_dark_mode', String(isDarkMode));
         updateDarkModeIcons();
         setRoute('theme');
@@ -1519,6 +1520,7 @@ async function initEditor() {
     function toggleDarkMode() {
         const body = document.body;
         const isDarkMode = body.classList.toggle('dark-mode');
+        body.classList.toggle('light-mode', !isDarkMode);
         updateDarkModeIcons();
         localStorage.setItem('scribouillart_dark_mode', isDarkMode ? 'true' : 'false');
     }
@@ -1529,9 +1531,8 @@ async function initEditor() {
     function loadDarkModePreference() {
         const isDarkMode = localStorage.getItem('scribouillart_dark_mode') === 'true';
 
-        if (isDarkMode) {
-            document.body.classList.add('dark-mode');
-        }
+        document.body.classList.toggle('dark-mode', isDarkMode);
+        document.body.classList.toggle('light-mode', !isDarkMode);
 
         updateDarkModeIcons();
     }
