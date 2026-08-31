@@ -529,11 +529,47 @@ body.editor-page .sidebar.open {
     position: relative;
 }
 
+.header-inner {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 82px;
+}
+
 .header-brand-block {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 0.45rem;
+    z-index: 1;
+}
+
+.settings-btn {
+    position: absolute;
+    right: 0.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 42px;
+    height: 40px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.12);
+    color: #f5f7fa;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.settings-btn:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.9);
+    outline-offset: 2px;
+}
+
+.settings-btn svg {
+    display: block;
 }
 
 .header-brand {
