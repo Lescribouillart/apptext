@@ -2023,11 +2023,13 @@ body:not(.dark-mode) .add-icon-btn img {
 .dyslexia-toggle-icon-off {
     left: 28px;
     opacity: 1;
+    visibility: visible;
 }
 
 .dyslexia-toggle-icon-on {
     right: 28px;
-    opacity: 0.7;
+    opacity: 0;
+    visibility: hidden;
 }
 
 .dyslexia-toggle[aria-pressed="true"] .dyslexia-toggle-track {
@@ -2042,11 +2044,13 @@ body:not(.dark-mode) .add-icon-btn img {
 }
 
 .dyslexia-toggle[aria-pressed="true"] .dyslexia-toggle-icon-off {
-    opacity: 0.7;
+    opacity: 0.5;
+    visibility: visible;
 }
 
 .dyslexia-toggle[aria-pressed="true"] .dyslexia-toggle-icon-on {
     opacity: 1;
+    visibility: visible;
 }
 
 body.dark-mode .dyslexia-toggle-track {
