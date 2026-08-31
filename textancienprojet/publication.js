@@ -795,8 +795,8 @@ async function initEditor() {
     });
 
     licensesBackBtn?.addEventListener('click', () => {
-        setSettingsOpen(true);
         setRoute('editor');
+        setSettingsOpen(true);
     });
 
     settingsCloseBtn?.addEventListener('click', () => {
