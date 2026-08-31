@@ -549,6 +549,103 @@ async function initEditor() {
     const settingsBtn = document.querySelector('.settings-btn');
     const settingsContent = document.querySelector('.settings-content');
 
+    const settingsState = {
+        spellcheck: true,
+        lineNumbers: false,
+        wrap: true,
+        autoSave: true,
+        defaultFormat: '.txt',
+        theme: 'dark',
+        fontSize: '14px',
+        fontFamily: 'System Sans-Serif',
+        updateLabels: {
+            theme: 'Sombre',
+            fontSize: 'Moyenne (14px)',
+            fontFamily: 'System Sans-Serif',
+            defaultFormat: '.txt'
+        }
+    };
+
+    function getSettings() {
+        try {
+            const saved = JSON.parse(localStorage.getItem('textplaystore_settings') || '{}');
+            return { ...settingsState, ...saved };
+        } catch (error) {
+            return { ...settingsState };
+        }
+    }
+
+    function saveSettings(nextState) {
+        const merged = { ...getSettings(), ...nextState };
+        localStorage.setItem('textplaystore_settings', JSON.stringify(merged));
+        return merged;
+    }
+
+    function syncThemeLabel() {
+        const themeBtn = document.querySelector('[data-setting="theme"]');
+        if (!themeBtn) return;
+        const state = getSettings();
+        const themeName = state.theme === 'light' ? 'Clair' : 'Sombre';
+        themeBtn.innerHTML = `${themeName} <span>›</span>`;
+    }
+
+    function syncFontSizeLabel() {
+        const fontSizeBtn = document.querySelector('[data-setting="font-size"]');
+        if (!fontSizeBtn) return;
+        const state = getSettings();
+        const value = state.fontSize || '14px';
+        const label = value === '12px' ? 'Petite (12px)' : value === '16px' ? 'Grande (16px)' : 'Moyenne (14px)';
+        fontSizeBtn.innerHTML = `${label} <span>›</span>`;
+    }
+
+    function syncFontFamilyLabel() {
+        const fontFamilyBtn = document.querySelector('[data-setting="font-family"]');
+        if (!fontFamilyBtn) return;
+        const state = getSettings();
+        const value = state.fontFamily || 'System Sans-Serif';
+        fontFamilyBtn.innerHTML = `${value} <span>›</span>`;
+    }
+
+    function syncDefaultFormatLabel() {
+        const formatBtn = document.querySelector('[data-setting="defaultFormat"]');
+        if (!formatBtn) return;
+        const state = getSettings();
+        formatBtn.innerHTML = `${state.defaultFormat || '.txt'} <span>›</span>`;
+    }
+
+    function applySettingsState() {
+        const state = getSettings();
+
+        document.querySelectorAll('.switch[data-setting]').forEach((button) => {
+            const name = button.dataset.setting;
+            const on = !!state[name];
+            button.classList.toggle('is-on', on);
+            button.setAttribute('aria-pressed', String(on));
+            button.setAttribute('aria-label', on ? `Désactiver ${button.dataset.setting}` : `Activer ${button.dataset.setting}`);
+        });
+
+        syncThemeLabel();
+        syncFontSizeLabel();
+        syncFontFamilyLabel();
+        syncDefaultFormatLabel();
+
+        document.body.classList.toggle('dark-mode', state.theme === 'dark');
+        document.body.classList.toggle('light-mode', state.theme === 'light');
+        localStorage.setItem('scribouillart_dark_mode', String(state.theme === 'dark'));
+
+        const editor = document.getElementById('editor');
+        if (editor) {
+            editor.style.whiteSpace = state.wrap ? 'normal' : 'pre-wrap';
+            editor.setAttribute('spellcheck', String(!!state.spellcheck));
+        }
+
+        if (state.lineNumbers) {
+            document.body.classList.add('show-line-numbers');
+        } else {
+            document.body.classList.remove('show-line-numbers');
+        }
+    }
+
     function setSettingsOpen(isOpen) {
         if (!settingsOverlay) return;
         settingsOverlay.classList.toggle('hidden', !isOpen);
@@ -562,6 +659,78 @@ async function initEditor() {
             });
         }
     }
+
+    function bindSettingsControls() {
+        document.querySelectorAll('.switch[data-setting]').forEach((button) => {
+            button.onclick = (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                const key = button.dataset.setting;
+                const state = getSettings();
+                const nextValue = !state[key];
+                saveSettings({ [key]: nextValue });
+                applySettingsState();
+            };
+        });
+
+        document.querySelectorAll('[data-setting]').forEach((button) => {
+            if (button.classList.contains('switch')) return;
+
+            button.onclick = (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                const key = button.dataset.setting;
+                const state = getSettings();
+
+                if (key === 'theme') {
+                    const nextTheme = state.theme === 'dark' ? 'light' : 'dark';
+                    saveSettings({ theme: nextTheme });
+                    applySettingsState();
+                    return;
+                }
+
+                if (key === 'font-size') {
+                    const sizes = ['12px', '14px', '16px'];
+                    const current = state.fontSize || '14px';
+                    const next = sizes[(sizes.indexOf(current) + 1) % sizes.length];
+                    saveSettings({ fontSize: next });
+                    applySettingsState();
+                    return;
+                }
+
+                if (key === 'font-family') {
+                    const fonts = ['System Sans-Serif', 'Georgia', 'Courier New'];
+                    const current = state.fontFamily || 'System Sans-Serif';
+                    const next = fonts[(fonts.indexOf(current) + 1) % fonts.length];
+                    saveSettings({ fontFamily: next });
+                    applySettingsState();
+                    return;
+                }
+
+                if (key === 'defaultFormat') {
+                    const formats = ['.txt', '.md', '.html'];
+                    const current = state.defaultFormat || '.txt';
+                    const next = formats[(formats.indexOf(current) + 1) % formats.length];
+                    saveSettings({ defaultFormat: next });
+                    applySettingsState();
+                    return;
+                }
+
+                const labels = {
+                    licenses: 'Licences du logiciel',
+                    updates: 'Aucune mise à jour disponible',
+                    shortcuts: 'Ctrl+B : gras • Ctrl+I : italique • Ctrl+K : lien'
+                };
+
+                if (labels[key]) {
+                    window.alert(labels[key]);
+                }
+            };
+        });
+    }
+
+    bindSettingsControls();
+    applySettingsState();
 
     settingsBtn?.addEventListener('click', () => {
         setSettingsOpen(true);

@@ -60,21 +60,21 @@
                             <span class="settings-label">Thème</span>
                             <span class="settings-hint">Choisir l'apparence visuelle</span>
                         </div>
-                        <button class="settings-value" type="button">Sombre <span>›</span></button>
+                        <button class="settings-value" type="button" data-setting="theme">Sombre <span>›</span></button>
                     </div>
                     <div class="settings-row">
                         <div class="settings-label-block">
                             <span class="settings-label">Taille du texte</span>
                             <span class="settings-hint">Ajuster la taille de la police dans l'éditeur</span>
                         </div>
-                        <button class="settings-value" type="button">Moyenne (14px) <span>›</span></button>
+                        <button class="settings-value" type="button" data-setting="font-size">Moyenne (14px) <span>›</span></button>
                     </div>
                     <div class="settings-row">
                         <div class="settings-label-block">
                             <span class="settings-label">Police d'écriture</span>
                             <span class="settings-hint">Police utilisée pour le texte</span>
                         </div>
-                        <button class="settings-value" type="button">System Sans-Serif <span>›</span></button>
+                        <button class="settings-value" type="button" data-setting="font-family">System Sans-Serif <span>›</span></button>
                     </div>
                 </section>
 
@@ -85,7 +85,7 @@
                             <span class="settings-label">Correcteur orthographique</span>
                             <span class="settings-hint">Surlignez les fautes de frappe</span>
                         </div>
-                        <button class="switch is-on" type="button" aria-label="Activer le correcteur orthographique">
+                        <button class="switch is-on" type="button" data-setting="spellcheck" aria-label="Activer le correcteur orthographique">
                             <span class="switch-thumb"></span>
                         </button>
                     </div>
@@ -94,7 +94,7 @@
                             <span class="settings-label">Numéros de ligne</span>
                             <span class="settings-hint">Afficher l'index des lignes à gauche</span>
                         </div>
-                        <button class="switch" type="button" aria-label="Activer les numéros de ligne">
+                        <button class="switch" type="button" data-setting="lineNumbers" aria-label="Activer les numéros de ligne">
                             <span class="switch-thumb"></span>
                         </button>
                     </div>
@@ -103,7 +103,7 @@
                             <span class="settings-label">Retour à la ligne automatique</span>
                             <span class="settings-hint">Adapter le texte à la largeur de l'écran</span>
                         </div>
-                        <button class="switch is-on" type="button" aria-label="Activer le retour à la ligne automatique">
+                        <button class="switch is-on" type="button" data-setting="wrap" aria-label="Activer le retour à la ligne automatique">
                             <span class="switch-thumb"></span>
                         </button>
                     </div>
@@ -116,7 +116,7 @@
                             <span class="settings-label">Sauvegarde automatique</span>
                             <span class="settings-hint">Enregistrer à chaque modification</span>
                         </div>
-                        <button class="switch is-on" type="button" aria-label="Activer la sauvegarde automatique">
+                        <button class="switch is-on" type="button" data-setting="autoSave" aria-label="Activer la sauvegarde automatique">
                             <span class="switch-thumb"></span>
                         </button>
                     </div>
@@ -125,7 +125,7 @@
                             <span class="settings-label">Format par défaut</span>
                             <span class="settings-hint">Extension par défaut des nouveaux fichiers</span>
                         </div>
-                        <button class="settings-value" type="button">.txt <span>›</span></button>
+                        <button class="settings-value" type="button" data-setting="defaultFormat">.txt <span>›</span></button>
                     </div>
                 </section>
 
@@ -139,19 +139,19 @@
                         <div class="settings-label-block">
                             <span class="settings-label">Licences</span>
                         </div>
-                        <button class="settings-value" type="button"><span>›</span></button>
+                        <button class="settings-value" type="button" data-setting="licenses"><span>›</span></button>
                     </div>
                     <div class="settings-row info-row">
                         <div class="settings-label-block">
                             <span class="settings-label">Mises à jour</span>
                         </div>
-                        <button class="settings-value" type="button">Disponible <span>›</span></button>
+                        <button class="settings-value" type="button" data-setting="updates">Disponible <span>›</span></button>
                     </div>
                     <div class="settings-row info-row">
                         <div class="settings-label-block">
                             <span class="settings-label">Raccourcis clavier</span>
                         </div>
-                        <button class="settings-value" type="button"><span>›</span></button>
+                        <button class="settings-value" type="button" data-setting="shortcuts"><span>›</span></button>
                     </div>
                 </section>
             </div>
