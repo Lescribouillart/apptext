@@ -633,6 +633,48 @@ async function initEditor() {
         formatBtn.innerHTML = `${state.defaultFormat || '.txt'} <span>›</span>`;
     }
 
+    function compareVersions(currentVersion, latestVersion) {
+        const current = String(currentVersion || '0.0.0').split('.').map(Number);
+        const latest = String(latestVersion || '0.0.0').split('.').map(Number);
+        const length = Math.max(current.length, latest.length);
+
+        for (let i = 0; i < length; i += 1) {
+            const a = current[i] || 0;
+            const b = latest[i] || 0;
+            if (a < b) return -1;
+            if (a > b) return 1;
+        }
+
+        return 0;
+    }
+
+    function syncUpdateStatusLabel() {
+        const updateBtn = document.querySelector('[data-setting="updates"]');
+        if (!updateBtn) return;
+
+        const updateStatus = localStorage.getItem('textplaystore_update_status') || 'up-to-date';
+        const label = updateStatus === 'available' ? 'Disponible' : 'À jour';
+        const statusLabel = updateBtn.querySelector('.update-status-label');
+
+        if (statusLabel) {
+            statusLabel.textContent = label;
+            return;
+        }
+
+        updateBtn.innerHTML = `${label} <span>›</span>`;
+    }
+
+    function checkForAppUpdate() {
+        const currentVersion = '1.0.0';
+        const latestKnownVersion = localStorage.getItem('textplaystore_latest_version') || currentVersion;
+        const status = compareVersions(currentVersion, latestKnownVersion) < 0 ? 'available' : 'up-to-date';
+
+        localStorage.setItem('textplaystore_update_status', status);
+        localStorage.setItem('textplaystore_latest_version', latestKnownVersion);
+        syncUpdateStatusLabel();
+        return status;
+    }
+
     function applySettingsState() {
         const state = getSettings();
 
@@ -648,6 +690,7 @@ async function initEditor() {
         syncFontSizeLabel();
         syncFontFamilyLabel();
         syncDefaultFormatLabel();
+        syncUpdateStatusLabel();
 
         document.body.classList.toggle('dark-mode', state.theme === 'dark');
         document.body.classList.toggle('light-mode', state.theme === 'light');
@@ -775,8 +818,16 @@ async function initEditor() {
                     return;
                 }
 
+                if (key === 'updates') {
+                    const status = checkForAppUpdate();
+                    const message = status === 'available'
+                        ? 'Une mise à jour est disponible dans le Play Store.'
+                        : 'Votre application est à jour.';
+                    window.alert(message);
+                    return;
+                }
+
                 const labels = {
-                    updates: 'Aucune mise à jour disponible',
                     shortcuts: 'Ctrl+B : gras • Ctrl+I : italique • Ctrl+K : lien'
                 };
 
@@ -787,6 +838,7 @@ async function initEditor() {
         });
     }
 
+    checkForAppUpdate();
     bindSettingsControls();
     applySettingsState();
 
