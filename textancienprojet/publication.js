@@ -544,6 +544,37 @@ async function initEditor() {
         music: document.getElementById('screen-music')
     };
 
+    const settingsOverlay = document.getElementById('settingsOverlay');
+    const settingsCloseBtn = document.getElementById('settingsCloseBtn');
+    const settingsBtn = document.querySelector('.settings-btn');
+
+    function setSettingsOpen(isOpen) {
+        if (!settingsOverlay) return;
+        settingsOverlay.classList.toggle('hidden', !isOpen);
+        settingsOverlay.setAttribute('aria-hidden', String(!isOpen));
+        document.body.classList.toggle('settings-open', isOpen);
+    }
+
+    settingsBtn?.addEventListener('click', () => {
+        setSettingsOpen(true);
+    });
+
+    settingsCloseBtn?.addEventListener('click', () => {
+        setSettingsOpen(false);
+    });
+
+    settingsOverlay?.addEventListener('click', (event) => {
+        if (event.target === settingsOverlay) {
+            setSettingsOpen(false);
+        }
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && settingsOverlay && !settingsOverlay.classList.contains('hidden')) {
+            setSettingsOpen(false);
+        }
+    });
+
     function setRoute(route) {
         Object.entries(appScreens).forEach(([key, screen]) => {
             if (!screen) return;
