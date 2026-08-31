@@ -556,6 +556,7 @@ async function initEditor() {
         autoSave: true,
         defaultFormat: '.txt',
         theme: 'dark',
+        dyslexia: localStorage.getItem('textplaystore_dyslexia_mode') === 'true',
         fontSize: '14px',
         fontFamily: 'System Sans-Serif',
         updateLabels: {
@@ -569,14 +570,22 @@ async function initEditor() {
     function getSettings() {
         try {
             const saved = JSON.parse(localStorage.getItem('textplaystore_settings') || '{}');
-            return { ...settingsState, ...saved };
+            const dyslexiaMode = localStorage.getItem('textplaystore_dyslexia_mode') === 'true';
+            return {
+                ...settingsState,
+                ...saved,
+                dyslexia: saved.dyslexia !== undefined ? !!saved.dyslexia : dyslexiaMode
+            };
         } catch (error) {
-            return { ...settingsState };
+            return { ...settingsState, dyslexia: localStorage.getItem('textplaystore_dyslexia_mode') === 'true' };
         }
     }
 
     function saveSettings(nextState) {
         const merged = { ...getSettings(), ...nextState };
+        if (Object.prototype.hasOwnProperty.call(nextState, 'dyslexia')) {
+            localStorage.setItem('textplaystore_dyslexia_mode', String(!!nextState.dyslexia));
+        }
         localStorage.setItem('textplaystore_settings', JSON.stringify(merged));
         return merged;
     }
@@ -618,7 +627,7 @@ async function initEditor() {
 
         document.querySelectorAll('.switch[data-setting]').forEach((button) => {
             const name = button.dataset.setting;
-            const on = !!state[name];
+            const on = name === 'dyslexia' ? (localStorage.getItem('textplaystore_dyslexia_mode') === 'true' || !!state.dyslexia) : !!state[name];
             button.classList.toggle('is-on', on);
             button.setAttribute('aria-pressed', String(on));
             button.setAttribute('aria-label', on ? `Désactiver ${button.dataset.setting}` : `Activer ${button.dataset.setting}`);
@@ -631,6 +640,7 @@ async function initEditor() {
 
         document.body.classList.toggle('dark-mode', state.theme === 'dark');
         document.body.classList.toggle('light-mode', state.theme === 'light');
+        document.body.classList.toggle('dyslexia-mode', localStorage.getItem('textplaystore_dyslexia_mode') === 'true' || !!state.dyslexia);
         localStorage.setItem('scribouillart_dark_mode', String(state.theme === 'dark'));
 
         const editor = document.getElementById('editor');
@@ -659,6 +669,22 @@ async function initEditor() {
         }
     }
 
+    function syncDyslexiaControls() {
+        const enabled = localStorage.getItem('textplaystore_dyslexia_mode') === 'true';
+        const settingSwitch = document.querySelector('[data-setting="dyslexia"].switch');
+
+        if (settingSwitch) {
+            settingSwitch.classList.toggle('is-on', enabled);
+            settingSwitch.setAttribute('aria-pressed', String(enabled));
+            settingSwitch.setAttribute('aria-label', enabled ? 'Désactiver le mode dyslexie' : 'Activer le mode dyslexie');
+        }
+
+        if (dyslexiaToggleBtn) {
+            dyslexiaToggleBtn.setAttribute('aria-pressed', String(enabled));
+            dyslexiaToggleBtn.setAttribute('aria-label', enabled ? 'Désactiver le mode dyslexie' : 'Activer le mode dyslexie');
+        }
+    }
+
     function bindSettingsControls() {
         document.querySelectorAll('.switch[data-setting]').forEach((button) => {
             button.onclick = (event) => {
@@ -666,6 +692,14 @@ async function initEditor() {
                 event.stopPropagation();
                 const key = button.dataset.setting;
                 const state = getSettings();
+                if (key === 'dyslexia') {
+                    const nextValue = !(localStorage.getItem('textplaystore_dyslexia_mode') === 'true' || !!state.dyslexia);
+                    saveSettings({ dyslexia: nextValue });
+                    localStorage.setItem('textplaystore_dyslexia_mode', String(nextValue));
+                    applyDyslexiaMode();
+                    applySettingsState();
+                    return;
+                }
                 const nextValue = !state[key];
                 saveSettings({ [key]: nextValue });
                 applySettingsState();
@@ -684,6 +718,14 @@ async function initEditor() {
                 if (key === 'theme') {
                     const nextTheme = state.theme === 'dark' ? 'light' : 'dark';
                     saveSettings({ theme: nextTheme });
+                    applySettingsState();
+                    return;
+                }
+
+                if (key === 'dyslexia') {
+                    const nextValue = !(localStorage.getItem('textplaystore_dyslexia_mode') === 'true' || !!state.dyslexia);
+                    saveSettings({ dyslexia: nextValue });
+                    applyDyslexiaMode();
                     applySettingsState();
                     return;
                 }
@@ -869,16 +911,15 @@ async function initEditor() {
     function applyDyslexiaMode() {
         const enabled = localStorage.getItem('textplaystore_dyslexia_mode') === 'true';
         document.body.classList.toggle('dyslexia-mode', enabled);
-        if (dyslexiaToggleBtn) {
-            dyslexiaToggleBtn.setAttribute('aria-pressed', String(enabled));
-            dyslexiaToggleBtn.setAttribute('aria-label', enabled ? 'Désactiver le mode dyslexie' : 'Activer le mode dyslexie');
-        }
+        syncDyslexiaControls();
+        applySettingsState();
     }
 
     dyslexiaToggleBtn?.addEventListener('click', () => {
         const enabled = localStorage.getItem('textplaystore_dyslexia_mode') === 'true';
         const nextState = !enabled;
         localStorage.setItem('textplaystore_dyslexia_mode', String(nextState));
+        saveSettings({ dyslexia: nextState });
         applyDyslexiaMode();
     });
 
