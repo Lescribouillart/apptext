@@ -6,16 +6,32 @@ var ytPlayer      = null;
 var ytPlayerReady = false;
 var currentTrackIndex = 0;
 
-// Chargement des pistes depuis localStorage (ou valeurs par défaut)
-var _defaultTracks = [
-    { id: 'XSXEaikz0Bc', title: 'Lofi Hip Hop Radio' },
-    { id: 'blAFxjhg62k', title: 'Seconde chaîne YouTube' }
+// Aucune piste par défaut : le lecteur démarre vierge.
+var _defaultTracks = [];
+var _legacyDefaultTracks = [
+    'XSXEaikz0Bc',
+    'blAFxjhg62k'
 ];
 var tracks = (function() {
     try {
         var saved = localStorage.getItem('scribouillart_tracks');
-        return saved ? JSON.parse(saved) : _defaultTracks;
-    } catch(e) { return _defaultTracks; }
+        if (!saved) return _defaultTracks.slice();
+
+        var parsed = JSON.parse(saved);
+        if (!Array.isArray(parsed)) return _defaultTracks.slice();
+        if (parsed.length === 0) return [];
+
+        var isLegacyDefaults = parsed.length === _legacyDefaultTracks.length && parsed.every(function(track, index) {
+            return track && track.id === _legacyDefaultTracks[index];
+        });
+
+        if (isLegacyDefaults) {
+            localStorage.removeItem('scribouillart_tracks');
+            return _defaultTracks.slice();
+        }
+
+        return parsed;
+    } catch(e) { return _defaultTracks.slice(); }
 })();
 
 function _saveTracks() {
@@ -76,8 +92,10 @@ function _showManageTracksModal() {
                 tracks.splice(idx, 1);
                 _saveTracks();
                 if (tracks.length === 0) {
-                    tracks = _defaultTracks.slice();
-                    _saveTracks();
+                    currentTrackIndex = 0;
+                    updateTrackTitle();
+                    render();
+                    return;
                 }
                 if (currentTrackIndex >= tracks.length) currentTrackIndex = 0;
                 updateTrackTitle();
@@ -174,14 +192,20 @@ function updateMusicUI(playing) {
 }
 
 function updateTrackTitle() {
-    var track = tracks[currentTrackIndex];
+    var track = tracks[currentTrackIndex] || null;
     var titleEl = document.querySelector('.sc-title');
     if (titleEl) {
-        titleEl.textContent = track.title;
-        titleEl.title = track.title;
+        titleEl.textContent = track ? track.title : 'Aucune piste';
+        titleEl.title = track ? track.title : 'Aucune piste';
     }
     var thumb = document.getElementById('scThumb');
     if (thumb) {
+        if (!track) {
+            thumb.removeAttribute('src');
+            thumb.alt = 'Aucune piste';
+            return;
+        }
+
         var candidates = ['maxresdefault.jpg', 'sddefault.jpg', 'hqdefault.jpg', 'default.jpg'];
         var currentIndex = 0;
         function setThumbCandidate() {
@@ -195,15 +219,19 @@ function updateTrackTitle() {
         setThumbCandidate();
     }
     var thumbLink = document.getElementById('scThumbLink');
-    if (thumbLink) thumbLink.href = 'https://www.youtube.com/watch?v=' + track.id;
+    if (thumbLink) {
+        thumbLink.href = track ? 'https://www.youtube.com/watch?v=' + track.id : '#';
+        thumbLink.title = track ? 'Ouvrir sur YouTube' : 'Aucune piste';
+    }
 }
 
 // Appelée automatiquement par l'API YouTube quand elle est prête
 function onYouTubeIframeAPIReady() {
+    var initialTrack = tracks[currentTrackIndex] || null;
     ytPlayer = new YT.Player('ytApiContainer', {
         height: '1',
         width: '1',
-        videoId: tracks[currentTrackIndex].id,
+        videoId: initialTrack ? initialTrack.id : '',
         playerVars: { autoplay: 0, controls: 0, playsinline: 1 },
         events: {
             onReady: function (e) {
@@ -236,7 +264,7 @@ function onYouTubeIframeAPIReady() {
     updateTrackTitle();
 
     playBtn.addEventListener('click', function () {
-        if (!ytPlayerReady || !ytPlayer) return;
+        if (!tracks.length || !ytPlayerReady || !ytPlayer) return;
 
         var state = ytPlayer.getPlayerState();
         if (state === YT.PlayerState.PLAYING || state === YT.PlayerState.BUFFERING) {
@@ -258,7 +286,7 @@ function onYouTubeIframeAPIReady() {
     }
 
     function changeTrack(direction) {
-        if (!ytPlayerReady || !ytPlayer) return;
+        if (!tracks.length || !ytPlayerReady || !ytPlayer) return;
         currentTrackIndex = (currentTrackIndex + direction + tracks.length) % tracks.length;
         updateTrackTitle();
         ytPlayer.loadVideoById({ videoId: tracks[currentTrackIndex].id, startSeconds: 0 });
