@@ -1644,6 +1644,27 @@ async function initEditor() {
     }
 
     /**
+     * Met à jour les visuels des boutons de thème et d'accessibilité
+     */
+    function updateDarkModeIcons() {
+        const isDarkMode = document.body.classList.contains('dark-mode');
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        const dyslexiaToggleBtn = document.getElementById('dyslexiaToggleBtn');
+
+        if (themeToggleBtn) {
+            themeToggleBtn.classList.toggle('is-dark', isDarkMode);
+            themeToggleBtn.setAttribute('aria-pressed', String(isDarkMode));
+            themeToggleBtn.setAttribute('aria-label', isDarkMode ? 'Basculer vers le mode clair' : 'Basculer vers le mode sombre');
+        }
+
+        if (dyslexiaToggleBtn) {
+            const enabled = localStorage.getItem('textplaystore_dyslexia_mode') === 'true';
+            dyslexiaToggleBtn.setAttribute('aria-pressed', String(enabled));
+            dyslexiaToggleBtn.setAttribute('aria-label', enabled ? 'Désactiver le mode dyslexie' : 'Activer le mode dyslexie');
+        }
+    }
+
+    /**
      * Bascule entre le mode clair et le mode nuit
      */
     function toggleDarkMode() {
