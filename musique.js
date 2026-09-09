@@ -6,7 +6,6 @@ var ytPlayer      = null;
 var ytPlayerReady = false;
 var currentTrackIndex = 0;
 
-// Aucune piste par défaut : le lecteur démarre vierge.
 var _defaultTracks = [];
 var _legacyDefaultTracks = [
     'XSXEaikz0Bc',
@@ -193,19 +192,44 @@ function updateMusicUI(playing) {
 
 function updateTrackTitle() {
     var track = tracks[currentTrackIndex] || null;
+    var scPlayer = document.getElementById('scPlayer');
     var titleEl = document.querySelector('.sc-title');
-    if (titleEl) {
-        titleEl.textContent = track ? track.title : 'Aucune piste';
-        titleEl.title = track ? track.title : 'Aucune piste';
-    }
     var thumb = document.getElementById('scThumb');
-    if (thumb) {
-        if (!track) {
-            thumb.removeAttribute('src');
-            thumb.alt = 'Aucune piste';
-            return;
-        }
+    var thumbLink = document.getElementById('scThumbLink');
+    var currentTimeEl = document.querySelector('.music-current-time');
+    var totalTimeEl = document.querySelector('.music-total-time');
+    var progressEl = document.querySelector('.music-progress-bar span');
 
+    if (scPlayer) {
+        scPlayer.classList.toggle('music-empty', !track);
+    }
+
+    if (!track) {
+        if (titleEl) {
+            titleEl.textContent = '';
+            titleEl.title = '';
+        }
+        if (thumb) {
+            thumb.removeAttribute('src');
+            thumb.alt = '';
+        }
+        if (thumbLink) {
+            thumbLink.style.display = 'none';
+            thumbLink.href = '#';
+            thumbLink.title = '';
+        }
+        if (currentTimeEl) currentTimeEl.textContent = '00:00';
+        if (totalTimeEl) totalTimeEl.textContent = '00:00';
+        if (progressEl) progressEl.style.width = '0%';
+        return;
+    }
+
+    if (titleEl) {
+        titleEl.textContent = track.title;
+        titleEl.title = track.title;
+    }
+    if (thumb) {
+        thumb.alt = track.title;
         var candidates = ['maxresdefault.jpg', 'sddefault.jpg', 'hqdefault.jpg', 'default.jpg'];
         var currentIndex = 0;
         function setThumbCandidate() {
@@ -218,11 +242,14 @@ function updateTrackTitle() {
         };
         setThumbCandidate();
     }
-    var thumbLink = document.getElementById('scThumbLink');
     if (thumbLink) {
-        thumbLink.href = track ? 'https://www.youtube.com/watch?v=' + track.id : '#';
-        thumbLink.title = track ? 'Ouvrir sur YouTube' : 'Aucune piste';
+        thumbLink.href = 'https://www.youtube.com/watch?v=' + track.id;
+        thumbLink.title = 'Ouvrir sur YouTube';
+        thumbLink.style.display = '';
     }
+    if (currentTimeEl) currentTimeEl.textContent = '00:00';
+    if (totalTimeEl) totalTimeEl.textContent = '00:00';
+    if (progressEl) progressEl.style.width = '0%';
 }
 
 // Appelée automatiquement par l'API YouTube quand elle est prête

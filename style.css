@@ -2626,6 +2626,12 @@ body.dyslexia-mode .setting-label {
 }
 
 /* État réduit du lecteur */
+.sc-player.music-empty .music-player-time-row,
+.sc-player.music-empty .sc-thumb-link,
+.sc-player.music-empty .sc-info {
+    display: none;
+}
+
 .sc-player.minimized .sc-skip-btn,
 .sc-player.minimized .sc-play-btn,
 .sc-player.minimized .sc-info,
