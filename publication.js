@@ -150,8 +150,9 @@ async function initEditor() {
     await _openDB();
     await _migrateFromLocalStorage();
 
-    // Afficher la liste des articles
-    await refreshArticlesList();
+    if (articlesList) {
+        await refreshArticlesList();
+    }
 
     // Charger la préférence du mode nuit
     loadDarkModePreference();
@@ -1389,9 +1390,11 @@ async function initEditor() {
     });
 
     // Bouton Nouvel Article
-    newArticleBtn.addEventListener('click', async () => {
-        await createNewArticle();
-    });
+    if (newArticleBtn) {
+        newArticleBtn.addEventListener('click', async () => {
+            await createNewArticle();
+        });
+    }
 
     // Bouton Importer
     loadBtn.addEventListener('click', () => {
@@ -2026,6 +2029,8 @@ async function initEditor() {
      * Rafraîchit l'affichage de la liste (IndexedDB)
      */
     async function refreshArticlesList() {
+        if (!articlesList) return;
+
         const articles = await _dbGetAll();
         
         if (articles.length === 0) {
