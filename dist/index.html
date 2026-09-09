@@ -123,20 +123,6 @@
             </div>
 
             <div class="editor-container" id="editorContainer">
-                <!-- Barre latérale des articles -->
-                <aside class="sidebar">
-                    <div class="sidebar-header">
-                        <h2 class="sidebar-title">Mes cartes</h2>
-                        <button class="new-article-btn" id="newArticleBtn" title="Nouvel article">+</button>
-                    </div>
-                    <div class="card-search-wrap">
-                        <input type="search" id="cardSearchInput" class="card-search" placeholder="Rechercher une carte..." aria-label="Rechercher une carte" />
-                    </div>
-                    <div class="articles-list" id="articlesList">
-                        <div class="no-articles">Aucun article sauvegardé</div>
-                    </div>
-                </aside>
-
                 <!-- Zone principale de l'éditeur -->
                 <div class="editor-main">
                     <div class="editor-wrapper">
@@ -511,6 +497,10 @@
             <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10.5V19h14v-8.5"/><path d="M9 19v-6h6v6"/></svg>
             <span>Saisie</span>
         </button>
+        <button class="bottom-tab" type="button" data-route="cards" aria-label="Écran Cartes">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5h13A2.5 2.5 0 0 1 21 7.5v9A2.5 2.5 0 0 1 18.5 19h-13A2.5 2.5 0 0 1 3 16.5v-9Z"/><path d="M7 9h10M7 13h6"/></svg>
+            <span>Cartes</span>
+        </button>
         <button class="bottom-tab" type="button" data-route="search" aria-label="Écran Recherche">
             <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6"/><path d="m16 16 5 5"/></svg>
             <span>Recherche</span>
@@ -518,10 +508,6 @@
         <button class="bottom-tab bottom-tab-mode" type="button" data-route="theme" aria-label="Écran Mode jour/nuit">
             <img class="nav-mode-accessibility" src="assets/icons/accessibilite.png" alt="Accessibilité" width="22" height="22" style="display:block;object-fit:contain;">
             <span>accessibilité</span>
-        </button>
-        <button class="bottom-tab" type="button" data-route="cards" aria-label="Écran Cartes">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5h13A2.5 2.5 0 0 1 21 7.5v9A2.5 2.5 0 0 1 18.5 19h-13A2.5 2.5 0 0 1 3 16.5v-9Z"/><path d="M7 9h10M7 13h6"/></svg>
-            <span>Cartes</span>
         </button>
         <button class="bottom-tab" type="button" data-route="music" aria-label="Écran Lecteur">
             <img class="nav-music-icon" src="assets/icons/disquevinyle.png" alt="Lecteur" width="22" height="22" style="display:block;object-fit:contain;">

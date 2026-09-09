@@ -113,35 +113,27 @@ async function initEditor() {
     const imageBtn = document.getElementById('imageBtn');
     const sourceBtn = document.getElementById('sourceBtn');
     const organizeToolbarBtn = document.getElementById('organizeToolbarBtn');
-    const saveBtn = document.getElementById('saveBtn');
     const saveAsBtn = document.getElementById('saveAsBtn');
     const addBtn = document.getElementById('addBtn');
     const loadBtn = document.getElementById('loadBtn');
-    const newArticleBtn = document.getElementById('newArticleBtn');
     const articlesList = document.getElementById('articlesList');
-    const darkModeToggle = document.getElementById('darkModeToggle');
-    const navModeSun = document.querySelector('.nav-mode-sun');
-    const navModeMoon = document.querySelector('.nav-mode-moon');
-    const cardSearchInput = document.getElementById('cardSearchInput');
     const bottomTabs = document.querySelectorAll('.bottom-tab');
     const formatSelect = document.getElementById('formatSelect');
     const globalSearchInput = document.getElementById('globalSearchInput');
     const searchResultsList = document.getElementById('searchResultsList');
     const cardsScreenList = document.getElementById('cardsScreenList');
-    const toolbarSearchInput = document.getElementById('toolbarSearchInput');
-    const toolbarSearchBtn = document.getElementById('toolbarSearchBtn');
-    const toolbarToggleBtn = document.getElementById('toolbarToggleBtn');
     const textColor = document.getElementById('textColor');
     const bgColor = document.getElementById('bgColor');
-        const textColorBtn = document.getElementById('textColorBtn');
-        const bgColorBtn = document.getElementById('bgColorBtn');
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+    const dyslexiaToggleBtn = document.getElementById('dyslexiaToggleBtn');
     const youtubeToggle = document.getElementById('youtubeToggle');
 
     let currentArticleId = null;
     let isSourceMode = false;
     let hasUnsavedChanges = false;
     let draggedArticleId = null;
-        let savedEditorSelection = null;
+    let isAddButtonLocked = false;
+    let savedEditorSelection = null;
 
     // Charger le contenu sauvegardé au démarrage
     loadFromLocalStorage();
@@ -150,8 +142,9 @@ async function initEditor() {
     await _openDB();
     await _migrateFromLocalStorage();
 
-    // Afficher la liste des articles
-    await refreshArticlesList();
+    if (articlesList) {
+        await refreshArticlesList();
+    }
 
     // Charger la préférence du mode nuit
     loadDarkModePreference();
@@ -527,38 +520,6 @@ async function initEditor() {
     });
 
     // Bouton Mode Nuit
-    if (darkModeToggle) {
-        darkModeToggle.addEventListener('click', () => {
-            toggleDarkMode();
-        });
-    }
-
-    function applyCardSearchFilter() {
-        if (!cardSearchInput || !articlesList) return;
-
-        const query = cardSearchInput.value.trim().toLowerCase();
-        const cards = articlesList.querySelectorAll('.article-card-item');
-        let visibleCount = 0;
-
-        cards.forEach((card) => {
-            const text = (card.textContent || '').toLowerCase();
-            const matches = !query || text.includes(query);
-            card.style.display = matches ? '' : 'none';
-            if (matches) visibleCount += 1;
-        });
-
-        const emptyState = articlesList.querySelector('.no-articles');
-        if (emptyState) {
-            emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
-        }
-    }
-
-    if (cardSearchInput) {
-        cardSearchInput.addEventListener('input', () => {
-            applyCardSearchFilter();
-        });
-    }
-
     const appScreens = {
         editor: document.getElementById('screen-editor'),
         search: document.getElementById('screen-search'),
@@ -955,17 +916,51 @@ async function initEditor() {
             }
 
             cardsScreenList.innerHTML = articles.map((article) => `
-                <button class="screen-item card-item" type="button" data-article-id="${article.id}">
-                    <span class="screen-item-title">${escapeHtml(article.subject || 'Sans titre')}</span>
-                    <span class="screen-item-meta">${escapeHtml(article.preview || '')}</span>
-                </button>
+                <div class="screen-item card-item" data-article-id="${article.id}">
+                    <button class="screen-item-main" type="button" data-article-id="${article.id}">
+                        <span class="screen-item-title">${escapeHtml(article.subject || 'Sans titre')}</span>
+                        <span class="screen-item-meta">${escapeHtml(article.preview || '')}</span>
+                    </button>
+                    <button class="card-delete-btn" type="button" data-article-id="${article.id}" aria-label="Supprimer la carte" title="Supprimer la carte">×</button>
+                </div>
             `).join('');
 
-            cardsScreenList.querySelectorAll('.screen-item').forEach((button) => {
-                button.addEventListener('click', async () => {
-                    const articleId = Number(button.dataset.articleId);
+            cardsScreenList.querySelectorAll('.screen-item').forEach((item) => {
+                const trigger = item.querySelector('.screen-item-main');
+                const openCard = async () => {
+                    const articleId = Number(item.dataset.articleId || trigger?.dataset.articleId);
+                    if (!articleId) return;
                     await loadArticleFromList(articleId);
                     setRoute('editor');
+                };
+
+                item.addEventListener('click', async (event) => {
+                    if (event.target.closest('.card-delete-btn')) return;
+                    await openCard();
+                });
+
+                if (trigger) {
+                    trigger.addEventListener('click', async (event) => {
+                        event.stopPropagation();
+                        await openCard();
+                    });
+                }
+            });
+
+            cardsScreenList.querySelectorAll('.card-delete-btn').forEach((button) => {
+                button.addEventListener('click', async (event) => {
+                    event.stopPropagation();
+                    const articleId = Number(button.dataset.articleId);
+                    if (!confirm('Supprimer cette carte ?')) return;
+                    await _dbDelete(articleId);
+                    if (currentArticleId === articleId) {
+                        currentArticleId = null;
+                        articleSubject.value = '';
+                        editor.innerHTML = '<p>Commencez à écrire ou tapez / pour choisir un bloc</p>';
+                        hasUnsavedChanges = false;
+                        markAsSaved();
+                    }
+                    renderCardsScreen();
                 });
             });
         });
@@ -986,16 +981,13 @@ async function initEditor() {
         const nextTheme = document.body.classList.contains('dark-mode') ? 'light' : 'dark';
         saveSettings({ theme: nextTheme });
         applySettingsState();
-        updateDarkModeIcons();
         setRoute('theme');
     });
 
-    const themeToggleBtn = document.getElementById('themeToggleBtn');
     if (themeToggleBtn) {
         themeToggleBtn.classList.toggle('is-dark', document.body.classList.contains('dark-mode'));
     }
 
-    const dyslexiaToggleBtn = document.getElementById('dyslexiaToggleBtn');
     function applyDyslexiaMode() {
         const enabled = localStorage.getItem('textplaystore_dyslexia_mode') === 'true';
         document.body.classList.toggle('dyslexia-mode', enabled);
@@ -1356,20 +1348,6 @@ async function initEditor() {
     editor.addEventListener('keyup', saveEditorSelection);
     editor.addEventListener('focus', saveEditorSelection);
 
-    // Bouton Enregistrer : enregistre dans la colonne "Mes articles" (mise à jour ou création)
-    if (saveBtn) {
-        saveBtn.addEventListener('click', async () => {
-            const subject = articleSubject.value.trim();
-            if (!subject) {
-                showStatus('\u26a0\ufe0f Veuillez saisir un objet pour l\'article', 'error');
-                return;
-            }
-            await saveArticleToList(subject, editor.innerHTML);
-            markAsSaved();
-            showStatus('\u2713 Article enregistr\u00e9 dans "Mes articles"', 'success');
-        });
-    }
-
     // Bouton Enregistrer sous : export .txt / .docx sur le PC
     if (saveAsBtn) {
         saveAsBtn.addEventListener('click', () => {
@@ -1377,32 +1355,37 @@ async function initEditor() {
         });
     }
 
-    // Bouton Ajouter (crée TOUJOURS une nouvelle carte dans la colonne "Mes articles")
-    addBtn.addEventListener('click', async () => {
-        const subject = articleSubject.value.trim();
-        if (!subject) {
-            alert('Veuillez saisir un objet avant d\'ajouter l\'article.');
-            return;
-        }
-        await saveArticleToList(subject, editor.innerHTML, { forceNew: true });
-        markAsSaved();
-    });
+    // Bouton Ajouter : crée une nouvelle carte dans l’éditeur courant
+    if (addBtn) {
+        addBtn.addEventListener('click', async () => {
+            if (isAddButtonLocked) return;
+            isAddButtonLocked = true;
 
-    // Bouton Nouvel Article
-    newArticleBtn.addEventListener('click', async () => {
-        await createNewArticle();
-    });
+            try {
+                const subject = articleSubject.value.trim();
+                if (!subject) {
+                    alert('Veuillez saisir un objet avant d\'ajouter l\'article.');
+                    return;
+                }
+                await saveArticleToList(subject, editor.innerHTML, { forceNew: true });
+                markAsSaved();
+            } finally {
+                setTimeout(() => { isAddButtonLocked = false; }, 250);
+            }
+        });
+    }
 
     // Bouton Importer
-    loadBtn.addEventListener('click', () => {
-        const input = document.createElement('input');
-        input.type = 'file';
-        // Formats proposés :
-        // - .docx (Word moderne) via mammoth.js
-        // - .odt  (OpenOffice/LibreOffice) via JSZip + parsing XML
-        // - .html / .htm (exports HTML)
-        // - .txt, .md (texte brut / Markdown)
-        input.accept = '.html,.htm,.txt,.md,.docx,.odt';
+    if (loadBtn) {
+        loadBtn.addEventListener('click', () => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            // Formats proposés :
+            // - .docx (Word moderne) via mammoth.js
+            // - .odt  (OpenOffice/LibreOffice) via JSZip + parsing XML
+            // - .html / .htm (exports HTML)
+            // - .txt, .md (texte brut / Markdown)
+            input.accept = '.html,.htm,.txt,.md,.docx,.odt';
 
         input.onchange = (e) => {
             const file = e.target.files[0];
@@ -1591,8 +1574,9 @@ async function initEditor() {
             reader.readAsText(file);
         };
 
-        input.click();
-    });
+            input.click();
+        });
+    }
 
     // Raccourcis clavier
     editor.addEventListener('keydown', (e) => {
@@ -1657,26 +1641,6 @@ async function initEditor() {
      */
     function markAsSaved() {
         hasUnsavedChanges = false;
-        saveBtn.textContent = 'Enregistrer';
-        saveBtn.title = 'Enregistrer l\'article';
-    }
-
-    function updateDarkModeIcons() {
-        const isDarkMode = document.body.classList.contains('dark-mode');
-
-        if (navModeSun) {
-            navModeSun.style.display = isDarkMode ? 'none' : 'block';
-        }
-        if (navModeMoon) {
-            navModeMoon.style.display = isDarkMode ? 'block' : 'none';
-        }
-
-        if (darkModeToggle) {
-            const moonIcon = darkModeToggle.querySelector('.moon-icon');
-            const sunIcon = darkModeToggle.querySelector('.sun-icon');
-            if (moonIcon) moonIcon.style.display = isDarkMode ? 'none' : 'block';
-            if (sunIcon) sunIcon.style.display = isDarkMode ? 'block' : 'none';
-        }
     }
 
     /**
@@ -2026,6 +1990,8 @@ async function initEditor() {
      * Rafraîchit l'affichage de la liste (IndexedDB)
      */
     async function refreshArticlesList() {
+        if (!articlesList) return;
+
         const articles = await _dbGetAll();
         
         if (articles.length === 0) {
@@ -2215,14 +2181,5 @@ async function initEditor() {
     }
 }
 
-// ─── Sidebar toggle (mobile) ────────────────────────────────────────────────
-(function () {
-    var sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
-    if (sidebarToggleBtn) {
-        sidebarToggleBtn.addEventListener('click', function () {
-            document.querySelector('.sidebar').classList.toggle('open');
-        });
-    }
-})();
 
 
