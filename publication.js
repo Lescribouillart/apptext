@@ -967,12 +967,26 @@ async function initEditor() {
                 </div>
             `).join('');
 
-            cardsScreenList.querySelectorAll('.screen-item-main').forEach((button) => {
-                button.addEventListener('click', async () => {
-                    const articleId = Number(button.dataset.articleId);
+            cardsScreenList.querySelectorAll('.screen-item').forEach((item) => {
+                const trigger = item.querySelector('.screen-item-main');
+                const openCard = async () => {
+                    const articleId = Number(item.dataset.articleId || trigger?.dataset.articleId);
+                    if (!articleId) return;
                     await loadArticleFromList(articleId);
                     setRoute('editor');
+                };
+
+                item.addEventListener('click', async (event) => {
+                    if (event.target.closest('.card-delete-btn')) return;
+                    await openCard();
                 });
+
+                if (trigger) {
+                    trigger.addEventListener('click', async (event) => {
+                        event.stopPropagation();
+                        await openCard();
+                    });
+                }
             });
 
             cardsScreenList.querySelectorAll('.card-delete-btn').forEach((button) => {
@@ -1722,6 +1736,7 @@ async function initEditor() {
      */
     function markAsSaved() {
         hasUnsavedChanges = false;
+        if (!saveBtn) return;
         saveBtn.textContent = 'Enregistrer';
         saveBtn.title = 'Enregistrer l\'article';
     }
