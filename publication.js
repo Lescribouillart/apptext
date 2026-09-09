@@ -118,6 +118,7 @@ async function initEditor() {
     const addBtn = document.getElementById('addBtn');
     const loadBtn = document.getElementById('loadBtn');
     const newArticleBtn = document.getElementById('newArticleBtn');
+    const cardsAddBtn = document.getElementById('cardsAddBtn');
     const articlesList = document.getElementById('articlesList');
     const darkModeToggle = document.getElementById('darkModeToggle');
     const navModeSun = document.querySelector('.nav-mode-sun');
@@ -141,7 +142,8 @@ async function initEditor() {
     let isSourceMode = false;
     let hasUnsavedChanges = false;
     let draggedArticleId = null;
-        let savedEditorSelection = null;
+    let isAddButtonLocked = false;
+    let savedEditorSelection = null;
 
     // Charger le contenu sauvegardé au démarrage
     loadFromLocalStorage();
@@ -956,17 +958,37 @@ async function initEditor() {
             }
 
             cardsScreenList.innerHTML = articles.map((article) => `
-                <button class="screen-item card-item" type="button" data-article-id="${article.id}">
-                    <span class="screen-item-title">${escapeHtml(article.subject || 'Sans titre')}</span>
-                    <span class="screen-item-meta">${escapeHtml(article.preview || '')}</span>
-                </button>
+                <div class="screen-item card-item" data-article-id="${article.id}">
+                    <button class="screen-item-main" type="button" data-article-id="${article.id}">
+                        <span class="screen-item-title">${escapeHtml(article.subject || 'Sans titre')}</span>
+                        <span class="screen-item-meta">${escapeHtml(article.preview || '')}</span>
+                    </button>
+                    <button class="card-delete-btn" type="button" data-article-id="${article.id}" aria-label="Supprimer la carte" title="Supprimer la carte">×</button>
+                </div>
             `).join('');
 
-            cardsScreenList.querySelectorAll('.screen-item').forEach((button) => {
+            cardsScreenList.querySelectorAll('.screen-item-main').forEach((button) => {
                 button.addEventListener('click', async () => {
                     const articleId = Number(button.dataset.articleId);
                     await loadArticleFromList(articleId);
                     setRoute('editor');
+                });
+            });
+
+            cardsScreenList.querySelectorAll('.card-delete-btn').forEach((button) => {
+                button.addEventListener('click', async (event) => {
+                    event.stopPropagation();
+                    const articleId = Number(button.dataset.articleId);
+                    if (!confirm('Supprimer cette carte ?')) return;
+                    await _dbDelete(articleId);
+                    if (currentArticleId === articleId) {
+                        currentArticleId = null;
+                        articleSubject.value = '';
+                        editor.innerHTML = '<p>Commencez à écrire ou tapez / pour choisir un bloc</p>';
+                        hasUnsavedChanges = false;
+                        markAsSaved();
+                    }
+                    renderCardsScreen();
                 });
             });
         });
@@ -1380,19 +1402,59 @@ async function initEditor() {
 
     // Bouton Ajouter (crée TOUJOURS une nouvelle carte dans la colonne "Mes articles")
     addBtn.addEventListener('click', async () => {
-        const subject = articleSubject.value.trim();
-        if (!subject) {
-            alert('Veuillez saisir un objet avant d\'ajouter l\'article.');
-            return;
+        if (isAddButtonLocked) return;
+        isAddButtonLocked = true;
+
+        try {
+            const subject = articleSubject.value.trim();
+            if (!subject) {
+                alert('Veuillez saisir un objet avant d\'ajouter l\'article.');
+                return;
+            }
+            await saveArticleToList(subject, editor.innerHTML, { forceNew: true });
+            markAsSaved();
+        } finally {
+            setTimeout(() => { isAddButtonLocked = false; }, 250);
         }
-        await saveArticleToList(subject, editor.innerHTML, { forceNew: true });
-        markAsSaved();
     });
 
     // Bouton Nouvel Article
     if (newArticleBtn) {
         newArticleBtn.addEventListener('click', async () => {
             await createNewArticle();
+        });
+    }
+
+    if (cardsAddBtn) {
+        cardsAddBtn.addEventListener('click', async () => {
+            if (isAddButtonLocked) return;
+            isAddButtonLocked = true;
+
+            try {
+                const subject = (articleSubject?.value || '').trim() || 'Nouvelle carte';
+                const content = editor?.innerHTML?.trim() ? editor.innerHTML : '<p></p>';
+                const newId = Date.now();
+                const article = {
+                    id: newId,
+                    subject,
+                    content,
+                    preview: getTextPreview(content),
+                    date: new Date().toLocaleString('fr-FR'),
+                    color: '',
+                    sortOrder: Date.now()
+                };
+
+                await _dbPut(article);
+                currentArticleId = newId;
+                articleSubject.value = subject;
+                editor.innerHTML = content;
+                hasUnsavedChanges = false;
+                markAsSaved();
+                await refreshArticlesList();
+                setRoute('editor');
+            } finally {
+                setTimeout(() => { isAddButtonLocked = false; }, 250);
+            }
         });
     }
 

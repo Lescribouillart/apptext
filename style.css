@@ -1864,12 +1864,41 @@ body:not(.dark-mode) .add-icon-btn img {
     background: rgba(255,255,255,0.03);
     border: 1px solid rgba(255,255,255,0.06);
     border-radius: 14px;
-    padding: 0.9rem 1rem;
+    padding: 0.9rem 3.1rem 0.9rem 1rem;
     color: var(--editor-text-primary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.screen-item-main {
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: none;
+    padding: 0;
+    color: inherit;
     cursor: pointer;
     display: flex;
     flex-direction: column;
     gap: 0.2rem;
+}
+
+.card-delete-btn {
+    position: absolute;
+    right: 0.8rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    background: rgba(255,255,255,0.04);
+    color: var(--editor-text-primary);
+    cursor: pointer;
+    font-size: 1.2rem;
+    line-height: 1;
 }
 
 .screen-item-title {
