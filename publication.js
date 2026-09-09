@@ -234,6 +234,29 @@ async function initEditor() {
     }
 
     const toolbar = document.querySelector('.editor-toolbar');
+    const editorWrapper = document.querySelector('.editor-wrapper');
+    const bottomNav = document.querySelector('.bottom-nav');
+
+    function dockToolbarToBottomNav(isCollapsed) {
+        if (!toolbar || !editorWrapper || !bottomNav) return;
+
+        if (isCollapsed) {
+            if (toolbar.parentElement !== bottomNav) {
+                bottomNav.appendChild(toolbar);
+            }
+            return;
+        }
+
+        if (toolbar.parentElement !== editorWrapper) {
+            const editorArea = editorWrapper.querySelector('.editor-area');
+            if (editorArea && editorArea.nextSibling) {
+                editorWrapper.insertBefore(toolbar, editorArea.nextSibling);
+            } else {
+                editorWrapper.appendChild(toolbar);
+            }
+        }
+    }
+
     if (toolbar) {
         let dragState = null;
 
@@ -1087,6 +1110,7 @@ async function initEditor() {
     if (toolbarToggleBtn && toolbar) {
         toolbarToggleBtn.addEventListener('click', () => {
             const isCollapsed = toolbar.classList.toggle('collapsed');
+            dockToolbarToBottomNav(isCollapsed);
             toolbarToggleBtn.setAttribute('title', isCollapsed ? 'Afficher la barre d’outils' : 'Masquer la barre d’outils');
             toolbarToggleBtn.setAttribute('aria-label', isCollapsed ? 'Afficher la barre d’outils' : 'Masquer la barre d’outils');
         });

@@ -1158,6 +1158,20 @@ body.dark-mode .article-card-delete:hover {
     order: 2;
 }
 
+.bottom-nav .editor-toolbar {
+    flex-basis: 100%;
+    width: 100%;
+    margin: 0 0 0.5rem;
+    border-radius: 14px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 -8px 18px rgba(0, 0, 0, 0.08);
+    position: relative;
+    bottom: auto;
+    order: -1;
+}
+
 .toolbar-btn {
     background: transparent;
     color: var(--editor-text-primary);
@@ -2226,6 +2240,7 @@ body.dyslexia-mode .setting-label {
     left: 0;
     right: 0;
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-around;
     gap: 0.2rem;
