@@ -2407,10 +2407,10 @@ body.dyslexia-mode .setting-label {
     width: 100%;
     min-width: 0;
     border: none;
-    border-radius: 18px;
+    border-radius: 0;
     padding: 0 0 16px;
-    background: #1a1a1a;
-    box-shadow: 0 20px 42px rgba(0,0,0,0.28);
+    background: transparent;
+    box-shadow: none;
 }
 
 #screen-music .sc-controls {
@@ -2787,8 +2787,9 @@ body.dyslexia-mode .setting-label {
         width: 100%;
         min-width: 0;
         max-width: 100%;
-        border-radius: 20px;
-        background: rgba(26, 27, 24, 0.92);
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
     }
 
     .music-screen-player .sc-thumb-link {
