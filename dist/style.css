@@ -2306,14 +2306,22 @@ body.dyslexia-mode .setting-label {
 }
 
 .bottom-tab .nav-editor-icon,
-.bottom-tab .nav-mode-accessibility,
-.bottom-tab .nav-music-icon {
+.bottom-tab .nav-mode-accessibility {
     display: block;
     width: 22px;
     height: 22px;
     object-fit: contain;
     filter: brightness(0) saturate(100%) invert(1);
     opacity: 0.88;
+}
+
+.bottom-tab .nav-music-icon {
+    display: block;
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+    opacity: 1;
+    filter: none;
 }
 
 .bottom-tab.active {
