@@ -113,6 +113,7 @@ async function initEditor() {
     const imageBtn = document.getElementById('imageBtn');
     const sourceBtn = document.getElementById('sourceBtn');
     const organizeToolbarBtn = document.getElementById('organizeToolbarBtn');
+    const toolbarSaveBtn = document.getElementById('toolbarSaveBtn');
     const saveAsBtn = document.getElementById('saveAsBtn');
     const addBtn = document.getElementById('addBtn');
     const loadBtn = document.getElementById('loadBtn');
@@ -153,7 +154,7 @@ async function initEditor() {
         const toolbar = document.querySelector('.editor-toolbar');
         if (!toolbar) return [];
 
-        return Array.from(toolbar.querySelectorAll('.toolbar-btn:not(#organizeToolbarBtn)'))
+        return Array.from(toolbar.querySelectorAll('.toolbar-btn:not(#organizeToolbarBtn):not(#toolbarSaveBtn)'))
             .map(btn => btn.id || btn.dataset.command)
             .filter(Boolean);
     }
@@ -169,7 +170,7 @@ async function initEditor() {
         const savedOrder = JSON.parse(localStorage.getItem('textToolbarOrder') || '[]');
         if (!Array.isArray(savedOrder) || savedOrder.length === 0) return;
 
-        const draggableButtons = Array.from(toolbar.querySelectorAll('.toolbar-btn:not(#organizeToolbarBtn)'));
+        const draggableButtons = Array.from(toolbar.querySelectorAll('.toolbar-btn:not(#organizeToolbarBtn):not(#toolbarSaveBtn)'));
         const keyMap = new Map(draggableButtons.map(btn => [(btn.id || btn.dataset.command), btn]));
 
         const orderedButtons = [];
@@ -189,7 +190,7 @@ async function initEditor() {
         const orderedNodes = [];
         let buttonIndex = 0;
         Array.from(toolbar.children).forEach(child => {
-            if (child.classList && child.classList.contains('toolbar-btn') && child.id !== 'organizeToolbarBtn') {
+            if (child.classList && child.classList.contains('toolbar-btn') && child.id !== 'organizeToolbarBtn' && child.id !== 'toolbarSaveBtn') {
                 orderedNodes.push(orderedButtons[buttonIndex]);
                 buttonIndex += 1;
             } else {
@@ -205,7 +206,7 @@ async function initEditor() {
     }
 
     function setToolbarOrganizeMode(enabled) {
-        const draggableButtons = document.querySelectorAll('.editor-toolbar .toolbar-btn:not(#organizeToolbarBtn)');
+        const draggableButtons = document.querySelectorAll('.editor-toolbar .toolbar-btn:not(#organizeToolbarBtn):not(#toolbarSaveBtn)');
         draggableButtons.forEach(btn => {
             btn.draggable = enabled;
             btn.classList.toggle('toolbar-reorderable', enabled);
@@ -224,6 +225,14 @@ async function initEditor() {
         });
 
         organizeToolbarBtn.setAttribute('aria-pressed', 'false');
+    }
+
+    if (toolbarSaveBtn) {
+        toolbarSaveBtn.addEventListener('click', () => {
+            if (saveAsBtn) {
+                saveAsBtn.click();
+            }
+        });
     }
 
     const toolbar = document.querySelector('.editor-toolbar');
