@@ -938,12 +938,14 @@ async function initEditor() {
                         <span class="screen-item-title">${escapeHtml(article.subject || 'Sans titre')}</span>
                         <span class="screen-item-meta">${escapeHtml(article.preview || '')}</span>
                     </button>
+                    <button class="card-open-btn" type="button" data-article-id="${article.id}" aria-label="Choisir une couleur" title="Choisir une couleur">▾</button>
                     <button class="card-delete-btn" type="button" data-article-id="${article.id}" aria-label="Supprimer la carte" title="Supprimer la carte">×</button>
                 </div>
             `).join('');
 
             cardsScreenList.querySelectorAll('.screen-item').forEach((item) => {
                 const trigger = item.querySelector('.screen-item-main');
+                const openTrigger = item.querySelector('.card-open-btn');
                 const openCard = async () => {
                     const articleId = Number(item.dataset.articleId || trigger?.dataset.articleId);
                     if (!articleId) return;
@@ -952,7 +954,8 @@ async function initEditor() {
                 };
 
                 item.addEventListener('click', async (event) => {
-                    if (event.target.closest('.card-delete-btn')) return;
+                    if (event.target.closest('.card-delete-btn, .card-open-btn, .card-color-option')) return;
+                    if (event.target.closest('.card-color-menu')) return;
                     await openCard();
                 });
 
@@ -960,6 +963,77 @@ async function initEditor() {
                     trigger.addEventListener('click', async (event) => {
                         event.stopPropagation();
                         await openCard();
+                    });
+                }
+
+                if (openTrigger) {
+                    openTrigger.addEventListener('click', async (event) => {
+                        event.stopPropagation();
+                        const articleId = Number(openTrigger.dataset.articleId);
+                        const menu = document.createElement('div');
+                        menu.className = 'card-color-menu';
+
+                        const colors = [
+                            '#ef4444', '#f59e0b', '#10b981', '#3b82f6',
+                            '#8b5cf6', '#ec4899', '#f97316', '#94a3b8'
+                        ];
+
+                        const currentArticle = (await _dbGetAll()).find((article) => article.id === articleId);
+                        colors.forEach((color) => {
+                            const option = document.createElement('button');
+                            option.type = 'button';
+                            option.className = 'card-color-option';
+                            option.title = 'Classer en couleur';
+                            option.dataset.color = color;
+                            option.style.background = color;
+                            option.setAttribute('aria-label', `Choisir la couleur ${color}`);
+                            if (currentArticle?.color === color) {
+                                option.classList.add('selected');
+                            }
+                            option.addEventListener('click', async (colorEvent) => {
+                                colorEvent.stopPropagation();
+                                const articleList = await _dbGetAll();
+                                const articleToUpdate = articleList.find((entry) => entry.id === articleId);
+                                if (!articleToUpdate) return;
+                                articleToUpdate.color = color;
+                                await _dbPut(articleToUpdate);
+                                menu.remove();
+                                renderCardsScreen();
+                            });
+                            menu.appendChild(option);
+                        });
+
+                        const clearButton = document.createElement('button');
+                        clearButton.type = 'button';
+                        clearButton.className = 'card-color-option clear';
+                        clearButton.title = 'Retirer la couleur';
+                        clearButton.setAttribute('aria-label', 'Retirer la couleur');
+                        clearButton.textContent = '×';
+                        if (!currentArticle?.color) {
+                            clearButton.classList.add('selected');
+                        }
+                        clearButton.addEventListener('click', async (colorEvent) => {
+                            colorEvent.stopPropagation();
+                            const articleList = await _dbGetAll();
+                            const articleToUpdate = articleList.find((entry) => entry.id === articleId);
+                            if (!articleToUpdate) return;
+                            articleToUpdate.color = '';
+                            await _dbPut(articleToUpdate);
+                            menu.remove();
+                            renderCardsScreen();
+                        });
+                        menu.appendChild(clearButton);
+
+                        document.querySelectorAll('.card-color-menu').forEach((existingMenu) => existingMenu.remove());
+                        item.appendChild(menu);
+
+                        const closeMenuOnOutsideClick = (event) => {
+                            if (!event.target.closest('.card-color-menu') && !event.target.closest('.card-open-btn')) {
+                                menu.remove();
+                                document.removeEventListener('click', closeMenuOnOutsideClick);
+                            }
+                        };
+                        document.addEventListener('click', closeMenuOnOutsideClick);
                     });
                 }
             });
