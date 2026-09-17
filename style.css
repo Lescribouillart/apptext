@@ -1201,6 +1201,17 @@ body.dark-mode .article-card-delete:hover {
     margin-left: 0;
 }
 
+.toolbar-save-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.12);
+    color: var(--editor-text-primary);
+    transition: background 0.2s ease;
+}
+
+.toolbar-save-btn:hover {
+    background: rgba(255, 255, 255, 0.09);
+}
+
 .toolbar-toggle-btn {
     background: rgba(255, 255, 255, 0.05);
     border-color: rgba(255, 255, 255, 0.12);
@@ -1246,7 +1257,8 @@ body.dark-mode .article-card-delete:hover {
 }
 
 .toolbar-toggle-btn:active,
-.toolbar-toggle-btn.active {
+.toolbar-toggle-btn.active,
+.toolbar-save-btn:active {
     background: rgba(255, 255, 255, 0.05);
     color: var(--editor-text-primary);
     border-color: rgba(255, 255, 255, 0.12);
