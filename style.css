@@ -2305,6 +2305,17 @@ body.dyslexia-mode .setting-label {
     display: block;
 }
 
+.bottom-tab .nav-editor-icon,
+.bottom-tab .nav-mode-accessibility,
+.bottom-tab .nav-music-icon {
+    display: block;
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+    filter: brightness(0) saturate(100%) invert(1);
+    opacity: 0.88;
+}
+
 .bottom-tab.active {
     color: #f3f6f9;
 }
