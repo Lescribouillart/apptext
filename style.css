@@ -1884,6 +1884,10 @@ body:not(.dark-mode) .add-icon-btn img {
     position: relative;
 }
 
+.screen-item.card-item.has-color {
+    box-shadow: inset 4px 0 0 var(--card-color, transparent);
+}
+
 .screen-item-main {
     width: 100%;
     text-align: left;

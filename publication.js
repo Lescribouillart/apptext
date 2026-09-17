@@ -932,16 +932,23 @@ async function initEditor() {
                 return;
             }
 
-            cardsScreenList.innerHTML = articles.map((article) => `
-                <div class="screen-item card-item" data-article-id="${article.id}">
-                    <button class="screen-item-main" type="button" data-article-id="${article.id}">
-                        <span class="screen-item-title">${escapeHtml(article.subject || 'Sans titre')}</span>
-                        <span class="screen-item-meta">${escapeHtml(article.preview || '')}</span>
-                    </button>
-                    <button class="card-open-btn" type="button" data-article-id="${article.id}" aria-label="Choisir une couleur" title="Choisir une couleur">▾</button>
-                    <button class="card-delete-btn" type="button" data-article-id="${article.id}" aria-label="Supprimer la carte" title="Supprimer la carte">×</button>
-                </div>
-            `).join('');
+            cardsScreenList.innerHTML = articles.map((article) => {
+                const cardColor = article.color || '#2f8b8d';
+                const cardStyle = article.color
+                    ? `--card-color: ${cardColor}; background: linear-gradient(90deg, ${hexToRgba(cardColor, 0.22)} 0%, rgba(255,255,255,0.02) 38%, rgba(255,255,255,0.03) 100%); border-color: ${hexToRgba(cardColor, 0.55)};`
+                    : '--card-color: transparent; background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.06);';
+
+                return `
+                    <div class="screen-item card-item ${article.color ? 'has-color' : ''}" data-article-id="${article.id}" style="${cardStyle}">
+                        <button class="screen-item-main" type="button" data-article-id="${article.id}">
+                            <span class="screen-item-title">${escapeHtml(article.subject || 'Sans titre')}</span>
+                            <span class="screen-item-meta">${escapeHtml(article.preview || '')}</span>
+                        </button>
+                        <button class="card-open-btn" type="button" data-article-id="${article.id}" aria-label="Choisir une couleur" title="Choisir une couleur" style="${article.color ? `border-color: ${hexToRgba(cardColor, 0.7)}; background: ${hexToRgba(cardColor, 0.14)};` : ''}">▾</button>
+                        <button class="card-delete-btn" type="button" data-article-id="${article.id}" aria-label="Supprimer la carte" title="Supprimer la carte">×</button>
+                    </div>
+                `;
+            }).join('');
 
             cardsScreenList.querySelectorAll('.screen-item').forEach((item) => {
                 const trigger = item.querySelector('.screen-item-main');
