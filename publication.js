@@ -228,10 +228,18 @@ async function initEditor() {
     }
 
     if (toolbarSaveBtn) {
-        toolbarSaveBtn.addEventListener('click', () => {
-            if (saveAsBtn) {
-                saveAsBtn.click();
+        toolbarSaveBtn.addEventListener('click', async () => {
+            const subject = articleSubject.value.trim();
+            if (!subject) {
+                alert('Veuillez saisir un titre avant d\'enregistrer la carte.');
+                articleSubject.focus();
+                return;
             }
+
+            await saveArticleToList(subject, editor.innerHTML, { forceNew: !currentArticleId });
+            hasUnsavedChanges = false;
+            markAsSaved();
+            showStatus('✓ Carte enregistrée', 'success');
         });
     }
 
