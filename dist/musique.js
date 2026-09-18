@@ -453,13 +453,19 @@ function playCurrentTrack() {
     var track = tracks[currentTrackIndex];
     if (isLocalTrack(track)) {
         var audio = ensureLocalAudioPlayer();
-        if (audio.src !== track.url) {
+        if (!audio.src || audio.src !== track.url) {
             audio.src = track.url;
+            audio.load();
         }
 
         if (audio.paused) {
-            audio.play().catch(function() {});
-            updateMusicUI(true);
+            audio.play().then(function() {
+                updateMusicUI(true);
+            }).catch(function() {
+                audio.load();
+                audio.play().catch(function() {});
+                updateMusicUI(true);
+            });
         } else {
             audio.pause();
             updateMusicUI(false);
@@ -467,21 +473,38 @@ function playCurrentTrack() {
         return;
     }
 
-    if (!ytPlayerReady || !ytPlayer) return;
+    if (!ytPlayer || !ytPlayerReady) {
+        return;
+    }
 
     var state = ytPlayer.getPlayerState();
     if (state === YT.PlayerState.PLAYING || state === YT.PlayerState.BUFFERING) {
         ytPlayer.pauseVideo();
+        updateMusicUI(false);
     } else {
-        if (state === YT.PlayerState.UNSTARTED || state === -1) {
+        if (state === YT.PlayerState.UNSTARTED || state === -1 || state === YT.PlayerState.ENDED) {
             ytPlayer.loadVideoById({ videoId: track.id, startSeconds: 0 });
         }
         ytPlayer.playVideo();
+        updateMusicUI(true);
     }
 }
 
 function changeTrack(direction) {
     if (!tracks.length) return;
+
+    var previousTrack = tracks[currentTrackIndex];
+    var previousLocalAudio = ensureLocalAudioPlayer();
+    if (previousTrack && isLocalTrack(previousTrack) && previousLocalAudio && previousLocalAudio.src) {
+        previousLocalAudio.pause();
+        previousLocalAudio.currentTime = 0;
+    }
+    if (ytPlayer && ytPlayerReady && (!previousTrack || !isLocalTrack(previousTrack))) {
+        try {
+            ytPlayer.stopVideo();
+        } catch (e) {}
+    }
+
     currentTrackIndex = (currentTrackIndex + direction + tracks.length) % tracks.length;
     updateTrackTitle();
 
@@ -490,6 +513,7 @@ function changeTrack(direction) {
         var audio = ensureLocalAudioPlayer();
         if (track.url) {
             audio.src = track.url;
+            audio.currentTime = 0;
             audio.play().catch(function() {});
         }
         updateMusicUI(true);
