@@ -243,6 +243,35 @@ function startYouTubeProgressLoop() {
     }, 500);
 }
 
+function seekToProgressRatio(ratio) {
+    var track = tracks[currentTrackIndex];
+    if (!track) return;
+
+    if (isLocalTrack(track)) {
+        var audio = ensureLocalAudioPlayer();
+        if (!audio.duration || !isFinite(audio.duration)) return;
+        audio.currentTime = Math.min(Math.max((ratio * audio.duration), 0), audio.duration);
+        updateLocalProgress();
+        return;
+    }
+
+    if (!ytPlayer || !ytPlayerReady || !ytPlayer.seekTo) return;
+    var duration = ytPlayer.getDuration ? ytPlayer.getDuration() : 0;
+    if (!duration) return;
+    ytPlayer.seekTo(Math.min(Math.max(ratio * duration, 0), duration), true);
+    updateYouTubeProgress();
+}
+
+function seekProgressBar(event) {
+    var progressBar = document.querySelector('.music-progress-bar');
+    if (!progressBar) return;
+
+    var rect = progressBar.getBoundingClientRect();
+    var ratio = (event.clientX - rect.left) / rect.width;
+    ratio = Math.min(Math.max(ratio, 0), 1);
+    seekToProgressRatio(ratio);
+}
+
 function ensureLocalAudioPlayer() {
     if (localAudioPlayer) return localAudioPlayer;
     localAudioPlayer = document.getElementById('localAudioPlayer');
@@ -485,10 +514,13 @@ function changeTrack(direction) {
 
     if (!playBtn) return;
 
+    var progressBar = document.querySelector('.music-progress-bar');
+
     if (addBtn) addBtn.addEventListener('click', _showAddTrackModal);
     if (localBtn) localBtn.addEventListener('click', openLocalMusicPicker);
     if (localInput) localInput.addEventListener('change', handleLocalAudioSelection);
     if (manageBtn) manageBtn.addEventListener('click', _showManageTracksModal);
+    if (progressBar) progressBar.addEventListener('click', seekProgressBar);
 
     updateTrackTitle();
 
