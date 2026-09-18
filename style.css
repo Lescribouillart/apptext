@@ -2747,14 +2747,14 @@ body.dyslexia-mode .setting-label {
 }
 
 .youtube-btn {
-    background: rgba(255, 0, 51, 0.12);
-    border-color: rgba(255, 0, 51, 0.4);
+    background: rgba(255, 255, 255, 0.02);
+    border-color: var(--editor-border-color);
     color: #ff0033;
 }
 
 .youtube-btn:hover {
-    background: rgba(255, 0, 51, 0.2);
-    border-color: rgba(255, 0, 51, 0.7);
+    background: rgba(255,255,255,0.05);
+    border-color: rgba(255,255,255,0.18);
     color: #ff4d6d;
 }
 
