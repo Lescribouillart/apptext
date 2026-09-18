@@ -483,12 +483,15 @@
                         </div>
 
                         <div class="sc-actions">
-                            <button class="sc-action-btn" id="youtubeAddBtn" title="Ajouter une piste">+</button>
+                            <button class="sc-action-btn" id="youtubeAddBtn" title="Ajouter une piste YouTube">+</button>
+                            <button class="sc-action-btn" id="localMusicBtn" title="Ouvrir un fichier audio du téléphone" aria-label="Ouvrir un fichier audio du téléphone">♫</button>
                             <button class="sc-action-btn" id="youtubeManageBtn" title="Gérer les pistes">
                                 <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
                             </button>
                             <button class="sc-action-btn" id="youtubeToggle" title="Réduire/Agrandir">−</button>
                         </div>
+                        <input id="localMusicInput" type="file" accept="audio/*" style="display:none;" aria-label="Choisir une musique sur le téléphone">
+                        <audio id="localAudioPlayer" preload="metadata" style="display:none;"></audio>
                     </div>
                 </div>
             </div>
