@@ -514,16 +514,16 @@ function changeTrack(direction) {
         if (track.url) {
             audio.src = track.url;
             audio.currentTime = 0;
-            audio.play().catch(function() {});
+            audio.pause();
         }
-        updateMusicUI(true);
+        updateMusicUI(false);
         return;
     }
 
     if (!ytPlayerReady || !ytPlayer) return;
     ytPlayer.loadVideoById({ videoId: track.id, startSeconds: 0 });
-    ytPlayer.playVideo();
-    updateMusicUI(true);
+    ytPlayer.pauseVideo();
+    updateMusicUI(false);
 }
 
 (function initCustomMusicControls() {
