@@ -1,0 +1,10 @@
+Prompt de commit android studio :
+
+"Synchronise le projet web vers Android Studio en faisant la bonne chaîne de mise à jour :
+
+vérifie les fichiers modifiés dans la racine du projet ;
+copie les dernières versions dans dist si nécessaire ;
+exécute npx cap sync android ;
+vérifie que les fichiers Android ont bien été mis à jour ;
+fais un commit Git clair pour enregistrer la synchronisation ;
+dis-moi si le projet est prêt à ouvrir dans Android Studio."
