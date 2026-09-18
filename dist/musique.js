@@ -22,7 +22,12 @@ var tracks = (function() {
         if (!Array.isArray(parsed)) return _defaultTracks.slice();
         if (parsed.length === 0) return [];
 
-        var isLegacyDefaults = parsed.length === _legacyDefaultTracks.length && parsed.every(function(track, index) {
+        var cleaned = parsed.filter(function(track) {
+            if (!track || !track.type || track.type !== 'local') return true;
+            return !(track.url && typeof track.url === 'string' && track.url.indexOf('blob:') === 0);
+        });
+
+        var isLegacyDefaults = cleaned.length === _legacyDefaultTracks.length && cleaned.every(function(track, index) {
             return track && track.id === _legacyDefaultTracks[index];
         });
 
@@ -31,12 +36,94 @@ var tracks = (function() {
             return _defaultTracks.slice();
         }
 
-        return parsed;
+        if (cleaned.length !== parsed.length) {
+            tracks = cleaned;
+            _saveTracks();
+        }
+
+        return cleaned;
     } catch(e) { return _defaultTracks.slice(); }
 })();
 
 function _saveTracks() {
-    try { localStorage.setItem('scribouillart_tracks', JSON.stringify(tracks)); } catch(e) {}
+    try {
+        localStorage.setItem('scribouillart_tracks', JSON.stringify(tracks.map(function(track) {
+            if (!track || track.type !== 'local') return track;
+            var safe = Object.assign({}, track);
+            delete safe.url;
+            return safe;
+        })));
+    } catch(e) {}
+}
+
+function readFileAsDataUrl(file) {
+    return new Promise(function(resolve, reject) {
+        var reader = new FileReader();
+        reader.onload = function() { resolve(reader.result); };
+        reader.onerror = function() { reject(new Error('Impossible de lire le fichier audio local.')); };
+        reader.readAsDataURL(file);
+    });
+}
+
+function _openLocalTracksDB() {
+    return new Promise(function(resolve, reject) {
+        if (!('indexedDB' in window)) {
+            resolve(null);
+            return;
+        }
+
+        var request = indexedDB.open('textplaystore_local_tracks', 1);
+        request.onupgradeneeded = function() {
+            var db = request.result;
+            if (!db.objectStoreNames.contains('tracks')) {
+                db.createObjectStore('tracks');
+            }
+        };
+        request.onsuccess = function() { resolve(request.result); };
+        request.onerror = function() { reject(request.error || new Error('Erreur IndexedDB')); };
+    });
+}
+
+function _storeLocalTrackData(track) {
+    return _openLocalTracksDB().then(function(db) {
+        if (!db || !track || track.type !== 'local') return null;
+        return new Promise(function(resolve, reject) {
+            var tx = db.transaction('tracks', 'readwrite');
+            var store = tx.objectStore('tracks');
+            store.put(track.url || '', track.id);
+            tx.oncomplete = function() { resolve(track); };
+            tx.onerror = function() { reject(tx.error || new Error('Impossible de sauvegarder la piste locale.')); };
+        });
+    });
+}
+
+function _getLocalTrackData(track) {
+    return _openLocalTracksDB().then(function(db) {
+        if (!db || !track || track.type !== 'local') return null;
+        return new Promise(function(resolve, reject) {
+            var tx = db.transaction('tracks', 'readonly');
+            var store = tx.objectStore('tracks');
+            var request = store.get(track.id);
+            request.onsuccess = function() { resolve(request.result || null); };
+            request.onerror = function() { reject(request.error || new Error('Impossible de lire la piste locale.')); };
+        });
+    }).catch(function() { return null; });
+}
+
+function _hydrateLocalTracksFromIndexedDB() {
+    if (!Array.isArray(tracks)) return Promise.resolve();
+
+    var localTracks = tracks.filter(function(track) { return track && track.type === 'local' && !track.url; });
+    if (!localTracks.length) return Promise.resolve();
+
+    return Promise.all(localTracks.map(function(track) {
+        return _getLocalTrackData(track).then(function(dataUrl) {
+            if (dataUrl) track.url = dataUrl;
+            return track;
+        });
+    })).then(function() {
+        if (typeof updateTrackTitle === 'function') updateTrackTitle();
+    });
 }
 
 function _extractYouTubeId(url) {
@@ -351,18 +438,38 @@ function updateTrackTitle() {
 
     if (thumb) {
         thumb.alt = track.title;
+        thumb.style.background = 'rgba(255,255,255,0.06)';
+        thumb.style.padding = '0';
+        thumb.style.boxSizing = 'border-box';
+
         if (isLocalTrack(track)) {
-            thumb.src = 'assets/icons/disquevinyle.png';
+            thumb.onerror = null;
+            thumb.src = 'assets/icons/logonote.png';
             thumb.style.objectFit = 'contain';
+            thumb.style.background = '#d7d0c5';
+            thumb.style.padding = '18%';
         } else {
             thumb.style.objectFit = 'cover';
             var candidates = ['maxresdefault.jpg', 'sddefault.jpg', 'hqdefault.jpg', 'default.jpg'];
             var currentIndex = 0;
+
+            function setFallbackThumb() {
+                thumb.onerror = null;
+                thumb.src = 'assets/icons/logonote.png';
+                thumb.style.objectFit = 'contain';
+                thumb.style.background = '#d7d0c5';
+                thumb.style.padding = '18%';
+            }
+
             function setThumbCandidate() {
-                if (currentIndex >= candidates.length) return;
+                if (currentIndex >= candidates.length) {
+                    setFallbackThumb();
+                    return;
+                }
                 thumb.src = 'https://img.youtube.com/vi/' + track.id + '/' + candidates[currentIndex];
                 currentIndex += 1;
             }
+
             thumb.onerror = function() {
                 setThumbCandidate();
             };
@@ -372,13 +479,15 @@ function updateTrackTitle() {
 
     if (thumbLink) {
         if (isLocalTrack(track)) {
-            thumbLink.style.display = 'none';
             thumbLink.href = '#';
             thumbLink.title = '';
+            thumbLink.style.display = '';
+            thumbLink.style.pointerEvents = 'none';
         } else {
             thumbLink.href = 'https://www.youtube.com/watch?v=' + track.id;
             thumbLink.title = 'Ouvrir sur YouTube';
             thumbLink.style.display = '';
+            thumbLink.style.pointerEvents = '';
         }
     }
 
@@ -395,26 +504,35 @@ function openLocalMusicPicker() {
     input.click();
 }
 
-function handleLocalAudioSelection(event) {
+async function handleLocalAudioSelection(event) {
     var file = event.target.files && event.target.files[0];
     if (!file) return;
 
-    var url = URL.createObjectURL(file);
-    tracks.push({
-        id: 'local-' + Date.now(),
-        title: file.name.replace(/\.[^/.]+$/, '') || 'Musique locale',
-        type: 'local',
-        url: url
-    });
+    try {
+        var dataUrl = await readFileAsDataUrl(file);
+        var localTrack = {
+            id: 'local-' + Date.now(),
+            title: file.name.replace(/\.[^/.]+$/, '') || 'Musique locale',
+            type: 'local',
+            url: dataUrl
+        };
 
-    currentTrackIndex = tracks.length - 1;
-    updateTrackTitle();
+        tracks.push(localTrack);
+        await _storeLocalTrackData(localTrack);
+        _saveTracks();
 
-    var audio = ensureLocalAudioPlayer();
-    audio.src = url;
-    audio.play().catch(function() {});
-    updateMusicUI(true);
-    event.target.value = '';
+        currentTrackIndex = tracks.length - 1;
+        updateTrackTitle();
+
+        var audio = ensureLocalAudioPlayer();
+        audio.src = dataUrl;
+        audio.play().catch(function() {});
+        updateMusicUI(true);
+    } catch (e) {
+        console.error(e);
+    } finally {
+        event.target.value = '';
+    }
 }
 
 function onYouTubeIframeAPIReady() {
@@ -546,7 +664,9 @@ function changeTrack(direction) {
     if (manageBtn) manageBtn.addEventListener('click', _showManageTracksModal);
     if (progressBar) progressBar.addEventListener('click', seekProgressBar);
 
-    updateTrackTitle();
+    _hydrateLocalTracksFromIndexedDB().then(function() {
+        updateTrackTitle();
+    });
 
     playBtn.addEventListener('click', playCurrentTrack);
 
