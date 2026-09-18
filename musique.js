@@ -351,18 +351,38 @@ function updateTrackTitle() {
 
     if (thumb) {
         thumb.alt = track.title;
+        thumb.style.background = 'rgba(255,255,255,0.06)';
+        thumb.style.padding = '0';
+        thumb.style.boxSizing = 'border-box';
+
         if (isLocalTrack(track)) {
-            thumb.src = 'assets/icons/disquevinyle.png';
+            thumb.onerror = null;
+            thumb.src = 'assets/icons/logonote.png';
             thumb.style.objectFit = 'contain';
+            thumb.style.background = '#d7d0c5';
+            thumb.style.padding = '18%';
         } else {
             thumb.style.objectFit = 'cover';
             var candidates = ['maxresdefault.jpg', 'sddefault.jpg', 'hqdefault.jpg', 'default.jpg'];
             var currentIndex = 0;
+
+            function setFallbackThumb() {
+                thumb.onerror = null;
+                thumb.src = 'assets/icons/logonote.png';
+                thumb.style.objectFit = 'contain';
+                thumb.style.background = '#d7d0c5';
+                thumb.style.padding = '18%';
+            }
+
             function setThumbCandidate() {
-                if (currentIndex >= candidates.length) return;
+                if (currentIndex >= candidates.length) {
+                    setFallbackThumb();
+                    return;
+                }
                 thumb.src = 'https://img.youtube.com/vi/' + track.id + '/' + candidates[currentIndex];
                 currentIndex += 1;
             }
+
             thumb.onerror = function() {
                 setThumbCandidate();
             };
@@ -372,13 +392,15 @@ function updateTrackTitle() {
 
     if (thumbLink) {
         if (isLocalTrack(track)) {
-            thumbLink.style.display = 'none';
             thumbLink.href = '#';
             thumbLink.title = '';
+            thumbLink.style.display = '';
+            thumbLink.style.pointerEvents = 'none';
         } else {
             thumbLink.href = 'https://www.youtube.com/watch?v=' + track.id;
             thumbLink.title = 'Ouvrir sur YouTube';
             thumbLink.style.display = '';
+            thumbLink.style.pointerEvents = '';
         }
     }
 
