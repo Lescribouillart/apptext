@@ -6,6 +6,7 @@ var ytPlayer      = null;
 var ytPlayerReady = false;
 var currentTrackIndex = 0;
 var localAudioPlayer = null;
+var youtubeProgressTimer = null;
 
 var _defaultTracks = [];
 var _legacyDefaultTracks = [
@@ -208,6 +209,40 @@ function updateLocalProgress() {
     }
 }
 
+function updateYouTubeProgress() {
+    if (!ytPlayer || !ytPlayerReady || !ytPlayer.getCurrentTime || !ytPlayer.getDuration) return;
+
+    var currentTimeEl = document.querySelector('.music-current-time');
+    var progressEl = document.querySelector('.music-progress-bar span');
+    var current = ytPlayer.getCurrentTime();
+    var duration = ytPlayer.getDuration();
+
+    if (currentTimeEl) {
+        currentTimeEl.textContent = formatTrackTime(current);
+    }
+
+    if (progressEl) {
+        if (!duration) {
+            progressEl.style.width = '0%';
+        } else {
+            progressEl.style.width = ((current / duration) * 100).toFixed(2) + '%';
+        }
+    }
+}
+
+function startYouTubeProgressLoop() {
+    if (youtubeProgressTimer) {
+        clearInterval(youtubeProgressTimer);
+    }
+    youtubeProgressTimer = setInterval(function() {
+        if (!ytPlayer || !ytPlayerReady) return;
+        var state = ytPlayer.getPlayerState();
+        if (state === YT.PlayerState.PLAYING || state === YT.PlayerState.BUFFERING) {
+            updateYouTubeProgress();
+        }
+    }, 500);
+}
+
 function ensureLocalAudioPlayer() {
     if (localAudioPlayer) return localAudioPlayer;
     localAudioPlayer = document.getElementById('localAudioPlayer');
@@ -365,10 +400,19 @@ function onYouTubeIframeAPIReady() {
                 ytPlayerReady = true;
                 var vol = document.getElementById('scVolume');
                 if (vol) e.target.setVolume(parseInt(vol.value, 10) || 80);
+                updateYouTubeProgress();
             },
             onStateChange: function (e) {
                 var playing = (e.data === YT.PlayerState.PLAYING);
                 updateMusicUI(playing);
+                updateYouTubeProgress();
+
+                if (playing || e.data === YT.PlayerState.BUFFERING) {
+                    startYouTubeProgressLoop();
+                } else if (youtubeProgressTimer) {
+                    clearInterval(youtubeProgressTimer);
+                    youtubeProgressTimer = null;
+                }
             }
         }
     });
