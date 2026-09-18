@@ -113,6 +113,7 @@ async function initEditor() {
     const imageBtn = document.getElementById('imageBtn');
     const sourceBtn = document.getElementById('sourceBtn');
     const organizeToolbarBtn = document.getElementById('organizeToolbarBtn');
+    const toolbarSaveBtn = document.getElementById('toolbarSaveBtn');
     const saveAsBtn = document.getElementById('saveAsBtn');
     const addBtn = document.getElementById('addBtn');
     const loadBtn = document.getElementById('loadBtn');
@@ -153,7 +154,7 @@ async function initEditor() {
         const toolbar = document.querySelector('.editor-toolbar');
         if (!toolbar) return [];
 
-        return Array.from(toolbar.querySelectorAll('.toolbar-btn:not(#organizeToolbarBtn)'))
+        return Array.from(toolbar.querySelectorAll('.toolbar-btn:not(#organizeToolbarBtn):not(#toolbarSaveBtn)'))
             .map(btn => btn.id || btn.dataset.command)
             .filter(Boolean);
     }
@@ -169,7 +170,7 @@ async function initEditor() {
         const savedOrder = JSON.parse(localStorage.getItem('textToolbarOrder') || '[]');
         if (!Array.isArray(savedOrder) || savedOrder.length === 0) return;
 
-        const draggableButtons = Array.from(toolbar.querySelectorAll('.toolbar-btn:not(#organizeToolbarBtn)'));
+        const draggableButtons = Array.from(toolbar.querySelectorAll('.toolbar-btn:not(#organizeToolbarBtn):not(#toolbarSaveBtn)'));
         const keyMap = new Map(draggableButtons.map(btn => [(btn.id || btn.dataset.command), btn]));
 
         const orderedButtons = [];
@@ -189,7 +190,7 @@ async function initEditor() {
         const orderedNodes = [];
         let buttonIndex = 0;
         Array.from(toolbar.children).forEach(child => {
-            if (child.classList && child.classList.contains('toolbar-btn') && child.id !== 'organizeToolbarBtn') {
+            if (child.classList && child.classList.contains('toolbar-btn') && child.id !== 'organizeToolbarBtn' && child.id !== 'toolbarSaveBtn') {
                 orderedNodes.push(orderedButtons[buttonIndex]);
                 buttonIndex += 1;
             } else {
@@ -205,7 +206,7 @@ async function initEditor() {
     }
 
     function setToolbarOrganizeMode(enabled) {
-        const draggableButtons = document.querySelectorAll('.editor-toolbar .toolbar-btn:not(#organizeToolbarBtn)');
+        const draggableButtons = document.querySelectorAll('.editor-toolbar .toolbar-btn:not(#organizeToolbarBtn):not(#toolbarSaveBtn)');
         draggableButtons.forEach(btn => {
             btn.draggable = enabled;
             btn.classList.toggle('toolbar-reorderable', enabled);
@@ -224,6 +225,22 @@ async function initEditor() {
         });
 
         organizeToolbarBtn.setAttribute('aria-pressed', 'false');
+    }
+
+    if (toolbarSaveBtn) {
+        toolbarSaveBtn.addEventListener('click', async () => {
+            const subject = articleSubject.value.trim();
+            if (!subject) {
+                alert('Veuillez saisir un titre avant d\'enregistrer la carte.');
+                articleSubject.focus();
+                return;
+            }
+
+            await saveArticleToList(subject, editor.innerHTML, { forceNew: !currentArticleId });
+            hasUnsavedChanges = false;
+            markAsSaved();
+            showStatus('✓ Carte enregistrée', 'success');
+        });
     }
 
     const toolbar = document.querySelector('.editor-toolbar');
@@ -915,18 +932,27 @@ async function initEditor() {
                 return;
             }
 
-            cardsScreenList.innerHTML = articles.map((article) => `
-                <div class="screen-item card-item" data-article-id="${article.id}">
-                    <button class="screen-item-main" type="button" data-article-id="${article.id}">
-                        <span class="screen-item-title">${escapeHtml(article.subject || 'Sans titre')}</span>
-                        <span class="screen-item-meta">${escapeHtml(article.preview || '')}</span>
-                    </button>
-                    <button class="card-delete-btn" type="button" data-article-id="${article.id}" aria-label="Supprimer la carte" title="Supprimer la carte">×</button>
-                </div>
-            `).join('');
+            cardsScreenList.innerHTML = articles.map((article) => {
+                const cardColor = article.color || '#2f8b8d';
+                const cardStyle = article.color
+                    ? `--card-color: ${cardColor}; background: linear-gradient(90deg, ${hexToRgba(cardColor, 0.22)} 0%, rgba(255,255,255,0.02) 38%, rgba(255,255,255,0.03) 100%); border-color: ${hexToRgba(cardColor, 0.55)};`
+                    : '--card-color: transparent; background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.06);';
+
+                return `
+                    <div class="screen-item card-item ${article.color ? 'has-color' : ''}" data-article-id="${article.id}" style="${cardStyle}">
+                        <button class="screen-item-main" type="button" data-article-id="${article.id}">
+                            <span class="screen-item-title">${escapeHtml(article.subject || 'Sans titre')}</span>
+                            <span class="screen-item-meta">${escapeHtml(article.preview || '')}</span>
+                        </button>
+                        <button class="card-open-btn" type="button" data-article-id="${article.id}" aria-label="Choisir une couleur" title="Choisir une couleur" style="${article.color ? `border-color: ${hexToRgba(cardColor, 0.7)}; background: ${hexToRgba(cardColor, 0.14)};` : ''}">▾</button>
+                        <button class="card-delete-btn" type="button" data-article-id="${article.id}" aria-label="Supprimer la carte" title="Supprimer la carte">×</button>
+                    </div>
+                `;
+            }).join('');
 
             cardsScreenList.querySelectorAll('.screen-item').forEach((item) => {
                 const trigger = item.querySelector('.screen-item-main');
+                const openTrigger = item.querySelector('.card-open-btn');
                 const openCard = async () => {
                     const articleId = Number(item.dataset.articleId || trigger?.dataset.articleId);
                     if (!articleId) return;
@@ -935,7 +961,8 @@ async function initEditor() {
                 };
 
                 item.addEventListener('click', async (event) => {
-                    if (event.target.closest('.card-delete-btn')) return;
+                    if (event.target.closest('.card-delete-btn, .card-open-btn, .card-color-option')) return;
+                    if (event.target.closest('.card-color-menu')) return;
                     await openCard();
                 });
 
@@ -943,6 +970,77 @@ async function initEditor() {
                     trigger.addEventListener('click', async (event) => {
                         event.stopPropagation();
                         await openCard();
+                    });
+                }
+
+                if (openTrigger) {
+                    openTrigger.addEventListener('click', async (event) => {
+                        event.stopPropagation();
+                        const articleId = Number(openTrigger.dataset.articleId);
+                        const menu = document.createElement('div');
+                        menu.className = 'card-color-menu';
+
+                        const colors = [
+                            '#ef4444', '#f59e0b', '#10b981', '#3b82f6',
+                            '#8b5cf6', '#ec4899', '#f97316', '#94a3b8'
+                        ];
+
+                        const currentArticle = (await _dbGetAll()).find((article) => article.id === articleId);
+                        colors.forEach((color) => {
+                            const option = document.createElement('button');
+                            option.type = 'button';
+                            option.className = 'card-color-option';
+                            option.title = 'Classer en couleur';
+                            option.dataset.color = color;
+                            option.style.background = color;
+                            option.setAttribute('aria-label', `Choisir la couleur ${color}`);
+                            if (currentArticle?.color === color) {
+                                option.classList.add('selected');
+                            }
+                            option.addEventListener('click', async (colorEvent) => {
+                                colorEvent.stopPropagation();
+                                const articleList = await _dbGetAll();
+                                const articleToUpdate = articleList.find((entry) => entry.id === articleId);
+                                if (!articleToUpdate) return;
+                                articleToUpdate.color = color;
+                                await _dbPut(articleToUpdate);
+                                menu.remove();
+                                renderCardsScreen();
+                            });
+                            menu.appendChild(option);
+                        });
+
+                        const clearButton = document.createElement('button');
+                        clearButton.type = 'button';
+                        clearButton.className = 'card-color-option clear';
+                        clearButton.title = 'Retirer la couleur';
+                        clearButton.setAttribute('aria-label', 'Retirer la couleur');
+                        clearButton.textContent = '×';
+                        if (!currentArticle?.color) {
+                            clearButton.classList.add('selected');
+                        }
+                        clearButton.addEventListener('click', async (colorEvent) => {
+                            colorEvent.stopPropagation();
+                            const articleList = await _dbGetAll();
+                            const articleToUpdate = articleList.find((entry) => entry.id === articleId);
+                            if (!articleToUpdate) return;
+                            articleToUpdate.color = '';
+                            await _dbPut(articleToUpdate);
+                            menu.remove();
+                            renderCardsScreen();
+                        });
+                        menu.appendChild(clearButton);
+
+                        document.querySelectorAll('.card-color-menu').forEach((existingMenu) => existingMenu.remove());
+                        item.appendChild(menu);
+
+                        const closeMenuOnOutsideClick = (event) => {
+                            if (!event.target.closest('.card-color-menu') && !event.target.closest('.card-open-btn')) {
+                                menu.remove();
+                                document.removeEventListener('click', closeMenuOnOutsideClick);
+                            }
+                        };
+                        document.addEventListener('click', closeMenuOnOutsideClick);
                     });
                 }
             });
