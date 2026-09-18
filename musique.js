@@ -353,8 +353,14 @@ function playCurrentTrack() {
         if (audio.src !== track.url) {
             audio.src = track.url;
         }
-        audio.play().catch(function() {});
-        updateMusicUI(true);
+
+        if (audio.paused) {
+            audio.play().catch(function() {});
+            updateMusicUI(true);
+        } else {
+            audio.pause();
+            updateMusicUI(false);
+        }
         return;
     }
 
