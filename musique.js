@@ -441,24 +441,38 @@ function updateTrackTitle() {
         thumb.style.background = 'rgba(255,255,255,0.06)';
         thumb.style.padding = '0';
         thumb.style.boxSizing = 'border-box';
+        thumb.style.opacity = '0';
+        thumb.style.transition = 'opacity 0.12s ease';
 
         if (isLocalTrack(track)) {
-            thumb.onerror = null;
+            thumb.onload = function() {
+                thumb.style.opacity = '1';
+            };
+            thumb.onerror = function() {
+                thumb.style.opacity = '1';
+            };
             thumb.src = 'assets/icons/logonote.png';
             thumb.style.objectFit = 'contain';
             thumb.style.background = '#d7d0c5';
             thumb.style.padding = '18%';
+            thumb.style.opacity = '1';
         } else {
             thumb.style.objectFit = 'cover';
             var candidates = ['maxresdefault.jpg', 'sddefault.jpg', 'hqdefault.jpg', 'default.jpg'];
             var currentIndex = 0;
 
             function setFallbackThumb() {
-                thumb.onerror = null;
+                thumb.onload = function() {
+                    thumb.style.opacity = '1';
+                };
+                thumb.onerror = function() {
+                    thumb.style.opacity = '1';
+                };
                 thumb.src = 'assets/icons/logonote.png';
                 thumb.style.objectFit = 'contain';
                 thumb.style.background = '#d7d0c5';
                 thumb.style.padding = '18%';
+                thumb.style.opacity = '1';
             }
 
             function setThumbCandidate() {
@@ -466,13 +480,16 @@ function updateTrackTitle() {
                     setFallbackThumb();
                     return;
                 }
+                thumb.onload = function() {
+                    thumb.style.opacity = '1';
+                };
+                thumb.onerror = function() {
+                    setThumbCandidate();
+                };
                 thumb.src = 'https://img.youtube.com/vi/' + track.id + '/' + candidates[currentIndex];
                 currentIndex += 1;
             }
 
-            thumb.onerror = function() {
-                setThumbCandidate();
-            };
             setThumbCandidate();
         }
     }
