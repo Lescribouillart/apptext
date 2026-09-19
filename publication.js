@@ -606,7 +606,9 @@ async function initEditor() {
 
         const result = await engine.generateSuggestions(text, { includeWebIdeas: suggestionsWebMode });
         const styleLabel = result.style ? result.style.style || result.style.tone : 'neutre';
-        suggestionsMeta.textContent = `Thème: ${result.theme} • Style: ${styleLabel} • ${result.progress}`;
+        const textTypeLabel = result.textType && result.textType.label ? result.textType.label : 'texte libre';
+        const genreLabel = result.genre ? result.genre : 'libre';
+        suggestionsMeta.textContent = `Type: ${textTypeLabel} • Genre: ${genreLabel} • Style: ${styleLabel} • ${result.progress}`;
         renderSuggestionItems(result.suggestions || []);
         renderWebIdeas(result.webIdeas || []);
     }

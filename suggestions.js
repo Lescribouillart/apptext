@@ -118,6 +118,113 @@
         return 'créatif';
     }
 
+    function detectGenre(text) {
+        const lower = normalizeText(text);
+        if (!lower) return 'libre';
+
+        const genreRules = [
+            { genre: 'fantastique', words: ['dragon', 'mage', 'sortilege', 'ombre', 'lune', 'royaume', 'magie', 'fantastique', 'sorcier', 'crystal', 'portal', 'forge', 'mythique'] },
+            { genre: 'policier', words: ['enquete', 'suspect', 'indice', 'mystere', 'police', 'lieu', 'alibi', 'preuve', 'crime', 'detective', 'tueur', 'affaire'] },
+            { genre: 'romance', words: ['amour', 'coeur', 'tendre', 'flirt', 'promesse', 'rencontre', 'sentiment', 'baiser', 'confession'] },
+            { genre: 'science-fiction', words: ['vaisseau', 'planete', 'robot', 'nucleaire', 'futur', 'galaxie', 'signal', 'simulation', 'ordinateur', 'technologie'] },
+            { genre: 'aventure', words: ['voyage', 'foret', 'montagne', 'pirate', 'temple', 'route', 'explorer', 'danger', 'aventure', 'escapade'] },
+            { genre: 'horreur', words: ['effroi', 'sombre', 'silence', 'hant', 'fantome', 'maison', 'gouffre', 'peur', 'nocturne', 'ombre'] },
+            { genre: 'poetique', words: ['vent', 'mer', 'lune', 'reve', 'silence', 'souffle', 'brume', 'ame', 'poesie', 'murmure'] },
+            { genre: 'course', words: ['oeufs', 'lait', 'pain', 'fromage', 'pommes', 'tomates', 'bananes', 'riz', 'poisson', 'huile', 'sel', 'sucre', 'cafe', 'yaourt', 'legumes', 'fruits'] }
+        ];
+
+        let bestGenre = 'libre';
+        let bestScore = 0;
+
+        genreRules.forEach(({ genre, words }) => {
+            const score = words.reduce((total, word) => total + (lower.includes(word) ? 1 : 0), 0);
+            if (score > bestScore) {
+                bestScore = score;
+                bestGenre = genre;
+            }
+        });
+
+        if (bestScore === 0 && /\b(ombre|lune|maison|porte|fenetre|murmure|secret|night)\b/.test(lower)) {
+            return 'fantastique';
+        }
+
+        return bestGenre;
+    }
+
+    function detectTextType(text) {
+        const rawText = String(text || '');
+        const lower = normalizeText(rawText);
+        if (!lower) {
+            return { type: 'inconnu', label: 'inconnu', genre: 'libre', confidence: 0 };
+        }
+
+        const lines = rawText
+            .split(/\r?\n/)
+            .map((line) => line.trim())
+            .filter(Boolean);
+
+        const bulletCount = lines.filter((line) => /^(?:[-*•]|\d+[.)])\s+/.test(line)).length;
+        const shoppingWords = /\b(oeufs|fromage|lait|pain|pommes|tomates|riz|beurre|yaourt|poisson|viande|cafe|sucre|sel|huile|bananes|legumes|fruits)\b/i;
+        const listSignals = /\b(acheter|ajouter|besoin|liste|course|courses|panier|magasins?)\b/i;
+
+        if ((lines.length > 1 && (bulletCount >= Math.max(2, Math.ceil(lines.length / 2)) || listSignals.test(lower))) || shoppingWords.test(lower)) {
+            return {
+                type: 'liste',
+                label: 'liste de course',
+                genre: detectGenre(rawText) === 'course' ? 'course' : 'liste',
+                confidence: 0.94
+            };
+        }
+
+        const songSignals = /\b(oh|refrain|chorus|coeur|amour|la la|je chante|dans ma tete|sur mon chemin|viens avec moi)\b/i;
+        const lineBreaks = rawText.split(/\r?\n/).filter(Boolean).length;
+        if ((lineBreaks >= 2 && songSignals.test(lower)) || /\b(accord|couplet|chorus|refrain)\b/i.test(lower)) {
+            return {
+                type: 'chanson',
+                label: 'chanson',
+                genre: detectGenre(rawText) === 'romance' ? 'romance' : 'lyrique',
+                confidence: 0.9
+            };
+        }
+
+        const speechSignals = /\b(nous devons|il faut|je vous demande|citoyens|amis|freres|concitoyens|ensemble|devons agir|nous avons choisi)\b/i;
+        if (speechSignals.test(lower) || (/\b(nous|vous)\b/i.test(lower) && /\b(doit|devons|faut|ensemble|action|avenir|patrie|gouvernement)\b/i.test(lower))) {
+            return {
+                type: 'discours',
+                label: 'discours',
+                genre: 'argumentatif',
+                confidence: 0.88
+            };
+        }
+
+        const isVerseLike = lines.length >= 2 && lines.every((line) => line.split(/\s+/).length <= 12) && /\b(oh|je|tu|nous|coeur|vent|lune|silence|reve|amour|mer|brume|souffle|ombre|murmure)\b/i.test(lower);
+        if (isVerseLike) {
+            return {
+                type: 'poeme',
+                label: 'poème',
+                genre: detectGenre(rawText) === 'libre' ? 'poetique' : detectGenre(rawText),
+                confidence: 0.9
+            };
+        }
+
+        const narrativeSignals = /\b(il|elle|ils|elles|alors|puis|soudain|au bout|ce soir|ce matin|dans la maison|sur le chemin|dans la foret|a travers)\b/i;
+        if (narrativeSignals.test(lower) || /\b(personnage|scene|histoire|chapitre|events?)\b/i.test(lower)) {
+            return {
+                type: 'recit',
+                label: 'récit',
+                genre: detectGenre(rawText),
+                confidence: 0.83
+            };
+        }
+
+        return {
+            type: 'libre',
+            label: 'texte libre',
+            genre: detectGenre(rawText),
+            confidence: 0.5
+        };
+    }
+
     function getSentenceStats(text) {
         const normalized = normalizeText(text);
         if (!normalized) return { sentences: 0, avgLength: 0, questionCount: 0 };
@@ -172,12 +279,12 @@
     function generateLocalSuggestions(text) {
         const context = buildSuggestionContext(text);
         const { keywords, style, progress, theme, sentenceStats, intent, questionCount } = context;
-
+        const textType = detectTextType(text);
         const topicText = keywords.length ? keywords.map((word) => `"${word}"`).join(', ') : 'le sujet';
 
         const base = [
             `Poursuis sur le thème ${topicText} avec un exemple concret et précis.`,
-            `Explique pourquoi ${keywords[0] || 'ce sujet'} est important pour ton lecteur.` ,
+            `Explique pourquoi ${keywords[0] || 'ce sujet'} est important pour ton lecteur.`,
             'Ajoute un moment de tension ou un obstacle pour donner de la dynamique.',
             'Pose une question qui pousse le lecteur à continuer.',
             'Développe un point de vue opposé pour donner du relief à ton texte.',
@@ -272,6 +379,91 @@
             ]
         };
 
+        const typeSpecific = {
+            liste: [
+                'Ajoute un ingrédient ou un produit qui manque encore dans cette liste.',
+                'Précise la quantité pour rendre la liste plus utile et plus réaliste.',
+                'Sépare les produits par catégories : fruits, légumes, produits frais, épicerie.',
+                'Ajoute une idée de recette ou de repas à partir des éléments déjà présents.'
+            ],
+            recit: [
+                'Ajoute un détail concret qui donne une image forte à la scène.',
+                'Introduis un élément de surprise ou un tournant dramatique.',
+                'Montre la réaction du personnage face au changement de situation.',
+                'Laisse une trace de suspense avant la prochaine révélation.'
+            ],
+            chanson: [
+                'Crée un refrain court et mémorable sur le mot-clé central.',
+                'Ajoute une image plus forte pour rendre le chorus plus chantant.',
+                'Répète un mot ou une formule pour donner un rythme plus musical.',
+                'Ajoute un pont émotionnel avant la dernière répétition.'
+            ],
+            poeme: [
+                'Joue sur une image visuelle ou sonore pour renforcer la scène.',
+                'Réduit certaines phrases pour garder un rythme plus poétique.',
+                'Utilise un mot clé en refrain pour donner de la cohérence.',
+                'Termine sur une image forte qui laisse une impression durable.'
+            ],
+            discours: [
+                'Ajoute un exemple concret pour donner plus de force à l’argument.',
+                'Présente un défi ou un enjeu important pour faire réagir le lecteur.',
+                'Appelle à une action claire et immédiate.',
+                'Termine avec une phrase courte et mémorable.'
+            ],
+            libre: [
+                'Donne une idée plus précise pour faire avancer le texte.',
+                'Ajoute une étape simple : exemple, tension, conclusion.',
+                'Renforce le point central avec un détail, une émotion ou une image.'
+            ]
+        };
+
+        const genreSpecific = {
+            fantastique: [
+                'Introduis une apparition ou un signe mystérieux qui trouble la scène.',
+                'La menace ou la promesse magique doit modifier le cours de l’action.',
+                'Ajoute un détail ancien, lumineux ou surnaturel qui fait évoluer le décor.'
+            ],
+            policier: [
+                'Introduis un indice ou un détail oublié qui change tout.',
+                'Place une contradiction entre le témoignage et la réalité.',
+                'Fais apparaître une piste qui pousse le personnage vers une nouvelle découverte.'
+            ],
+            romance: [
+                'Ajoute un geste discret qui révèle un sentiment profond.',
+                'Fais émerger une hésitation ou une promesse sincère.',
+                'Montre un moment où le cœur semble prendre le dessus sur la raison.'
+            ],
+            'science-fiction': [
+                'Ajoute une donnée technologique ou un signe de changement futur.',
+                'Introduis une conséquence inattendue de cette innovation.',
+                'Fais émerger une question sur le sens de la technologie.'
+            ],
+            aventure: [
+                'Ajoute un obstacle imprévu sur le chemin.',
+                'Présente une découverte qui change la mission ou le voyage.',
+                'Donne un rythme plus rapide pour faire monter l’adrénaline.'
+            ],
+            horreur: [
+                'Ajoute un bruit, un silence ou un détail qui fait basculer le courage.',
+                'Rend la menace plus proche, plus tangible, plus personnelle.',
+                'Laisse le lecteur sentir que quelque chose de mauvais va arriver.'
+            ],
+            poetique: [
+                'Utilise une comparaison qui donne une image forte et lumineuse.',
+                'Répète un mot pour créer du rythme et une émotion plus intense.',
+                'Termine sur une sensation plus douce ou plus profonde.'
+            ],
+            course: [
+                'Ajoute un produit utile pour compléter le repas ou la semaine.',
+                'Ajoute un ingrédient qui manque pour rendre la liste plus cohérente.',
+                'Introduis une remarque pratique sur l’organisation de la liste.'
+            ],
+            libre: [
+                'Ajoute un détail concret pour ancrer le texte dans la réalité.',
+                'Rends la phrase suivante plus nette, plus vive et plus engageante.'
+            ]
+        };
+
         const extra = [];
         if (sentenceStats.sentences > 0 && sentenceStats.avgLength > 20) {
             extra.push('Simplifie certaines phrases pour rendre l’idée plus lisible et plus percutante.');
@@ -285,11 +477,15 @@
             ...dynamic,
             ...(byStyle[style.style] || []),
             ...(byProgress[progress] || []),
+            ...(typeSpecific[textType.type] || []),
+            ...(genreSpecific[textType.genre] || []),
             ...extra
         ];
 
         return {
             ...context,
+            textType,
+            genre: textType.genre,
             suggestions: [...new Set(suggestions)].slice(0, 10)
         };
     }
@@ -344,6 +540,8 @@
         extractKeywords,
         detectWritingStyle,
         detectIntent,
+        detectGenre,
+        detectTextType,
         getSentenceStats,
         estimateProgress,
         buildSuggestionContext,
