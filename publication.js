@@ -537,33 +537,49 @@ async function initEditor() {
     let suggestionsRefreshTimer = null;
 
     function positionSuggestionsBelowCaret() {
-        if (!inlineSuggestions || !editor || !editorArea) return;
-        const editorRect = editorArea.getBoundingClientRect();
+        if (!inlineSuggestions || !editorArea || !editor) return;
+
         const selection = window.getSelection();
+        const range = selection && selection.rangeCount ? selection.getRangeAt(0) : null;
+        const areaRect = editorArea.getBoundingClientRect();
 
-        if (!selection || selection.rangeCount === 0) {
-            inlineSuggestions.style.left = '1.2rem';
-            inlineSuggestions.style.top = '1rem';
-            inlineSuggestions.style.width = `${Math.min(520, Math.max(240, editorRect.width - 24))}px`;
-            return;
+        let targetRect = null;
+
+        if (range && editor.contains(range.startContainer)) {
+            const rect = range.getBoundingClientRect();
+            if (rect && rect.height) {
+                targetRect = rect;
+            }
         }
 
-        const range = selection.getRangeAt(0);
-        const caretRect = range.getBoundingClientRect();
-        const isActive = caretRect && (caretRect.width > 0 || caretRect.height > 0);
-
-        if (isActive) {
-            const left = Math.max(16, Math.min(caretRect.left - editorRect.left + 8, editorRect.width - 210));
-            const top = Math.max(20, caretRect.bottom - editorRect.top + 10);
-            inlineSuggestions.style.left = `${left}px`;
-            inlineSuggestions.style.top = `${top}px`;
-            inlineSuggestions.style.width = `${Math.min(520, Math.max(260, editorRect.width - 30))}px`;
-            return;
+        if (!targetRect) {
+            const fallback = editor.getBoundingClientRect();
+            targetRect = {
+                left: fallback.left + 24,
+                top: fallback.top + fallback.height - 28,
+                bottom: fallback.top + fallback.height - 28,
+                right: fallback.left + fallback.width - 24,
+                width: Math.max(120, fallback.width * 0.55)
+            };
         }
 
-        inlineSuggestions.style.left = '1.2rem';
-        inlineSuggestions.style.top = '1rem';
-        inlineSuggestions.style.width = `${Math.min(520, Math.max(260, editorRect.width - 24))}px`;
+        const spaceBelow = window.innerHeight - (areaRect.top + targetRect.bottom - areaRect.top + 12);
+        const suggestionHeight = Math.min(220, inlineSuggestions.scrollHeight || 180);
+        const preferredTop = targetRect.bottom - areaRect.top + 12;
+        const left = Math.min(
+            Math.max(targetRect.left - areaRect.left + 8, 12),
+            Math.max(12, areaRect.width - Math.min(areaRect.width * 0.8, 520) - 12)
+        );
+        const width = Math.min(Math.max(260, targetRect.width + 80), areaRect.width - 24);
+
+        inlineSuggestions.style.left = `${left}px`;
+        inlineSuggestions.style.width = `${width}px`;
+
+        if (spaceBelow >= suggestionHeight + 24) {
+            inlineSuggestions.style.top = `${preferredTop}px`;
+        } else {
+            inlineSuggestions.style.top = `${Math.max(12, targetRect.top - areaRect.top - suggestionHeight - 12)}px`;
+        }
     }
 
     function insertSuggestionAtCaret(text) {

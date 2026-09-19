@@ -1746,6 +1746,8 @@ body.dark-mode .article-card-move-down:hover {
 
 .editor-area {
     position: relative;
+    display: flex;
+    flex-direction: column;
     min-height: 500px;
     padding: 0;
     margin-bottom: 0;
@@ -1756,6 +1758,7 @@ body.dark-mode .article-card-move-down:hover {
     border-radius: 18px 18px 0 0;
     background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+    overflow: visible;
 }
 
 .editor-surface {
@@ -1766,6 +1769,7 @@ body.dark-mode .article-card-move-down:hover {
     font-size: 1.125rem;
     line-height: 1.8;
     outline: none;
+    flex: 0 0 auto;
 }
 
 .editor-surface:focus {
@@ -1804,19 +1808,23 @@ body.dark-mode .article-card-move-down:hover {
 
 .inline-suggestions {
     position: absolute;
-    left: 1.2rem;
-    right: 1.2rem;
-    top: 1rem;
-    z-index: 20;
+    z-index: 25;
     display: block;
+    width: min(520px, calc(100% - 2.4rem));
+    max-width: calc(100% - 2.4rem);
+    max-height: 220px;
     padding: 10px 10px 8px;
     background: rgba(15, 23, 35, 0.96);
     border: 1px solid rgba(143, 164, 188, 0.18);
     border-radius: 14px;
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
     backdrop-filter: blur(8px);
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
     pointer-events: auto;
+    transform: translate3d(0, 0, 0);
+    left: 1.2rem;
+    top: 1.2rem;
 }
 
 .inline-suggestion {
