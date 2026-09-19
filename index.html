@@ -116,8 +116,8 @@
                 <div class="top-bar-actions">
                     <button class="wp-button" id="loadBtn">Importer</button>
                     <button class="wp-button" id="saveAsBtn">Exporter</button>
-                    <button class="wp-button add-icon-btn" id="addBtn" title="Ajouter" aria-label="Ajouter" style="margin-left:auto;">
-                        <img src="assets/icons/plus.png" alt="Ajouter" width="16" height="16" />
+                    <button class="wp-button" id="topInspirationBtn" type="button" title="Inspiration" aria-label="Ouvrir les suggestions d’inspiration">
+                        Inspiration
                     </button>
                 </div>
             </div>
@@ -532,6 +532,18 @@
     <!-- Export Word .docx -->
     <script src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js"></script>
 
+    <aside id="suggestionsPanel" class="suggestions-panel hidden" aria-live="polite">
+        <div class="suggestions-header">
+            <h3>Coach d’écriture</h3>
+            <button id="closeSuggestionsBtn" class="suggestions-close" type="button" aria-label="Fermer les suggestions">×</button>
+        </div>
+        <div id="suggestionsMeta" class="suggestions-meta"></div>
+        <button id="webIdeasToggleBtn" class="web-ideas-toggle" type="button">Idées générales</button>
+        <ul id="suggestionsList" class="suggestions-list"></ul>
+        <div id="webIdeasContainer" class="web-ideas-container"></div>
+    </aside>
+
+    <script src="suggestions.js"></script>
     <script src="publication.js"></script>
     <script src="musique.js"></script>
     <!-- API IFrame YouTube pour piloter volume + lecture -->

@@ -529,7 +529,126 @@ async function initEditor() {
         hasUnsavedChanges = true;
         markAsModified();
         updateWordCounter();
+        refreshSuggestions();
     });
+
+    const inspirationBtn = document.getElementById('inspirationBtn');
+    const topInspirationBtn = document.getElementById('topInspirationBtn');
+    const suggestionsPanel = document.getElementById('suggestionsPanel');
+    const suggestionsList = document.getElementById('suggestionsList');
+    const suggestionsMeta = document.getElementById('suggestionsMeta');
+    const closeSuggestionsBtn = document.getElementById('closeSuggestionsBtn');
+    const webIdeasToggleBtn = document.getElementById('webIdeasToggleBtn');
+    const webIdeasContainer = document.getElementById('webIdeasContainer');
+    let suggestionsWebMode = false;
+    let suggestionsRefreshTimer = null;
+
+    function renderSuggestionItems(items = []) {
+        if (!suggestionsList) return;
+        suggestionsList.innerHTML = '';
+        if (!items.length) {
+            suggestionsList.innerHTML = '<li class="suggestion-item">Commencez à écrire pour obtenir des idées.</li>';
+            return;
+        }
+
+        items.forEach((item) => {
+            const li = document.createElement('button');
+            li.type = 'button';
+            li.className = 'suggestion-item';
+            li.textContent = item;
+            li.addEventListener('click', () => {
+                const currentText = (editor.innerText || editor.textContent || '').trim();
+                const appended = currentText ? `${currentText}\n\n${item}` : item;
+                editor.innerText = appended;
+                editor.dispatchEvent(new Event('input', { bubbles: true }));
+            });
+            suggestionsList.appendChild(li);
+        });
+    }
+
+    function renderWebIdeas(items = []) {
+        if (!webIdeasContainer) return;
+        webIdeasContainer.innerHTML = '';
+
+        if (!items.length) {
+            return;
+        }
+
+        const title = document.createElement('h4');
+        title.textContent = 'Idées générales';
+        webIdeasContainer.appendChild(title);
+
+        const list = document.createElement('ul');
+        items.forEach((idea) => {
+            const item = document.createElement('li');
+            item.className = 'web-idea-item';
+            item.innerHTML = `<strong>${escapeHtml(idea.title || 'Idée')}</strong><small>${escapeHtml(idea.description || '')}</small>`;
+            list.appendChild(item);
+        });
+        webIdeasContainer.appendChild(list);
+    }
+
+    async function refreshSuggestions() {
+        if (!suggestionsList || !suggestionsPanel) return;
+        const text = (editor.innerText || editor.textContent || '').trim();
+        if (!text) {
+            suggestionsMeta.textContent = 'Aucune idée pour le moment';
+            renderSuggestionItems([]);
+            renderWebIdeas([]);
+            return;
+        }
+
+        const engine = window.TextSuggestions;
+        if (!engine || typeof engine.generateSuggestions !== 'function') {
+            renderSuggestionItems(['Le moteur d’inspiration est indisponible.']);
+            return;
+        }
+
+        const result = await engine.generateSuggestions(text, { includeWebIdeas: suggestionsWebMode });
+        const styleLabel = result.style ? result.style.style || result.style.tone : 'neutre';
+        suggestionsMeta.textContent = `Thème: ${result.theme} • Style: ${styleLabel} • ${result.progress}`;
+        renderSuggestionItems(result.suggestions || []);
+        renderWebIdeas(result.webIdeas || []);
+    }
+
+    function toggleSuggestionsPanel(forceOpen) {
+        if (!suggestionsPanel) return;
+        const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : suggestionsPanel.classList.contains('hidden');
+        suggestionsPanel.classList.toggle('hidden', !shouldOpen);
+        if (shouldOpen) {
+            refreshSuggestions();
+        }
+    }
+
+    const triggerInspiration = () => toggleSuggestionsPanel();
+    inspirationBtn?.addEventListener('click', triggerInspiration);
+    topInspirationBtn?.addEventListener('click', triggerInspiration);
+    closeSuggestionsBtn?.addEventListener('click', () => toggleSuggestionsPanel(false));
+    webIdeasToggleBtn?.addEventListener('click', async () => {
+        suggestionsWebMode = !suggestionsWebMode;
+        webIdeasToggleBtn.textContent = suggestionsWebMode ? 'Idées générales activées' : 'Idées générales';
+        webIdeasToggleBtn.classList.toggle('is-active', suggestionsWebMode);
+        await refreshSuggestions();
+    });
+
+    const suggestionsDebouncedRefresh = () => {
+        clearTimeout(suggestionsRefreshTimer);
+        suggestionsRefreshTimer = setTimeout(() => {
+            refreshSuggestions();
+        }, 300);
+    };
+
+    editor.addEventListener('keyup', suggestionsDebouncedRefresh);
+    editor.addEventListener('paste', suggestionsDebouncedRefresh);
+    editor.addEventListener('focus', () => {
+        if (!suggestionsPanel || !suggestionsPanel.classList.contains('hidden')) {
+            refreshSuggestions();
+        }
+    });
+
+    if (!suggestionsPanel.classList.contains('hidden')) {
+        refreshSuggestions();
+    }
 
     articleSubject.addEventListener('input', () => {
         hasUnsavedChanges = true;

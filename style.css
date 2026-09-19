@@ -16,6 +16,165 @@ html, body {
     box-sizing: border-box;
 }
 
+.suggestions-panel {
+    position: fixed;
+    right: 18px;
+    bottom: 92px;
+    width: min(340px, calc(100vw - 28px));
+    max-height: min(480px, 75vh);
+    background: rgba(18, 22, 28, 0.97);
+    border: 1px solid rgba(119, 136, 164, 0.4);
+    border-radius: 18px;
+    box-shadow: 0 20px 44px rgba(0, 0, 0, 0.35);
+    z-index: 1200;
+    padding: 14px 12px 10px;
+    color: #edf2ff;
+    overflow: hidden;
+}
+
+.suggestions-panel.hidden {
+    display: none;
+}
+
+.suggestions-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 0 4px;
+}
+
+.suggestions-header h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #edf2ff;
+}
+
+.suggestions-close {
+    border: none;
+    background: transparent;
+    color: #d4dbef;
+    font-size: 1.6rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.suggestions-meta {
+    padding: 0 4px 8px;
+    font-size: 0.76rem;
+    color: #b7c2d9;
+}
+
+.web-ideas-toggle {
+    width: 100%;
+    margin: 0 0 10px;
+    border: 1px solid rgba(140, 168, 214, 0.35);
+    background: rgba(105, 147, 255, 0.1);
+    color: #edf2ff;
+    border-radius: 10px;
+    padding: 8px 10px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.suggestions-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 250px;
+    overflow: auto;
+    padding: 0 2px 6px;
+}
+
+.suggestion-item {
+    display: block;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(142, 162, 196, 0.28);
+    border-radius: 12px;
+    color: #edf2ff;
+    text-align: left;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+
+.suggestion-item:hover {
+    background: rgba(110, 162, 255, 0.12);
+    border-color: rgba(110, 162, 255, 0.4);
+    transform: translateY(-1px);
+}
+
+.web-ideas-container {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.web-ideas-container h4 {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #b7c2d9;
+    margin-bottom: 8px;
+}
+
+.web-ideas-container ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.web-idea-item {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 8px 10px;
+}
+
+.web-idea-item strong {
+    display: block;
+    font-size: 0.8rem;
+    margin-bottom: 3px;
+    color: #edf2ff;
+}
+
+.web-idea-item small {
+    color: #b7c2d9;
+    line-height: 1.4;
+}
+
+.dark-mode .suggestions-panel {
+    background: rgba(12, 16, 22, 0.98);
+}
+
+.light-mode .suggestions-panel {
+    background: rgba(255, 255, 255, 0.98);
+    color: #1a2233;
+    border-color: rgba(122, 138, 173, 0.32);
+}
+
+.light-mode .suggestions-header h3,
+.light-mode .suggestions-meta,
+.light-mode .suggestions-close,
+.light-mode .web-idea-item strong,
+.light-mode .web-idea-item small {
+    color: #1a2233;
+}
+
+.light-mode .suggestion-item,
+.light-mode .web-idea-item,
+.light-mode .web-ideas-toggle {
+    background: rgba(28, 36, 49, 0.04);
+    border-color: rgba(28, 36, 49, 0.12);
+    color: #1a2233;
+}
+
 .app-splash {
     position: fixed;
     inset: 0;
