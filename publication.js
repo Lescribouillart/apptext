@@ -535,51 +535,66 @@ async function initEditor() {
     const inlineSuggestions = document.getElementById('inlineSuggestions');
     const editorArea = document.getElementById('editorArea');
     let suggestionsRefreshTimer = null;
+    let lastSuggestionsAnchor = null;
 
-    function positionSuggestionsBelowCaret() {
-        if (!inlineSuggestions || !editorArea || !editor) return;
+    function getActiveParagraph() {
+        if (!editor || !window.getSelection) return null;
 
         const selection = window.getSelection();
-        const range = selection && selection.rangeCount ? selection.getRangeAt(0) : null;
-        const areaRect = editorArea.getBoundingClientRect();
+        if (!selection || selection.rangeCount === 0) {
+            return editor.lastElementChild || editor;
+        }
 
-        let targetRect = null;
-
-        if (range && editor.contains(range.startContainer)) {
-            const rect = range.getBoundingClientRect();
-            if (rect && rect.height) {
-                targetRect = rect;
+        let node = selection.anchorNode;
+        while (node && node !== editor) {
+            if (node.nodeType === 1 && (node.tagName === 'P' || node.tagName === 'DIV' || node.tagName === 'LI' || node.matches('h1, h2, h3, h4, h5, h6, blockquote'))) {
+                return node;
             }
+            node = node.parentNode;
         }
 
-        if (!targetRect) {
-            const fallback = editor.getBoundingClientRect();
-            targetRect = {
-                left: fallback.left + 24,
-                top: fallback.top + fallback.height - 28,
-                bottom: fallback.top + fallback.height - 28,
-                right: fallback.left + fallback.width - 24,
-                width: Math.max(120, fallback.width * 0.55)
-            };
+        return editor.lastElementChild || editor;
+    }
+
+    function keepSuggestionsAnchored() {
+        if (!inlineSuggestions || !editor) return;
+
+        const selection = window.getSelection && window.getSelection();
+        const hasSelectionInEditor = !!(selection && selection.rangeCount && editor.contains(selection.anchorNode));
+        const isEditorActive = document.activeElement === editor || editor.contains(document.activeElement);
+
+        if (!isEditorActive && !hasSelectionInEditor && lastSuggestionsAnchor) {
+            const anchor = lastSuggestionsAnchor;
+            if (anchor.nextSibling !== inlineSuggestions) {
+                anchor.insertAdjacentElement('afterend', inlineSuggestions);
+            }
+            inlineSuggestions.style.position = 'relative';
+            inlineSuggestions.style.left = '';
+            inlineSuggestions.style.top = '';
+            inlineSuggestions.style.width = '100%';
+            inlineSuggestions.style.maxWidth = '100%';
+            return;
         }
 
-        const spaceBelow = window.innerHeight - (areaRect.top + targetRect.bottom - areaRect.top + 12);
-        const suggestionHeight = Math.min(220, inlineSuggestions.scrollHeight || 180);
-        const preferredTop = targetRect.bottom - areaRect.top + 12;
-        const left = Math.min(
-            Math.max(targetRect.left - areaRect.left + 8, 12),
-            Math.max(12, areaRect.width - Math.min(areaRect.width * 0.8, 520) - 12)
-        );
-        const width = Math.min(Math.max(260, targetRect.width + 80), areaRect.width - 24);
+        const anchor = isEditorActive ? getActiveParagraph() : lastSuggestionsAnchor || getActiveParagraph();
+        if (!anchor) return;
 
-        inlineSuggestions.style.left = `${left}px`;
-        inlineSuggestions.style.width = `${width}px`;
+        lastSuggestionsAnchor = anchor;
 
-        if (spaceBelow >= suggestionHeight + 24) {
-            inlineSuggestions.style.top = `${preferredTop}px`;
-        } else {
-            inlineSuggestions.style.top = `${Math.max(12, targetRect.top - areaRect.top - suggestionHeight - 12)}px`;
+        if (anchor.nextSibling !== inlineSuggestions) {
+            anchor.insertAdjacentElement('afterend', inlineSuggestions);
         }
+
+        inlineSuggestions.style.position = 'relative';
+        inlineSuggestions.style.left = '';
+        inlineSuggestions.style.top = '';
+        inlineSuggestions.style.width = '100%';
+        inlineSuggestions.style.maxWidth = '100%';
+    }
+
+    function positionSuggestionsBelowCaret() {
+        if (!inlineSuggestions || !editor) return;
+        keepSuggestionsAnchored();
     }
 
     function insertSuggestionAtCaret(text) {
@@ -668,18 +683,28 @@ async function initEditor() {
         hasUnsavedChanges = true;
         markAsModified();
         updateWordCounter();
+        lastSuggestionsAnchor = getActiveParagraph();
+        positionSuggestionsBelowCaret();
         suggestionsDebouncedRefresh();
     });
 
     editor.addEventListener('keyup', () => {
+        lastSuggestionsAnchor = getActiveParagraph();
         positionSuggestionsBelowCaret();
         suggestionsDebouncedRefresh();
     });
-    editor.addEventListener('paste', suggestionsDebouncedRefresh);
+    editor.addEventListener('paste', () => {
+        lastSuggestionsAnchor = getActiveParagraph();
+        positionSuggestionsBelowCaret();
+        suggestionsDebouncedRefresh();
+    });
     editor.addEventListener('focus', () => {
+        lastSuggestionsAnchor = getActiveParagraph();
         positionSuggestionsBelowCaret();
         suggestionsDebouncedRefresh();
     });
+    lastSuggestionsAnchor = getActiveParagraph();
+    positionSuggestionsBelowCaret();
     refreshSuggestions();
 
     articleSubject.addEventListener('input', () => {
