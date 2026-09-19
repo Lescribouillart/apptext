@@ -10,34 +10,6 @@
         'tres', 'tout', 'toute', 'toutes', 'autre', 'autres', 'entre', 'vers', 'contre', 'apres'
     ]);
 
-    const LITERARY_DICTIONARY = {
-        genres: {
-            fantastique: ['magie', 'mage', 'dragon', 'sort', 'ombre', 'lune', 'potion', 'monstre', 'royaume', 'enchante', 'sorcier', 'rune', 'crystal', 'mystere', 'fantome', 'porte', 'labyrinthe'],
-            policier: ['enquete', 'suspect', 'indice', 'affaire', 'crime', 'detective', 'preuve', 'alibi', 'témoin', 'mystere', 'cadavre', 'lieu', 'secret', 'scène'],
-            romance: ['amour', 'coeur', 'tendre', 'promesse', 'rendez', 'sentiment', 'desir', 'flirt', 'confession', 'emotion', 'amoureux', 'rencontre', 'baiser'],
-            aventure: ['route', 'voyage', 'foret', 'montagne', 'temple', 'pirate', 'quete', 'danger', 'explorer', 'caravane', 'trésor', 'aventurier', 'frontiere'],
-            sciencefiction: ['vaisseau', 'planete', 'robot', 'galaxie', 'simulation', 'technologie', 'futur', 'orbitale', 'intelligence', 'station', 'univers', 'quantique'],
-            horreur: ['sombre', 'peur', 'effroi', 'fantome', 'silence', 'hallucination', 'grincement', 'nocturne', 'rouge', 'ombre', 'cave', 'hanté', 'gouffre'],
-            historique: ['royaume', 'cour', 'chevalier', 'empire', 'ancien', 'medieval', 'guerre', 'armure', 'village', 'chronique', 'monarque', 'epoque'],
-            realiste: ['rue', 'quartier', 'bureau', 'famille', 'maison', 'voisin', 'travail', 'marché', 'école', 'arrondissement', 'femme', 'enfant']
-        },
-        styles: {
-            narratif: ['alors', 'puis', 'soudain', 'personnage', 'histoire', 'chemin', 'maison', 'jour', 'soir', 'chapitre', 'scène', 'regarda', 'continua'],
-            descriptif: ['lumiere', 'ombre', 'couleur', 'bruit', 'odeur', 'forme', 'texture', 'décor', 'atmosphere', 'silhouette', 'clarté', 'brume'],
-            analytique: ['raison', 'cause', 'effet', 'analyse', 'objectif', 'methode', 'consequence', 'preuve', 'hypothese', 'conclusion', 'logique'],
-            persuasif: ['doit', 'il faut', 'important', 'avantage', 'convaincre', 'pourquoi', 'essentiel', 'choisir', 'prefere', 'nécessaire', 'ensemble'],
-            poetique: ['vent', 'mer', 'lune', 'brume', 'silence', 'ame', 'souffle', 'murmure', 'reve', 'vague', 'etoile', 'fleur', 'nocturne'],
-            intime: ['je', 'moi', 'mes', 'mon', 'souvenir', 'emotion', 'coeur', 'secret', 'je pense', 'je veux', 'je me sens', 'je me rappelle']
-        },
-        types: {
-            recit: ['histoire', 'personnage', 'alors', 'puis', 'quand', 'soudain', 'scene', 'chemin', 'maison', 'soir', 'jour', 'apparut'],
-            liste: ['liste', 'acheter', 'ajouter', 'besoin', 'course', 'panier', 'produit', 'frais', 'legumes', 'oeufs', 'lait', 'pain', 'fromage', 'fromages'],
-            chanson: ['refrain', 'chorus', 'coeur', 'amour', 'oh', 'chante', 'couplet', 'musique', 'rythme', 'voix', 'mélodie', 'chanson'],
-            poeme: ['vers', 'murmure', 'brume', 'lune', 'vent', 'souffle', 'ame', 'silence', 'etoile', 'ode', 'poesie', 'poème'],
-            discours: ['nous', 'vous', 'devons', 'il faut', 'ensemble', 'citoyens', 'avenir', 'action', 'justice', 'freres', 'amis', 'message', 'discours', 'patrie']
-        }
-    };
-
     function normalizeText(text = '') {
         return String(text || '')
             .replace(/<[^>]*>/g, ' ')
@@ -76,46 +48,12 @@
             .map(([word]) => word);
     }
 
-    function scoreLexicon(text, dictionary) {
-        const normalized = normalizeText(text || '');
-        if (!normalized) return { key: 'libre', score: 0 };
-
-        let bestKey = 'libre';
-        let bestScore = 0;
-
-        Object.entries(dictionary).forEach(([key, values]) => {
-            let score = 0;
-
-            values.forEach((value) => {
-                const cleanValue = normalizeText(value);
-                if (!cleanValue) return;
-
-                if (normalized.includes(cleanValue)) {
-                    score += 2;
-                }
-
-                const tokens = tokenizeWords(cleanValue);
-                if (tokens.length === 1 && normalized.split(/\s+/).includes(cleanValue)) {
-                    score += 1;
-                }
-            });
-
-            if (score > bestScore) {
-                bestScore = score;
-                bestKey = key;
-            }
-        });
-
-        return { key: bestKey, score: bestScore };
-    }
-
     function detectWritingStyle(text) {
         const cleaned = normalizeText(text);
         if (!cleaned) {
             return { tone: 'neutre', style: 'neutre', confidence: 0 };
         }
 
-        const lexicalStyle = scoreLexicon(text, LITERARY_DICTIONARY.styles);
         const words = tokenizeWords(text);
         const lower = cleaned;
         const score = {
@@ -143,9 +81,7 @@
                 }
             });
         });
-        if (lexicalStyle.score > 0 && lexicalStyle.key !== 'libre') {
-            score[lexicalStyle.key] += Math.max(2, lexicalStyle.score);
-        }
+
         if (/[!?]/.test(text)) score.persuasif += 2;
         if (/(\b\w+\b\s+){12,}/.test(lower)) score.analytique += 1;
         if ((text.match(/\?/g) || []).length > 0) score.persuasif += 2;
@@ -186,52 +122,33 @@
         const lower = normalizeText(text);
         if (!lower) return 'libre';
 
-        const fantasySignal = /(magie|mage|dragon|sort|ombre|lune|porte|murmure|secret|fantome|royaume|sorcier|crystal|mythique|eternel|ancient|mystere)/.test(lower);
-        const policeSignal = /(enquete|suspect|indice|crime|affaire|preuve|alibi|detective|mystere|cadavre|secret|lieu)/.test(lower);
-        const romanceSignal = /(amour|coeur|tendre|romance|promesse|rendez|sentiment|desir|flirt|baiser|confession|rencontre)/.test(lower);
-        const aventureSignal = /(voyage|foret|montagne|quete|pirate|temple|route|explorer|danger|aventure|trésor|frontiere)/.test(lower);
-        const sciFiSignal = /(vaisseau|planete|robot|galaxie|futur|univers|simulation|technologie|station|ordinateur|signal)/.test(lower);
-        const horrorSignal = /(effroi|peur|fantome|sombre|hallucination|silence|gouffre|nocturne|hant|ombres|gris)/.test(lower);
-        const historiqueSignal = /(royaume|cour|chevalier|empire|ancien|epoque|medieval|guerre|armure|monarque|chronique)/.test(lower);
+        const genreRules = [
+            { genre: 'fantastique', words: ['dragon', 'mage', 'sortilege', 'ombre', 'lune', 'royaume', 'magie', 'fantastique', 'sorcier', 'crystal', 'portal', 'forge', 'mythique'] },
+            { genre: 'policier', words: ['enquete', 'suspect', 'indice', 'mystere', 'police', 'lieu', 'alibi', 'preuve', 'crime', 'detective', 'tueur', 'affaire'] },
+            { genre: 'romance', words: ['amour', 'coeur', 'tendre', 'flirt', 'promesse', 'rencontre', 'sentiment', 'baiser', 'confession'] },
+            { genre: 'science-fiction', words: ['vaisseau', 'planete', 'robot', 'nucleaire', 'futur', 'galaxie', 'signal', 'simulation', 'ordinateur', 'technologie'] },
+            { genre: 'aventure', words: ['voyage', 'foret', 'montagne', 'pirate', 'temple', 'route', 'explorer', 'danger', 'aventure', 'escapade'] },
+            { genre: 'horreur', words: ['effroi', 'sombre', 'silence', 'hant', 'fantome', 'maison', 'gouffre', 'peur', 'nocturne', 'ombre'] },
+            { genre: 'poetique', words: ['vent', 'mer', 'lune', 'reve', 'silence', 'souffle', 'brume', 'ame', 'poesie', 'murmure'] },
+            { genre: 'course', words: ['oeufs', 'lait', 'pain', 'fromage', 'pommes', 'tomates', 'bananes', 'riz', 'poisson', 'huile', 'sel', 'sucre', 'cafe', 'yaourt', 'legumes', 'fruits'] }
+        ];
 
-        if (fantasySignal && !policeSignal && !romanceSignal && !aventureSignal && !sciFiSignal && !horrorSignal && !historiqueSignal) {
+        let bestGenre = 'libre';
+        let bestScore = 0;
+
+        genreRules.forEach(({ genre, words }) => {
+            const score = words.reduce((total, word) => total + (lower.includes(word) ? 1 : 0), 0);
+            if (score > bestScore) {
+                bestScore = score;
+                bestGenre = genre;
+            }
+        });
+
+        if (bestScore === 0 && /\b(ombre|lune|maison|porte|fenetre|murmure|secret|night)\b/.test(lower)) {
             return 'fantastique';
         }
 
-        const genreScores = {};
-        Object.entries(LITERARY_DICTIONARY.genres).forEach(([genre, words]) => {
-            let score = 0;
-            words.forEach((word) => {
-                const cleanWord = normalizeText(word);
-                if (!cleanWord) return;
-                if (lower.includes(cleanWord)) {
-                    score += 2;
-                }
-                if (new RegExp(`\\b${cleanWord.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`).test(lower)) {
-                    score += 1;
-                }
-            });
-            genreScores[genre] = score;
-        });
-
-        const extraBoost = {
-            fantastique: /(magie|mage|dragon|sort|ombre|lune|porte|murmure|secret|fantome|royaume|sorcier|crystal|mythique|eternel|mystere)/.test(lower) ? 6 : 0,
-            policier: /(enquete|suspect|indice|crime|affaire|preuve|alibi|detective|mystere|cadavre|secret|lieu)/.test(lower) ? 5 : 0,
-            romance: /(amour|coeur|tendre|romance|promesse|rendez|sentiment|desir|flirt|baiser|confession|rencontre)/.test(lower) ? 5 : 0,
-            aventure: /(voyage|foret|montagne|quete|pirate|temple|route|explorer|danger|aventure|trésor|frontiere)/.test(lower) ? 5 : 0,
-            'science-fiction': /(vaisseau|planete|robot|galaxie|futur|univers|simulation|technologie|station|ordinateur|signal)/.test(lower) ? 5 : 0,
-            horreur: /(effroi|peur|fantome|sombre|hallucination|silence|gouffre|nocturne|hant|ombres|gris)/.test(lower) ? 5 : 0,
-            historique: /(royaume|cour|chevalier|empire|ancien|epoque|medieval|guerre|armure|monarque|chronique)/.test(lower) ? 5 : 0,
-            realiste: /(rue|quartier|bureau|maison|famille|voisin|travail|marché|ecole|arrondissement|enfant|emploi)/.test(lower) ? 3 : 0,
-            poetique: /(vent|mer|lune|reve|silence|souffle|brume|ame|etoile|murmure|poesie)/.test(lower) ? 3 : 0
-        };
-
-        Object.entries(extraBoost).forEach(([genre, bonus]) => {
-            if (bonus) genreScores[genre] = (genreScores[genre] || 0) + bonus;
-        });
-
-        const bestGenre = Object.entries(genreScores).sort((a, b) => b[1] - a[1])[0];
-        return bestGenre && bestGenre[1] > 0 ? bestGenre[0] : 'libre';
+        return bestGenre;
     }
 
     function detectTextType(text) {
@@ -246,13 +163,11 @@
             .map((line) => line.trim())
             .filter(Boolean);
 
-        const lexiconTypeScore = scoreLexicon(rawText, LITERARY_DICTIONARY.types);
         const bulletCount = lines.filter((line) => /^(?:[-*•]|\d+[.)])\s+/.test(line)).length;
         const shoppingWords = /\b(oeufs|fromage|lait|pain|pommes|tomates|riz|beurre|yaourt|poisson|viande|cafe|sucre|sel|huile|bananes|legumes|fruits)\b/i;
         const listSignals = /\b(acheter|ajouter|besoin|liste|course|courses|panier|magasins?)\b/i;
-        const narrativeSignals = /\b(il|elle|ils|elles|alors|puis|quand|soudain|au bout|ce soir|ce matin|dans la maison|sur le chemin|dans la foret|a travers|continua|entendit|decida)\b/i;
 
-        if (lexiconTypeScore.key === 'liste' || (lines.length > 1 && (bulletCount >= Math.max(2, Math.ceil(lines.length / 2)) || listSignals.test(lower))) || shoppingWords.test(lower)) {
+        if ((lines.length > 1 && (bulletCount >= Math.max(2, Math.ceil(lines.length / 2)) || listSignals.test(lower))) || shoppingWords.test(lower)) {
             return {
                 type: 'liste',
                 label: 'liste de course',
@@ -263,7 +178,7 @@
 
         const songSignals = /\b(oh|refrain|chorus|coeur|amour|la la|je chante|dans ma tete|sur mon chemin|viens avec moi)\b/i;
         const lineBreaks = rawText.split(/\r?\n/).filter(Boolean).length;
-        if (lexiconTypeScore.key === 'chanson' || (lineBreaks >= 2 && songSignals.test(lower)) || /\b(accord|couplet|chorus|refrain)\b/i.test(lower)) {
+        if ((lineBreaks >= 2 && songSignals.test(lower)) || /\b(accord|couplet|chorus|refrain)\b/i.test(lower)) {
             return {
                 type: 'chanson',
                 label: 'chanson',
@@ -273,7 +188,7 @@
         }
 
         const speechSignals = /\b(nous devons|il faut|je vous demande|citoyens|amis|freres|concitoyens|ensemble|devons agir|nous avons choisi)\b/i;
-        if (lexiconTypeScore.key === 'discours' || speechSignals.test(lower) || (/\b(nous|vous)\b/i.test(lower) && /\b(doit|devons|faut|ensemble|action|avenir|patrie|gouvernement)\b/i.test(lower))) {
+        if (speechSignals.test(lower) || (/\b(nous|vous)\b/i.test(lower) && /\b(doit|devons|faut|ensemble|action|avenir|patrie|gouvernement)\b/i.test(lower))) {
             return {
                 type: 'discours',
                 label: 'discours',
@@ -283,16 +198,7 @@
         }
 
         const isVerseLike = lines.length >= 2 && lines.every((line) => line.split(/\s+/).length <= 12) && /\b(oh|je|tu|nous|coeur|vent|lune|silence|reve|amour|mer|brume|souffle|ombre|murmure)\b/i.test(lower);
-        if (narrativeSignals.test(lower) && !isVerseLike) {
-            return {
-                type: 'recit',
-                label: 'récit',
-                genre: detectGenre(rawText),
-                confidence: 0.9
-            };
-        }
-
-        if (lexiconTypeScore.key === 'poeme' || isVerseLike) {
+        if (isVerseLike) {
             return {
                 type: 'poeme',
                 label: 'poème',
@@ -301,7 +207,8 @@
             };
         }
 
-        if (lexiconTypeScore.key === 'recit' || narrativeSignals.test(lower) || /\b(personnage|scene|histoire|chapitre|events?)\b/i.test(lower)) {
+        const narrativeSignals = /\b(il|elle|ils|elles|alors|puis|soudain|au bout|ce soir|ce matin|dans la maison|sur le chemin|dans la foret|a travers)\b/i;
+        if (narrativeSignals.test(lower) || /\b(personnage|scene|histoire|chapitre|events?)\b/i.test(lower)) {
             return {
                 type: 'recit',
                 label: 'récit',
