@@ -543,6 +543,35 @@ async function initEditor() {
     let suggestionsWebMode = false;
     let suggestionsRefreshTimer = null;
 
+    function insertSuggestionAtCaret(text) {
+        if (!editor) return;
+
+        const cleanText = String(text || '').trim();
+        if (!cleanText) return;
+
+        editor.focus();
+
+        const selection = window.getSelection();
+        if (selection && selection.rangeCount > 0) {
+            const range = selection.getRangeAt(0);
+            range.deleteContents();
+            const textNode = document.createTextNode(cleanText);
+            range.insertNode(textNode);
+            range.setStartAfter(textNode);
+            range.setEndAfter(textNode);
+            selection.removeAllRanges();
+            selection.addRange(range);
+            editor.dispatchEvent(new Event('input', { bubbles: true }));
+            return;
+        }
+
+        const cursor = window.getSelection ? window.getSelection().anchorOffset : null;
+        const currentText = (editor.innerText || editor.textContent || '');
+        const nextText = currentText.slice(0, cursor ?? currentText.length) + cleanText + currentText.slice(cursor ?? currentText.length);
+        editor.innerText = nextText;
+        editor.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
     function renderSuggestionItems(items = []) {
         if (!suggestionsList) return;
         suggestionsList.innerHTML = '';
@@ -557,10 +586,7 @@ async function initEditor() {
             li.className = 'suggestion-item';
             li.textContent = item;
             li.addEventListener('click', () => {
-                const currentText = (editor.innerText || editor.textContent || '').trim();
-                const appended = currentText ? `${currentText}\n\n${item}` : item;
-                editor.innerText = appended;
-                editor.dispatchEvent(new Event('input', { bubbles: true }));
+                insertSuggestionAtCaret(item);
             });
             suggestionsList.appendChild(li);
         });
