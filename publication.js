@@ -511,6 +511,14 @@ async function initEditor() {
             }
         }
 
+    const MIN_SUGGESTION_WORDS = 12;
+
+    function getEditorWordCount() {
+        const text = (editor.innerText || editor.textContent || '').trim();
+        if (!text) return 0;
+        return text.split(/\s+/).filter(Boolean).length;
+    }
+
     // Compteur de mots et de signes
     function updateWordCounter() {
         const text = editor.innerText || '';
@@ -524,24 +532,39 @@ async function initEditor() {
     }
     updateWordCounter();
 
-    // Détecter les modifications
-    editor.addEventListener('input', () => {
-        hasUnsavedChanges = true;
-        markAsModified();
-        updateWordCounter();
-        refreshSuggestions();
-    });
-
-    const inspirationBtn = document.getElementById('inspirationBtn');
-    const topInspirationBtn = document.getElementById('topInspirationBtn');
-    const suggestionsPanel = document.getElementById('suggestionsPanel');
-    const suggestionsList = document.getElementById('suggestionsList');
-    const suggestionsMeta = document.getElementById('suggestionsMeta');
-    const closeSuggestionsBtn = document.getElementById('closeSuggestionsBtn');
-    const webIdeasToggleBtn = document.getElementById('webIdeasToggleBtn');
-    const webIdeasContainer = document.getElementById('webIdeasContainer');
-    let suggestionsWebMode = false;
+    const inlineSuggestions = document.getElementById('inlineSuggestions');
+    const editorArea = document.getElementById('editorArea');
     let suggestionsRefreshTimer = null;
+
+    function positionSuggestionsBelowCaret() {
+        if (!inlineSuggestions || !editor || !editorArea) return;
+        const editorRect = editorArea.getBoundingClientRect();
+        const selection = window.getSelection();
+
+        if (!selection || selection.rangeCount === 0) {
+            inlineSuggestions.style.left = '1.2rem';
+            inlineSuggestions.style.top = '1rem';
+            inlineSuggestions.style.width = `${Math.min(520, Math.max(240, editorRect.width - 24))}px`;
+            return;
+        }
+
+        const range = selection.getRangeAt(0);
+        const caretRect = range.getBoundingClientRect();
+        const isActive = caretRect && (caretRect.width > 0 || caretRect.height > 0);
+
+        if (isActive) {
+            const left = Math.max(16, Math.min(caretRect.left - editorRect.left + 8, editorRect.width - 210));
+            const top = Math.max(20, caretRect.bottom - editorRect.top + 10);
+            inlineSuggestions.style.left = `${left}px`;
+            inlineSuggestions.style.top = `${top}px`;
+            inlineSuggestions.style.width = `${Math.min(520, Math.max(260, editorRect.width - 30))}px`;
+            return;
+        }
+
+        inlineSuggestions.style.left = '1.2rem';
+        inlineSuggestions.style.top = '1rem';
+        inlineSuggestions.style.width = `${Math.min(520, Math.max(260, editorRect.width - 24))}px`;
+    }
 
     function insertSuggestionAtCaret(text) {
         if (!editor) return;
@@ -552,7 +575,7 @@ async function initEditor() {
         editor.focus();
 
         const selection = window.getSelection();
-        if (selection && selection.rangeCount > 0) {
+        if (selection && selection.rangeCount > 0 && editor.contains(selection.anchorNode)) {
             const range = selection.getRangeAt(0);
             range.deleteContents();
             const textNode = document.createTextNode(cleanText);
@@ -565,118 +588,83 @@ async function initEditor() {
             return;
         }
 
-        const cursor = window.getSelection ? window.getSelection().anchorOffset : null;
         const currentText = (editor.innerText || editor.textContent || '');
-        const nextText = currentText.slice(0, cursor ?? currentText.length) + cleanText + currentText.slice(cursor ?? currentText.length);
+        const nextText = currentText ? `${currentText}${currentText.endsWith(' ') ? '' : ' '}${cleanText}` : cleanText;
         editor.innerText = nextText;
         editor.dispatchEvent(new Event('input', { bubbles: true }));
     }
 
-    function renderSuggestionItems(items = []) {
-        if (!suggestionsList) return;
-        suggestionsList.innerHTML = '';
+    function renderInlineSuggestions(items = []) {
+        if (!inlineSuggestions) return;
+        inlineSuggestions.innerHTML = '';
+
         if (!items.length) {
-            suggestionsList.innerHTML = '<li class="suggestion-item">Commencez à écrire pour obtenir des idées.</li>';
+            if (getEditorWordCount() >= MIN_SUGGESTION_WORDS) {
+                inlineSuggestions.innerHTML = '<span class="inline-suggestion empty">Aucune idée compatible pour le moment.</span>';
+            }
+            positionSuggestionsBelowCaret();
             return;
         }
 
-        items.forEach((item) => {
-            const li = document.createElement('button');
-            li.type = 'button';
-            li.className = 'suggestion-item';
-            li.textContent = item;
-            li.addEventListener('click', () => {
+        items.slice(0, 4).forEach((item) => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'inline-suggestion';
+            button.textContent = item;
+            button.addEventListener('click', () => {
                 insertSuggestionAtCaret(item);
             });
-            suggestionsList.appendChild(li);
+            inlineSuggestions.appendChild(button);
         });
-    }
 
-    function renderWebIdeas(items = []) {
-        if (!webIdeasContainer) return;
-        webIdeasContainer.innerHTML = '';
-
-        if (!items.length) {
-            return;
-        }
-
-        const title = document.createElement('h4');
-        title.textContent = 'Idées générales';
-        webIdeasContainer.appendChild(title);
-
-        const list = document.createElement('ul');
-        items.forEach((idea) => {
-            const item = document.createElement('li');
-            item.className = 'web-idea-item';
-            item.innerHTML = `<strong>${escapeHtml(idea.title || 'Idée')}</strong><small>${escapeHtml(idea.description || '')}</small>`;
-            list.appendChild(item);
-        });
-        webIdeasContainer.appendChild(list);
+        positionSuggestionsBelowCaret();
     }
 
     async function refreshSuggestions() {
-        if (!suggestionsList || !suggestionsPanel) return;
+        if (!inlineSuggestions) return;
+
         const text = (editor.innerText || editor.textContent || '').trim();
-        if (!text) {
-            suggestionsMeta.textContent = 'Aucune idée pour le moment';
-            renderSuggestionItems([]);
-            renderWebIdeas([]);
+        const words = getEditorWordCount();
+
+        if (!text || words < MIN_SUGGESTION_WORDS) {
+            renderInlineSuggestions([]);
             return;
         }
 
         const engine = window.TextSuggestions;
         if (!engine || typeof engine.generateSuggestions !== 'function') {
-            renderSuggestionItems(['Le moteur d’inspiration est indisponible.']);
+            renderInlineSuggestions(['Le moteur d’inspiration est indisponible.']);
             return;
         }
 
-        const result = await engine.generateSuggestions(text, { includeWebIdeas: suggestionsWebMode });
-        const styleLabel = result.style ? result.style.style || result.style.tone : 'neutre';
-        const textTypeLabel = result.textType && result.textType.label ? result.textType.label : 'texte libre';
-        const genreLabel = result.genre ? result.genre : 'libre';
-        suggestionsMeta.textContent = `Type: ${textTypeLabel} • Genre: ${genreLabel} • Style: ${styleLabel} • ${result.progress}`;
-        renderSuggestionItems(result.suggestions || []);
-        renderWebIdeas(result.webIdeas || []);
+        const result = await engine.generateSuggestions(text, { includeWebIdeas: false });
+        renderInlineSuggestions(result.suggestions || []);
     }
-
-    function toggleSuggestionsPanel(forceOpen) {
-        if (!suggestionsPanel) return;
-        const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : suggestionsPanel.classList.contains('hidden');
-        suggestionsPanel.classList.toggle('hidden', !shouldOpen);
-        if (shouldOpen) {
-            refreshSuggestions();
-        }
-    }
-
-    const triggerInspiration = () => toggleSuggestionsPanel();
-    inspirationBtn?.addEventListener('click', triggerInspiration);
-    topInspirationBtn?.addEventListener('click', triggerInspiration);
-    closeSuggestionsBtn?.addEventListener('click', () => toggleSuggestionsPanel(false));
-    webIdeasToggleBtn?.addEventListener('click', async () => {
-        suggestionsWebMode = !suggestionsWebMode;
-        webIdeasToggleBtn.textContent = suggestionsWebMode ? 'Idées générales activées' : 'Idées générales';
-        webIdeasToggleBtn.classList.toggle('is-active', suggestionsWebMode);
-        await refreshSuggestions();
-    });
 
     const suggestionsDebouncedRefresh = () => {
         clearTimeout(suggestionsRefreshTimer);
         suggestionsRefreshTimer = setTimeout(() => {
             refreshSuggestions();
-        }, 300);
+        }, 250);
     };
 
-    editor.addEventListener('keyup', suggestionsDebouncedRefresh);
-    editor.addEventListener('paste', suggestionsDebouncedRefresh);
-    editor.addEventListener('focus', () => {
-        if (!suggestionsPanel || !suggestionsPanel.classList.contains('hidden')) {
-            refreshSuggestions();
-        }
+    editor.addEventListener('input', () => {
+        hasUnsavedChanges = true;
+        markAsModified();
+        updateWordCounter();
+        suggestionsDebouncedRefresh();
     });
 
-    if (!suggestionsPanel.classList.contains('hidden')) {
-        refreshSuggestions();
-    }
+    editor.addEventListener('keyup', () => {
+        positionSuggestionsBelowCaret();
+        suggestionsDebouncedRefresh();
+    });
+    editor.addEventListener('paste', suggestionsDebouncedRefresh);
+    editor.addEventListener('focus', () => {
+        positionSuggestionsBelowCaret();
+        suggestionsDebouncedRefresh();
+    });
+    refreshSuggestions();
 
     articleSubject.addEventListener('input', () => {
         hasUnsavedChanges = true;
