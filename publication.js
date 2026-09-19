@@ -537,6 +537,18 @@ async function initEditor() {
     let suggestionsRefreshTimer = null;
     let lastSuggestionsAnchor = null;
 
+    function ensureSingleSuggestionsInstance() {
+        if (!editor) return;
+
+        const duplicates = Array.from(editor.querySelectorAll('.inline-suggestions')).filter(el => el !== inlineSuggestions);
+        duplicates.forEach((el) => el.remove());
+
+        if (inlineSuggestions && inlineSuggestions.parentElement && inlineSuggestions.parentElement !== editor) {
+            inlineSuggestions.remove();
+            editor.appendChild(inlineSuggestions);
+        }
+    }
+
     function getActiveParagraph() {
         if (!editor || !window.getSelection) return null;
 
@@ -559,24 +571,13 @@ async function initEditor() {
     function keepSuggestionsAnchored() {
         if (!inlineSuggestions || !editor) return;
 
+        ensureSingleSuggestionsInstance();
+
         const selection = window.getSelection && window.getSelection();
         const hasSelectionInEditor = !!(selection && selection.rangeCount && editor.contains(selection.anchorNode));
         const isEditorActive = document.activeElement === editor || editor.contains(document.activeElement);
 
-        if (!isEditorActive && !hasSelectionInEditor && lastSuggestionsAnchor) {
-            const anchor = lastSuggestionsAnchor;
-            if (anchor.nextSibling !== inlineSuggestions) {
-                anchor.insertAdjacentElement('afterend', inlineSuggestions);
-            }
-            inlineSuggestions.style.position = 'relative';
-            inlineSuggestions.style.left = '';
-            inlineSuggestions.style.top = '';
-            inlineSuggestions.style.width = '100%';
-            inlineSuggestions.style.maxWidth = '100%';
-            return;
-        }
-
-        const anchor = isEditorActive ? getActiveParagraph() : lastSuggestionsAnchor || getActiveParagraph();
+        const anchor = (isEditorActive ? getActiveParagraph() : lastSuggestionsAnchor || getActiveParagraph()) || editor.lastElementChild || editor;
         if (!anchor) return;
 
         lastSuggestionsAnchor = anchor;
