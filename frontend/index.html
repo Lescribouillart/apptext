@@ -85,6 +85,16 @@
                     </div>
                 </section>
 
+                <section class="settings-group">
+                    <h3>COMPTE</h3>
+                    <div class="settings-row info-row">
+                        <button class="settings-value-full" type="button" data-setting="account">
+                            <span class="settings-label">Mon compte</span>
+                            <span class="settings-arrow">›</span>
+                        </button>
+                    </div>
+                </section>
+
                 <section class="settings-group settings-group-footer">
                     <h3>À PROPOS</h3>
                     <div class="settings-row info-row">
@@ -358,6 +368,43 @@
                                 </span>
                             </button>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="screen-account" class="app-screen" aria-label="Écran d'inscription">
+            <div class="screen-header screen-header-with-back">
+                <button class="screen-back-btn" id="accountBackBtn" type="button" aria-label="Retour aux paramètres">
+                    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+                        <path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z" fill="currentColor"/>
+                    </svg>
+                </button>
+                <h2>Compte</h2>
+            </div>
+            <div class="screen-content">
+                <div class="account-panel">
+                    <div class="account-card">
+                        <h3>Créer un compte</h3>
+                        <form class="account-form" onsubmit="event.preventDefault();">
+                            <label class="account-field">
+                                <span>Nom</span>
+                                <input type="text" placeholder="Votre nom" aria-label="Nom" />
+                            </label>
+                            <label class="account-field">
+                                <span>Email</span>
+                                <input type="email" placeholder="votre@email.com" aria-label="Email" />
+                            </label>
+                            <label class="account-field">
+                                <span>Mot de passe</span>
+                                <input type="password" placeholder="••••••••" aria-label="Mot de passe" />
+                            </label>
+                            <label class="account-field">
+                                <span>Confirmer le mot de passe</span>
+                                <input type="password" placeholder="Répétez le mot de passe" aria-label="Confirmer le mot de passe" />
+                            </label>
+                            <button type="submit" class="account-submit">S'inscrire</button>
+                        </form>
                     </div>
                 </div>
             </div>

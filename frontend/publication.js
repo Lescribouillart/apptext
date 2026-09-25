@@ -537,6 +537,7 @@ async function initEditor() {
         editor: document.getElementById('screen-editor'),
         search: document.getElementById('screen-search'),
         theme: document.getElementById('screen-theme'),
+        account: document.getElementById('screen-account'),
         licenses: document.getElementById('screen-licenses'),
         updates: document.getElementById('screen-updates'),
         cards: document.getElementById('screen-cards'),
@@ -547,6 +548,7 @@ async function initEditor() {
     const settingsCloseBtn = document.getElementById('settingsCloseBtn');
     const settingsBtn = document.querySelector('.settings-btn');
     const settingsContent = document.querySelector('.settings-content');
+    const accountBackBtn = document.getElementById('accountBackBtn');
     const licensesBackBtn = document.getElementById('licensesBackBtn');
     const updatesBackBtn = document.getElementById('updatesBackBtn');
 
@@ -802,6 +804,12 @@ async function initEditor() {
                     return;
                 }
 
+                if (key === 'account') {
+                    setSettingsOpen(false);
+                    setRoute('account');
+                    return;
+                }
+
                 if (key === 'licenses') {
                     setSettingsOpen(false);
                     setRoute('licenses');
@@ -830,6 +838,11 @@ async function initEditor() {
     applySettingsState();
 
     settingsBtn?.addEventListener('click', () => {
+        setSettingsOpen(true);
+    });
+
+    accountBackBtn?.addEventListener('click', () => {
+        setRoute('editor');
         setSettingsOpen(true);
     });
 
