@@ -385,26 +385,47 @@
             <div class="screen-content">
                 <div class="account-panel">
                     <div class="account-card">
-                        <h3>Créer un compte</h3>
-                        <form class="account-form" onsubmit="event.preventDefault();">
+                        <div class="account-mode-switch" role="tablist" aria-label="Mode de compte">
+                            <button class="account-mode-btn is-active" type="button" data-account-mode="signup" aria-selected="true">Créer un compte</button>
+                            <button class="account-mode-btn" type="button" data-account-mode="signin" aria-selected="false">Se connecter</button>
+                        </div>
+
+                        <div id="accountSessionStatus" class="account-session-status">Vous n'êtes pas connecté.</div>
+
+                        <form id="accountForm" class="account-form" data-mode="signup">
                             <label class="account-field">
                                 <span>Nom</span>
-                                <input type="text" placeholder="Votre nom" aria-label="Nom" />
+                                <input id="accountName" name="fullName" type="text" placeholder="Votre nom" aria-label="Nom" />
                             </label>
                             <label class="account-field">
                                 <span>Email</span>
-                                <input type="email" placeholder="votre@email.com" aria-label="Email" />
+                                <input id="accountEmail" name="email" type="email" placeholder="votre@email.com" aria-label="Email" />
                             </label>
                             <label class="account-field">
                                 <span>Mot de passe</span>
-                                <input type="password" placeholder="••••••••" aria-label="Mot de passe" />
+                                <input id="accountPassword" name="password" type="password" placeholder="••••••••" aria-label="Mot de passe" />
                             </label>
                             <label class="account-field">
                                 <span>Confirmer le mot de passe</span>
-                                <input type="password" placeholder="Répétez le mot de passe" aria-label="Confirmer le mot de passe" />
+                                <input id="accountConfirmPassword" name="confirmPassword" type="password" placeholder="Répétez le mot de passe" aria-label="Confirmer le mot de passe" />
                             </label>
                             <button type="submit" class="account-submit">S'inscrire</button>
                         </form>
+
+                        <form id="accountLoginForm" class="account-form hidden" data-mode="signin">
+                            <label class="account-field">
+                                <span>Email</span>
+                                <input id="accountLoginEmail" name="email" type="email" placeholder="votre@email.com" aria-label="Email de connexion" />
+                            </label>
+                            <label class="account-field">
+                                <span>Mot de passe</span>
+                                <input id="accountLoginPassword" name="password" type="password" placeholder="••••••••" aria-label="Mot de passe de connexion" />
+                            </label>
+                            <button type="submit" class="account-submit">Se connecter</button>
+                        </form>
+
+                        <button id="accountSignOutBtn" type="button" class="account-signout hidden">Se déconnecter</button>
+                        <button id="accountDeleteBtn" type="button" class="account-delete hidden">Supprimer mon compte</button>
                     </div>
                 </div>
             </div>
@@ -572,11 +593,19 @@
     </nav>
 
     <!-- Librairie pour importer les fichiers Word .docx -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js"></script>
     <!-- Librairie pour décompresser les fichiers .odt (OpenDocument) -->
     <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
     <!-- Export Word .docx -->
     <script src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js"></script>
+
+    <script>
+        window.noteSupabase = window.supabase.createClient(
+            'https://xmkcwtqlxjpnqvjtnvpj.supabase.co',
+            'sb_publishable_bPP0felsZ7u05BrMfotrSg_AstgL9bB'
+        );
+    </script>
 
     <script src="publication.js"></script>
     <script src="musique.js"></script>

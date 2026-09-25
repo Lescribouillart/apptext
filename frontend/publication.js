@@ -860,6 +860,217 @@ async function initEditor() {
         setSettingsOpen(false);
     });
 
+    const accountForm = document.getElementById('accountForm');
+    const accountLoginForm = document.getElementById('accountLoginForm');
+    const accountName = document.getElementById('accountName');
+    const accountEmail = document.getElementById('accountEmail');
+    const accountPassword = document.getElementById('accountPassword');
+    const accountConfirmPassword = document.getElementById('accountConfirmPassword');
+    const accountLoginEmail = document.getElementById('accountLoginEmail');
+    const accountLoginPassword = document.getElementById('accountLoginPassword');
+    const accountModeButtons = document.querySelectorAll('.account-mode-btn');
+    const accountSessionStatus = document.getElementById('accountSessionStatus');
+    const accountSignOutBtn = document.getElementById('accountSignOutBtn');
+    const accountDeleteBtn = document.getElementById('accountDeleteBtn');
+    const supabaseClient = window.noteSupabase;
+
+    function setAccountMode(mode) {
+        const isSignup = mode === 'signup';
+
+        accountModeButtons.forEach((button) => {
+            const isSelected = button.dataset.accountMode === mode;
+            button.classList.toggle('is-active', isSelected);
+            button.setAttribute('aria-selected', String(isSelected));
+        });
+
+        accountForm?.classList.toggle('hidden', !isSignup);
+        accountLoginForm?.classList.toggle('hidden', isSignup);
+        accountForm?.setAttribute('aria-hidden', String(!isSignup));
+        accountLoginForm?.setAttribute('aria-hidden', String(isSignup));
+    }
+
+    async function syncAccountSessionState() {
+        if (!supabaseClient) return;
+
+        const { data } = await supabaseClient.auth.getSession();
+        const session = data?.session;
+        const displayEmail = session?.user?.email || 'Utilisateur';
+
+        if (accountSessionStatus) {
+            accountSessionStatus.textContent = session
+                ? `Connecté : ${displayEmail}`
+                : 'Vous n’êtes pas connecté.';
+        }
+
+        const isSignedIn = Boolean(session);
+        accountSignOutBtn?.classList.toggle('hidden', !isSignedIn);
+        accountDeleteBtn?.classList.toggle('hidden', !isSignedIn);
+
+        if (isSignedIn) {
+            accountForm?.classList.add('hidden');
+            accountLoginForm?.classList.add('hidden');
+            return;
+        }
+
+        setAccountMode('signup');
+    }
+
+    async function deleteCurrentAccount() {
+        if (!supabaseClient) {
+            window.alert('Supabase n’est pas initialisé.');
+            return;
+        }
+
+        const confirmed = window.confirm('Supprimer votre compte est définitif. Voulez-vous vraiment continuer ?');
+        if (!confirmed) return;
+
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        const accessToken = session?.access_token;
+
+        if (!accessToken) {
+            window.alert('Vous devez être connecté pour supprimer votre compte.');
+            return;
+        }
+
+        try {
+            const response = await fetch('http://localhost:3001/api/delete-account', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                },
+                body: JSON.stringify({})
+            });
+
+            const payload = await response.json().catch(() => ({}));
+
+            if (!response.ok) {
+                throw new Error(payload.error || 'Erreur lors de la suppression du compte.');
+            }
+
+            await supabaseClient.auth.signOut();
+            await syncAccountSessionState();
+            window.alert('Votre compte a bien été supprimé.');
+        } catch (error) {
+            window.alert(error.message || 'Erreur lors de la suppression du compte.');
+        }
+    }
+
+    accountModeButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+            setAccountMode(button.dataset.accountMode || 'signup');
+        });
+    });
+
+    if (accountSignOutBtn && supabaseClient) {
+        accountSignOutBtn.addEventListener('click', async () => {
+            const { error } = await supabaseClient.auth.signOut();
+
+            if (error) {
+                window.alert(error.message || 'Erreur lors de la déconnexion.');
+                return;
+            }
+
+            accountForm?.reset();
+            accountLoginForm?.reset();
+            await syncAccountSessionState();
+            window.alert('Déconnexion réussie.');
+        });
+    }
+
+    if (accountDeleteBtn) {
+        accountDeleteBtn.addEventListener('click', deleteCurrentAccount);
+    }
+
+    if (accountForm && supabaseClient) {
+        accountForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const name = (accountName?.value || '').trim();
+            const email = (accountEmail?.value || '').trim();
+            const password = accountPassword?.value || '';
+            const confirmPassword = accountConfirmPassword?.value || '';
+
+            if (!name || !email || !password || !confirmPassword) {
+                window.alert('Tous les champs sont requis.');
+                return;
+            }
+
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                window.alert('L’adresse email est invalide.');
+                return;
+            }
+
+            if (password.length < 8) {
+                window.alert('Le mot de passe doit contenir au moins 8 caractères.');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                window.alert('Les mots de passe ne correspondent pas.');
+                return;
+            }
+
+            const { error } = await supabaseClient.auth.signUp({
+                email,
+                password,
+                options: {
+                    data: {
+                        full_name: name
+                    }
+                }
+            });
+
+            if (error) {
+                window.alert(error.message || 'Erreur lors de l’inscription.');
+                return;
+            }
+
+            window.alert('Compte créé avec succès. Vérifie ton email pour confirmer l’inscription.');
+            accountForm.reset();
+        });
+    }
+
+    if (accountLoginForm && supabaseClient) {
+        accountLoginForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const email = (accountLoginEmail?.value || '').trim();
+            const password = accountLoginPassword?.value || '';
+
+            if (!email || !password) {
+                window.alert('L’email et le mot de passe sont requis.');
+                return;
+            }
+
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                window.alert('L’adresse email est invalide.');
+                return;
+            }
+
+            const { error } = await supabaseClient.auth.signInWithPassword({
+                email,
+                password
+            });
+
+            if (error) {
+                window.alert(error.message || 'Erreur lors de la connexion.');
+                return;
+            }
+
+            accountLoginForm.reset();
+            await syncAccountSessionState();
+            window.alert('Connexion réussie.');
+        });
+    }
+
+    if (supabaseClient) {
+        supabaseClient.auth.onAuthStateChange(async () => {
+            await syncAccountSessionState();
+        });
+        syncAccountSessionState();
+    }
+
     settingsOverlay?.addEventListener('click', (event) => {
         if (event.target === settingsOverlay) {
             setSettingsOpen(false);

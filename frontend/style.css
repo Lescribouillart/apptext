@@ -2023,6 +2023,38 @@ body:not(.dark-mode) .add-icon-btn img {
     letter-spacing: -0.04em;
 }
 
+.account-mode-switch {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 0.35rem;
+}
+
+.account-mode-btn {
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--editor-text-muted);
+    font-weight: 600;
+    padding: 0.7rem 0.8rem;
+    cursor: pointer;
+}
+
+.account-mode-btn.is-active {
+    background: linear-gradient(135deg, rgba(90,169,255,0.22), rgba(124,169,255,0.12));
+    color: var(--editor-text-primary);
+    box-shadow: inset 0 0 0 1px rgba(90,169,255,0.35);
+}
+
+.account-session-status {
+    color: var(--editor-text-muted);
+    font-size: 0.82rem;
+    line-height: 1.4;
+}
+
 .account-form {
     display: flex;
     flex-direction: column;
@@ -2052,7 +2084,9 @@ body:not(.dark-mode) .add-icon-btn img {
     color: rgba(255,255,255,0.4);
 }
 
-.account-submit {
+.account-submit,
+.account-signout,
+.account-delete {
     margin-top: 0.5rem;
     border: none;
     border-radius: 10px;
@@ -2061,6 +2095,16 @@ body:not(.dark-mode) .add-icon-btn img {
     font-weight: 700;
     padding: 0.85rem 1rem;
     cursor: pointer;
+}
+
+.account-signout {
+    background: linear-gradient(135deg, rgba(255,111,97,0.9), rgba(239,68,68,0.9));
+    color: #fff;
+}
+
+.account-delete {
+    background: linear-gradient(135deg, rgba(239,68,68,0.92), rgba(185,28,28,0.92));
+    color: #fff;
 }
 
 .licenses-header,

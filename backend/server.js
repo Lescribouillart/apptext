@@ -35,14 +35,8 @@ const server = http.createServer(async (req, res) => {
       service: 'textplaystore-backend',
       environment: process.env.NODE_ENV || 'development',
       supabase: Boolean(supabase),
-      endpoints: ['/api/health']
+      endpoints: ['/api/health', '/api/delete-account']
     }));
-    return;
-  }
-
-  if (req.method !== 'GET') {
-    res.writeHead(405, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ error: 'Method not allowed' }));
     return;
   }
 
@@ -56,6 +50,56 @@ const server = http.createServer(async (req, res) => {
       port: PORT,
       database: Boolean(supabase) ? 'supabase-connected' : 'local-fallback'
     }));
+    return;
+  }
+
+  if (url.pathname === '/api/delete-account') {
+    if (req.method !== 'POST') {
+      res.writeHead(405, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Method not allowed' }));
+      return;
+    }
+
+    if (!supabase) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Supabase is not configured' }));
+      return;
+    }
+
+    const authHeader = req.headers.authorization || '';
+    const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : '';
+
+    if (!token) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Authentication token is required' }));
+      return;
+    }
+
+    try {
+      const { data: { user }, error: userError } = await supabase.auth.getUser(token);
+
+      if (userError || !user) {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: userError?.message || 'Invalid session' }));
+        return;
+      }
+
+      const { error: deleteError } = await supabase.auth.admin.deleteUser(user.id);
+
+      if (deleteError) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: deleteError.message || 'Unable to delete user' }));
+        return;
+      }
+
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, deletedUserId: user.id }));
+      return;
+    } catch (error) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: error.message || 'Unexpected server error' }));
+    }
+
     return;
   }
 
