@@ -1,4 +1,6 @@
 (function (global) {
+    const API_BASE_URL = 'https://note-backend.onrender.com';
+
     const STOP_WORDS = new Set([
         'le', 'la', 'les', 'un', 'une', 'des', 'dans', 'pour', 'avec', 'sans',
         'sur', 'sous', 'entre', 'comme', 'plus', 'moins', 'mais', 'oui', 'non',
@@ -1030,21 +1032,60 @@
         }
     }
 
-    function generateSuggestions(text, options = {}) {
+    async function fetchRemoteSuggestions(text, options = {}) {
+        const safeText = String(text || '').trim();
+        if (!safeText) return null;
+
+        const url = new URL('/api/suggestions', API_BASE_URL);
+        url.searchParams.set('text', safeText);
+        if (options.includeWebIdeas === true) {
+            url.searchParams.set('includeWebIdeas', 'true');
+        }
+
+        try {
+            const response = await fetch(url.toString());
+            if (!response.ok) return null;
+
+            const payload = await response.json();
+            if (!payload || !Array.isArray(payload.suggestions)) return null;
+
+            return payload;
+        } catch (error) {
+            console.warn('fetchRemoteSuggestions error:', error);
+            return null;
+        }
+    }
+
+    async function generateSuggestions(text, options = {}) {
         const localResult = generateLocalSuggestions(text || '');
         const includeWebIdeas = options.includeWebIdeas === true;
 
-        if (!includeWebIdeas) {
-            return Promise.resolve({
+        const remoteResult = await fetchRemoteSuggestions(text || '', { includeWebIdeas });
+        if (remoteResult && Array.isArray(remoteResult.suggestions) && remoteResult.suggestions.length) {
+            const remoteSuggestions = remoteResult.suggestions
+                .map((item) => typeof item === 'string' ? item : (item && typeof item.value === 'string' ? item.value : null))
+                .filter(Boolean);
+
+            return {
                 ...localResult,
-                webIdeas: []
-            });
+                ...remoteResult,
+                suggestions: [...new Set([...remoteSuggestions, ...localResult.suggestions])].slice(0, 10),
+                webIdeas: remoteResult.webIdeas || []
+            };
         }
 
-        return fetchWebIdeas(localResult.theme, { limit: 3 }).then((webIdeas) => ({
+        if (!includeWebIdeas) {
+            return {
+                ...localResult,
+                webIdeas: []
+            };
+        }
+
+        const webIdeas = await fetchWebIdeas(localResult.theme, { limit: 3 });
+        return {
             ...localResult,
             webIdeas: webIdeas.length ? webIdeas : buildFallbackWebIdeas(localResult.theme, localResult.textType)
-        }));
+        };
     }
 
     const api = {

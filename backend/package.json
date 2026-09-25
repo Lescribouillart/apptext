@@ -1,21 +1,34 @@
 {
-  "name": "textplaystore",
+  "name": "textplaystore-backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "API backend pour le moteur de suggestions textuelles de Note",
+  "main": "server.js",
   "scripts": {
+    "dev": "node --watch server.js",
+    "start": "node server.js",
+    "test": "node -e \"const { generateSuggestions, detectTextType } = require('./suggestions.js'); console.log(JSON.stringify({ ok: typeof generateSuggestions === 'function', type: detectTextType('Bonjour').type }));\"",
     "sync": "npx cap sync android",
-    "open:android": "npx cap open android",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "open:android": "npx cap open android"
   },
-  "keywords": [],
+  "keywords": [
+    "backend",
+    "api",
+    "suggestions",
+    "supabase",
+    "node"
+  ],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
+  "engines": {
+    "node": ">=18"
+  },
   "dependencies": {
     "@capacitor/android": "^8.5.0",
     "@capacitor/cli": "^8.5.0",
-    "@capacitor/core": "^8.5.0"
+    "@capacitor/core": "^8.5.0",
+    "@supabase/supabase-js": "^2.45.4",
+    "dotenv": "^16.4.5"
   },
   "devDependencies": {
     "@capacitor/assets": "^3.0.5"
