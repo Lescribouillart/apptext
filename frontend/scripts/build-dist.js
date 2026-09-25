@@ -28,7 +28,7 @@ function ensureFileCopy(fileName) {
 
 fs.mkdirSync(distDir, { recursive: true });
 
-['index.html', 'style.css', 'publication.js', 'suggestions.js', 'musique.js'].forEach(ensureFileCopy);
+['index.html', 'style.css', 'publication.js', 'musique.js'].forEach(ensureFileCopy);
 
 for (const folder of ['assets', 'illustrheader']) {
   const src = path.join(root, folder);

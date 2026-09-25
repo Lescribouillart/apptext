@@ -511,202 +511,21 @@ async function initEditor() {
             }
         }
 
-    const MIN_SUGGESTION_WORDS = 12;
-
-    function getEditorWordCount() {
-        const text = (editor.innerText || editor.textContent || '').trim();
-        if (!text) return 0;
-        return text.split(/\s+/).filter(Boolean).length;
-    }
-
-    // Compteur de mots et de signes
-    function updateWordCounter() {
-        const text = editor.innerText || '';
-        const trimmed = text.trim();
-        const words = trimmed === '' ? 0 : trimmed.split(/\s+/).length;
-        const chars = trimmed.replace(/\s/g, '').length;
-        document.getElementById('statWords').textContent =
-            words.toLocaleString('fr-FR') + (words <= 1 ? '\u00a0mot' : '\u00a0mots');
-        document.getElementById('statChars').textContent =
-            chars.toLocaleString('fr-FR') + (chars <= 1 ? '\u00a0signe' : '\u00a0signes');
-    }
-    updateWordCounter();
-
-    const inlineSuggestions = document.getElementById('inlineSuggestions');
-    const editorArea = document.getElementById('editorArea');
-    let suggestionsRefreshTimer = null;
-    let lastSuggestionsAnchor = null;
-
-    function ensureSingleSuggestionsInstance() {
-        if (!editor) return;
-
-        const duplicates = Array.from(editor.querySelectorAll('.inline-suggestions')).filter(el => el !== inlineSuggestions);
-        duplicates.forEach((el) => el.remove());
-
-        if (inlineSuggestions && inlineSuggestions.parentElement && inlineSuggestions.parentElement !== editor) {
-            inlineSuggestions.remove();
-            editor.appendChild(inlineSuggestions);
-        }
-    }
-
-    function getActiveParagraph() {
-        if (!editor || !window.getSelection) return null;
-
-        const selection = window.getSelection();
-        if (!selection || selection.rangeCount === 0) {
-            return editor.lastElementChild || editor;
-        }
-
-        let node = selection.anchorNode;
-        while (node && node !== editor) {
-            if (node.nodeType === 1 && (node.tagName === 'P' || node.tagName === 'DIV' || node.tagName === 'LI' || node.matches('h1, h2, h3, h4, h5, h6, blockquote'))) {
-                return node;
-            }
-            node = node.parentNode;
-        }
-
-        return editor.lastElementChild || editor;
-    }
-
-    function keepSuggestionsAnchored() {
-        if (!inlineSuggestions || !editor) return;
-
-        ensureSingleSuggestionsInstance();
-
-        const selection = window.getSelection && window.getSelection();
-        const hasSelectionInEditor = !!(selection && selection.rangeCount && editor.contains(selection.anchorNode));
-        const isEditorActive = document.activeElement === editor || editor.contains(document.activeElement);
-
-        const anchor = (isEditorActive ? getActiveParagraph() : lastSuggestionsAnchor || getActiveParagraph()) || editor.lastElementChild || editor;
-        if (!anchor) return;
-
-        lastSuggestionsAnchor = anchor;
-
-        if (anchor.nextSibling !== inlineSuggestions) {
-            anchor.insertAdjacentElement('afterend', inlineSuggestions);
-        }
-
-        inlineSuggestions.style.position = 'relative';
-        inlineSuggestions.style.left = '';
-        inlineSuggestions.style.top = '';
-        inlineSuggestions.style.width = '100%';
-        inlineSuggestions.style.maxWidth = '100%';
-    }
-
-    function positionSuggestionsBelowCaret() {
-        if (!inlineSuggestions || !editor) return;
-        keepSuggestionsAnchored();
-    }
-
-    function insertSuggestionAtCaret(text) {
-        if (!editor) return;
-
-        const cleanText = String(text || '').trim();
-        if (!cleanText) return;
-
-        editor.focus();
-
-        const selection = window.getSelection();
-        if (selection && selection.rangeCount > 0 && editor.contains(selection.anchorNode)) {
-            const range = selection.getRangeAt(0);
-            range.deleteContents();
-            const textNode = document.createTextNode(cleanText);
-            range.insertNode(textNode);
-            range.setStartAfter(textNode);
-            range.setEndAfter(textNode);
-            selection.removeAllRanges();
-            selection.addRange(range);
-            editor.dispatchEvent(new Event('input', { bubbles: true }));
-            return;
-        }
-
-        const currentText = (editor.innerText || editor.textContent || '');
-        const nextText = currentText ? `${currentText}${currentText.endsWith(' ') ? '' : ' '}${cleanText}` : cleanText;
-        editor.innerText = nextText;
-        editor.dispatchEvent(new Event('input', { bubbles: true }));
-    }
-
-    function renderInlineSuggestions(items = []) {
-        if (!inlineSuggestions) return;
-        inlineSuggestions.innerHTML = '';
-
-        if (!items.length) {
-            if (getEditorWordCount() >= MIN_SUGGESTION_WORDS) {
-                inlineSuggestions.innerHTML = '<span class="inline-suggestion empty">Aucune idée compatible pour le moment.</span>';
-            }
-            positionSuggestionsBelowCaret();
-            return;
-        }
-
-        items.slice(0, 4).forEach((item) => {
-            const button = document.createElement('button');
-            button.type = 'button';
-            button.className = 'inline-suggestion';
-            button.textContent = item;
-            button.addEventListener('click', () => {
-                insertSuggestionAtCaret(item);
-            });
-            inlineSuggestions.appendChild(button);
-        });
-
-        positionSuggestionsBelowCaret();
-    }
-
-    async function refreshSuggestions() {
-        if (!inlineSuggestions) return;
-
-        const text = (editor.innerText || editor.textContent || '').trim();
-        const words = getEditorWordCount();
-
-        if (!text || words < MIN_SUGGESTION_WORDS) {
-            renderInlineSuggestions([]);
-            return;
-        }
-
-        const engine = window.TextSuggestions;
-        if (!engine || typeof engine.generateSuggestions !== 'function') {
-            renderInlineSuggestions(['Le moteur d’inspiration est indisponible.']);
-            return;
-        }
-
-        const result = await engine.generateSuggestions(text, { includeWebIdeas: false });
-        renderInlineSuggestions(result.suggestions || []);
-    }
-
-    const suggestionsDebouncedRefresh = () => {
-        clearTimeout(suggestionsRefreshTimer);
-        suggestionsRefreshTimer = setTimeout(() => {
-            refreshSuggestions();
-        }, 250);
-    };
-
     editor.addEventListener('input', () => {
         hasUnsavedChanges = true;
         markAsModified();
         updateWordCounter();
-        lastSuggestionsAnchor = getActiveParagraph();
-        positionSuggestionsBelowCaret();
-        suggestionsDebouncedRefresh();
     });
 
     editor.addEventListener('keyup', () => {
-        lastSuggestionsAnchor = getActiveParagraph();
-        positionSuggestionsBelowCaret();
-        suggestionsDebouncedRefresh();
+        updateWordCounter();
     });
-    editor.addEventListener('paste', () => {
-        lastSuggestionsAnchor = getActiveParagraph();
-        positionSuggestionsBelowCaret();
-        suggestionsDebouncedRefresh();
-    });
+
     editor.addEventListener('focus', () => {
-        lastSuggestionsAnchor = getActiveParagraph();
-        positionSuggestionsBelowCaret();
-        suggestionsDebouncedRefresh();
+        updateWordCounter();
     });
-    lastSuggestionsAnchor = getActiveParagraph();
-    positionSuggestionsBelowCaret();
-    refreshSuggestions();
+
+    updateWordCounter();
 
     articleSubject.addEventListener('input', () => {
         hasUnsavedChanges = true;
@@ -1041,6 +860,10 @@ async function initEditor() {
     });
 
     function setRoute(route) {
+        if (!route || !appScreens || !appScreens[route]) {
+            return;
+        }
+
         setSettingsOpen(false);
 
         Object.entries(appScreens).forEach(([key, screen]) => {
@@ -1049,6 +872,7 @@ async function initEditor() {
         });
 
         bottomTabs.forEach((button) => {
+            if (!button.dataset || !button.dataset.route) return;
             button.classList.toggle('active', button.dataset.route === route);
         });
 
@@ -1902,6 +1726,19 @@ async function initEditor() {
             scPlayer.classList.toggle('minimized');
             youtubeToggle.textContent = scPlayer.classList.contains('minimized') ? '+' : '−';
         });
+    }
+
+    function updateWordCounter() {
+        const wordsEl = document.getElementById('statWords');
+        const charsEl = document.getElementById('statChars');
+        if (!wordsEl || !charsEl || !editor) return;
+
+        const text = (editor.innerText || editor.textContent || '').trim();
+        const words = text ? text.split(/\s+/).filter(Boolean).length : 0;
+        const chars = text.length;
+
+        wordsEl.textContent = `${words} ${words <= 1 ? 'mot' : 'mots'}`;
+        charsEl.textContent = `${chars} ${chars <= 1 ? 'signe' : 'signes'}`;
     }
 
     /**

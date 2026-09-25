@@ -9,7 +9,7 @@ Le frontend est l’interface utilisateur de l’application de prise de notes e
 - une barre d’outils de mise en forme
 - l’import/export de documents
 - la gestion locale des données via IndexedDB
-- le moteur de suggestions littéraires en interface directe
+- un correcteur de base sans moteur de suggestion de mots
 
 ## Stack technique
 
@@ -23,8 +23,7 @@ Le frontend est l’interface utilisateur de l’application de prise de notes e
 
 - index.html : point d’entrée de l’interface utilisateur
 - style.css : styles globaux et mise en page
-- publication.js : logique de l’éditeur, sauvegarde, import/export, suggestions
-- suggestions.js : moteur de suggestions locales (version front)
+- publication.js : logique de l’éditeur, sauvegarde, import/export et correcteur de texte
 - musique.js : gestion audio/lecteur si applicable
 - assets/ : icônes et ressources visuelles
 - scripts/ : scripts utilitaires de build / packaging
@@ -42,8 +41,8 @@ Exemple de lancement local :
 
 - Les éléments de l’éditeur sont gérés en JavaScript DOM.
 - Les données sont stockées localement dans le navigateur.
-- Les suggestions sont affichées dans le flux du document, et non dans une bulle flottante.
 - L’interface est prévue pour fonctionner sans framework ni bundler.
+- Le correcteur ne propose plus de suggestions de mots dans le flux d’écriture.
 
 ## Rôle dans l’architecture globale
 
@@ -52,6 +51,6 @@ Le frontend est responsable de :
 - l’expérience utilisateur
 - l’interaction avec l’éditeur
 - la présentation visuelle
-- l’appel au backend pour les suggestions avancées si nécessaire
+- la gestion du correcteur de texte sans moteur de suggestions de mots
 
-Le backend, lui, est responsable de la logique métier et des algorithmes de suggestion.
+Le backend, lui, est responsable de la logique métier minimale et de la santé du service.
