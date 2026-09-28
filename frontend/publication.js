@@ -171,7 +171,7 @@ async function initEditor() {
         const savedOrder = JSON.parse(localStorage.getItem('textToolbarOrder') || '[]');
         if (!Array.isArray(savedOrder) || savedOrder.length === 0) return;
 
-        const draggableButtons = Array.from(toolbar.querySelectorAll('.toolbar-btn:not(#organizeToolbarBtn):not(#toolbarSaveBtn)'));
+        const draggableButtons = Array.from(toolbar.querySelectorAll('.toolbar-btn:not(#organizeToolbarBtn):not(#toolbarSaveBtn):not(#toolbarEditorBtn)'));
         const keyMap = new Map(draggableButtons.map(btn => [(btn.id || btn.dataset.command), btn]));
 
         const orderedButtons = [];
@@ -207,7 +207,7 @@ async function initEditor() {
     }
 
     function setToolbarOrganizeMode(enabled) {
-        const draggableButtons = document.querySelectorAll('.editor-toolbar .toolbar-btn:not(#organizeToolbarBtn):not(#toolbarSaveBtn)');
+        const draggableButtons = document.querySelectorAll('.editor-toolbar .toolbar-btn:not(#organizeToolbarBtn):not(#toolbarSaveBtn):not(#toolbarEditorBtn)');
         draggableButtons.forEach(btn => {
             btn.draggable = enabled;
             btn.classList.toggle('toolbar-reorderable', enabled);
