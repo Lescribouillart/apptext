@@ -114,6 +114,7 @@ async function initEditor() {
     const sourceBtn = document.getElementById('sourceBtn');
     const organizeToolbarBtn = document.getElementById('organizeToolbarBtn');
     const toolbarSaveBtn = document.getElementById('toolbarSaveBtn');
+    const toolbarEditorBtn = document.getElementById('toolbarEditorBtn');
     const saveAsBtn = document.getElementById('saveAsBtn');
     const addBtn = document.getElementById('addBtn');
     const loadBtn = document.getElementById('loadBtn');
@@ -154,7 +155,7 @@ async function initEditor() {
         const toolbar = document.querySelector('.editor-toolbar');
         if (!toolbar) return [];
 
-        return Array.from(toolbar.querySelectorAll('.toolbar-btn:not(#organizeToolbarBtn):not(#toolbarSaveBtn)'))
+        return Array.from(toolbar.querySelectorAll('.toolbar-btn:not(#organizeToolbarBtn):not(#toolbarSaveBtn):not(#toolbarEditorBtn)'))
             .map(btn => btn.id || btn.dataset.command)
             .filter(Boolean);
     }
@@ -240,6 +241,13 @@ async function initEditor() {
             hasUnsavedChanges = false;
             markAsSaved();
             showStatus('✓ Carte enregistrée', 'success');
+        });
+    }
+
+    if (toolbarEditorBtn) {
+        toolbarEditorBtn.addEventListener('click', () => {
+            editor?.focus();
+            showStatus('Éditeur actif', 'success');
         });
     }
 
@@ -868,6 +876,9 @@ async function initEditor() {
     const accountConfirmPassword = document.getElementById('accountConfirmPassword');
     const accountLoginEmail = document.getElementById('accountLoginEmail');
     const accountLoginPassword = document.getElementById('accountLoginPassword');
+    const accountSyncPanel = document.getElementById('accountSyncPanel');
+    const accountSyncConfirmBtn = document.getElementById('accountSyncConfirmBtn');
+    const accountSyncCancelBtn = document.getElementById('accountSyncCancelBtn');
     const accountModeButtons = document.querySelectorAll('.account-mode-btn');
     const accountSessionStatus = document.getElementById('accountSessionStatus');
     const accountSignOutBtn = document.getElementById('accountSignOutBtn');
@@ -880,6 +891,96 @@ async function initEditor() {
         const showSessionButtons = isSignedIn && mode === 'signin';
         accountSignOutBtn?.classList.toggle('hidden', !showSessionButtons);
         accountDeleteBtn?.classList.toggle('hidden', !showSessionButtons);
+    }
+
+    function showAccountSyncPrompt() {
+        accountSyncPanel?.classList.remove('hidden');
+        accountSyncPanel?.setAttribute('aria-hidden', 'false');
+    }
+
+    function hideAccountSyncPrompt() {
+        accountSyncPanel?.classList.add('hidden');
+        accountSyncPanel?.setAttribute('aria-hidden', 'true');
+    }
+
+    async function syncUserCardsToAccount() {
+        if (!supabaseClient) {
+            window.alert('Supabase n’est pas initialisé.');
+            return;
+        }
+
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session?.access_token) {
+            window.alert('Vous devez être connecté pour synchroniser vos cartes.');
+            return;
+        }
+
+        try {
+            const articles = await _dbGetAll();
+            const response = await fetch('http://localhost:3001/api/sync-cards', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session.access_token}`
+                },
+                body: JSON.stringify({ cards: articles })
+            });
+
+            const payload = await response.json().catch(() => ({}));
+            if (!response.ok) {
+                throw new Error(payload.error || 'Erreur lors de la synchronisation des cartes.');
+            }
+
+            window.alert('Vos cartes ont bien été enregistrées sur votre compte.');
+        } catch (error) {
+            window.alert(error.message || 'Erreur lors de la synchronisation des cartes.');
+        }
+    }
+
+    async function restoreUserCardsFromAccount() {
+        if (!supabaseClient) return;
+
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session?.access_token) return;
+
+        try {
+            const response = await fetch('http://localhost:3001/api/get-cards', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${session.access_token}`
+                }
+            });
+
+            const payload = await response.json().catch(() => ({}));
+            if (!response.ok) {
+                return;
+            }
+
+            const cards = Array.isArray(payload.cards) ? payload.cards : [];
+            if (!cards.length) return;
+
+            const currentCards = await _dbGetAll();
+            const currentIds = new Set(currentCards.map(card => Number(card.id)));
+
+            for (const card of cards) {
+                if (currentIds.has(Number(card.id))) continue;
+                await _dbPut({
+                    ...card,
+                    id: Number(card.id),
+                    subject: String(card.subject || 'Sans titre'),
+                    preview: String(card.preview || ''),
+                    content: String(card.content || ''),
+                    color: String(card.color || ''),
+                    sortOrder: Number(card.sortOrder || 0),
+                    createdAt: String(card.createdAt || new Date().toISOString()),
+                    updatedAt: String(card.updatedAt || new Date().toISOString())
+                });
+            }
+
+            renderCardsScreen?.();
+        } catch (error) {
+            console.warn('Impossible de restaurer les cartes depuis le compte', error);
+        }
     }
 
     setAccountMode('signup');
@@ -942,6 +1043,7 @@ async function initEditor() {
             });
             accountSignOutBtn?.classList.remove('hidden');
             accountDeleteBtn?.classList.remove('hidden');
+            hideAccountSyncPrompt();
             return;
         }
 
@@ -1096,9 +1198,20 @@ async function initEditor() {
 
             accountLoginForm.reset();
             await syncAccountSessionState();
+            await restoreUserCardsFromAccount();
+            showAccountSyncPrompt();
             window.alert('Connexion réussie.');
         });
     }
+
+    accountSyncConfirmBtn?.addEventListener('click', async () => {
+        hideAccountSyncPrompt();
+        await syncUserCardsToAccount();
+    });
+
+    accountSyncCancelBtn?.addEventListener('click', () => {
+        hideAccountSyncPrompt();
+    });
 
     if (supabaseClient) {
         supabaseClient.auth.onAuthStateChange(async () => {
