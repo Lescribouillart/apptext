@@ -885,6 +885,7 @@ async function initEditor() {
     setAccountMode('signup');
 
     function setAccountMode(mode) {
+        const isSignedIn = Boolean(currentAccountSession);
         const isSignup = mode === 'signup';
         currentAccountMode = mode;
 
@@ -894,12 +895,22 @@ async function initEditor() {
             button.setAttribute('aria-selected', String(isSelected));
         });
 
+        if (isSignedIn) {
+            accountForm?.classList.add('hidden');
+            accountLoginForm?.classList.add('hidden');
+            accountForm?.setAttribute('aria-hidden', 'true');
+            accountLoginForm?.setAttribute('aria-hidden', 'true');
+            accountSignOutBtn?.classList.remove('hidden');
+            accountDeleteBtn?.classList.remove('hidden');
+            return;
+        }
+
         accountForm?.classList.toggle('hidden', !isSignup);
         accountLoginForm?.classList.toggle('hidden', isSignup);
         accountForm?.setAttribute('aria-hidden', String(!isSignup));
         accountLoginForm?.setAttribute('aria-hidden', String(isSignup));
 
-        updateAccountSessionButtons(mode, Boolean(currentAccountSession));
+        updateAccountSessionButtons(mode, false);
     }
 
     async function syncAccountSessionState() {
@@ -917,15 +928,26 @@ async function initEditor() {
         }
 
         const isSignedIn = Boolean(session);
-        updateAccountSessionButtons(currentAccountMode, isSignedIn);
 
         if (isSignedIn) {
+            currentAccountMode = 'signin';
             accountForm?.classList.add('hidden');
             accountLoginForm?.classList.add('hidden');
+            accountForm?.setAttribute('aria-hidden', 'true');
+            accountLoginForm?.setAttribute('aria-hidden', 'true');
+            accountModeButtons.forEach((button) => {
+                const isSelected = button.dataset.accountMode === 'signin';
+                button.classList.toggle('is-active', isSelected);
+                button.setAttribute('aria-selected', String(isSelected));
+            });
+            accountSignOutBtn?.classList.remove('hidden');
+            accountDeleteBtn?.classList.remove('hidden');
             return;
         }
 
-        setAccountMode('signup');
+        const nextMode = currentAccountMode === 'signin' ? 'signin' : 'signup';
+        setAccountMode(nextMode);
+        updateAccountSessionButtons(nextMode, false);
     }
 
     async function deleteCurrentAccount() {
@@ -977,6 +999,7 @@ async function initEditor() {
 
     if (accountSignOutBtn && supabaseClient) {
         accountSignOutBtn.addEventListener('click', async () => {
+            currentAccountMode = 'signin';
             const { error } = await supabaseClient.auth.signOut();
 
             if (error) {
@@ -1112,6 +1135,10 @@ async function initEditor() {
             if (!button.dataset || !button.dataset.route) return;
             button.classList.toggle('active', button.dataset.route === route);
         });
+
+        if (route === 'account' && supabaseClient) {
+            syncAccountSessionState();
+        }
 
         if (route === 'editor') {
             document.getElementById('editor')?.focus();
