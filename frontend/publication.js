@@ -245,9 +245,20 @@ async function initEditor() {
     }
 
     if (toolbarEditorBtn) {
-        toolbarEditorBtn.addEventListener('click', () => {
-            editor?.focus();
-            showStatus('Éditeur actif', 'success');
+        toolbarEditorBtn.addEventListener('click', async () => {
+            if (hasUnsavedChanges && !confirm('Créer une nouvelle carte ? Les modifications non enregistrées seront perdues.')) {
+                return;
+            }
+
+            currentArticleId = null;
+            articleSubject.value = '';
+            editor.innerHTML = '';
+            updateWordCounter();
+            hasUnsavedChanges = false;
+            markAsSaved();
+            editor.focus();
+            await refreshArticlesList();
+            showStatus('✓ Nouvelle carte prête', 'success');
         });
     }
 
