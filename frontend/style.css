@@ -1193,6 +1193,15 @@ body.dark-mode .article-card-delete:hover {
     justify-content: center;
 }
 
+.toolbar-editor-btn img {
+    display: block;
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+    filter: brightness(0) saturate(100%) invert(1);
+    opacity: 0.92;
+}
+
 .toolbar-btn:hover {
     background: var(--editor-bg-tertiary);
     border-color: var(--editor-border-color);
