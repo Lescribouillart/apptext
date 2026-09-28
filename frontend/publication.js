@@ -882,6 +882,8 @@ async function initEditor() {
         accountDeleteBtn?.classList.toggle('hidden', !showSessionButtons);
     }
 
+    setAccountMode('signup');
+
     function setAccountMode(mode) {
         const isSignup = mode === 'signup';
         currentAccountMode = mode;
