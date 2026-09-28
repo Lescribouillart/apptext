@@ -16,6 +16,9 @@ html, body {
     box-sizing: border-box;
 }
 
+.hidden {
+    display: none !important;
+}
 
 .app-splash {
     position: fixed;

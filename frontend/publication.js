@@ -873,9 +873,18 @@ async function initEditor() {
     const accountSignOutBtn = document.getElementById('accountSignOutBtn');
     const accountDeleteBtn = document.getElementById('accountDeleteBtn');
     const supabaseClient = window.noteSupabase;
+    let currentAccountSession = null;
+    let currentAccountMode = 'signup';
+
+    function updateAccountSessionButtons(mode, isSignedIn) {
+        const showSessionButtons = isSignedIn && mode === 'signin';
+        accountSignOutBtn?.classList.toggle('hidden', !showSessionButtons);
+        accountDeleteBtn?.classList.toggle('hidden', !showSessionButtons);
+    }
 
     function setAccountMode(mode) {
         const isSignup = mode === 'signup';
+        currentAccountMode = mode;
 
         accountModeButtons.forEach((button) => {
             const isSelected = button.dataset.accountMode === mode;
@@ -887,6 +896,8 @@ async function initEditor() {
         accountLoginForm?.classList.toggle('hidden', isSignup);
         accountForm?.setAttribute('aria-hidden', String(!isSignup));
         accountLoginForm?.setAttribute('aria-hidden', String(isSignup));
+
+        updateAccountSessionButtons(mode, Boolean(currentAccountSession));
     }
 
     async function syncAccountSessionState() {
@@ -894,6 +905,7 @@ async function initEditor() {
 
         const { data } = await supabaseClient.auth.getSession();
         const session = data?.session;
+        currentAccountSession = session || null;
         const displayEmail = session?.user?.email || 'Utilisateur';
 
         if (accountSessionStatus) {
@@ -903,8 +915,7 @@ async function initEditor() {
         }
 
         const isSignedIn = Boolean(session);
-        accountSignOutBtn?.classList.toggle('hidden', !isSignedIn);
-        accountDeleteBtn?.classList.toggle('hidden', !isSignedIn);
+        updateAccountSessionButtons(currentAccountMode, isSignedIn);
 
         if (isSignedIn) {
             accountForm?.classList.add('hidden');
