@@ -7,6 +7,8 @@ html, body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    background: #0f1117;
+    color: var(--editor-text-primary, #f5f7fb);
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
@@ -20,90 +22,17 @@ html, body {
     display: none !important;
 }
 
-.app-splash {
-    position: fixed;
-    inset: 0;
-    z-index: 2000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, #1d1d23 0%, #2b2d35 48%, #121419 100%);
-    transition: opacity 0.7s ease, visibility 0.7s ease;
+body {
+    background: #0f1117;
 }
 
-.app-splash.is-hidden {
-    opacity: 0;
-    visibility: hidden;
-}
-
-.splash-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-}
-
-.splash-logo-wrap {
-    width: 120px;
-    height: 120px;
-    border-radius: 28px;
-    display: grid;
-    place-items: center;
-    background: rgba(255, 255, 255, 0.05);
-    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
-}
-
-.splash-logo {
-    width: 72px;
-    height: 72px;
-    object-fit: contain;
-    filter: drop-shadow(0 12px 20px rgba(12, 14, 18, 0.4));
-}
-
-.splash-loader {
-    width: 160px;
-    height: 6px;
-    background: rgba(255, 255, 255, 0.12);
-    border-radius: 999px;
-    overflow: hidden;
-    position: relative;
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
-}
-
-.splash-loader-bar {
-    display: block;
-    height: 100%;
-    width: 0%;
-    border-radius: inherit;
-    background: linear-gradient(90deg, #66c2ff 0%, #8fe3ff 35%, #b9fff7 100%);
-    box-shadow: 0 0 18px rgba(131, 224, 255, 0.9);
-    transition: width 2.8s ease-out;
+body.startup-locked {
+    background: #0f1117;
 }
 
 /* ========================================
    ÉCRAN D'ACCUEIL
    ======================================== */
-#welcomeOverlay {
-    display: none !important;
-}
-
-#welcomeOverlay.welcome-in {
-    display: none !important;
-}
-
-#welcomeOverlay.welcome-out {
-    display: none !important;
-}
-
-@keyframes welcome-in {
-    from { opacity: 0; transform: scale(1.03); }
-    to   { opacity: 1; transform: scale(1); }
-}
-
-@keyframes welcome-out {
-    from { opacity: 1; transform: scale(1); }
-    to   { opacity: 0; transform: scale(0.97); }
-}
 
 .welcome-card {
     background: #1e1d28;
