@@ -239,7 +239,7 @@ async function initEditor() {
         toolbarSaveBtn.addEventListener('click', async () => {
             const subject = articleSubject.value.trim();
             if (!subject) {
-                alert('Veuillez saisir un titre avant d\'enregistrer la carte.');
+                alert(t('saveCardTitle', 'Please enter a title before saving the card.'));
                 articleSubject.focus();
                 return;
             }
@@ -247,7 +247,7 @@ async function initEditor() {
             await saveArticleToList(subject, editor.innerHTML, { forceNew: !currentArticleId });
             hasUnsavedChanges = false;
             markAsSaved();
-            showStatus('✓ Carte enregistrée', 'success');
+            showStatus(`✓ ${t('cardSaved', 'Card saved')}`, 'success');
 
             // Pousse aussi la carte vers le compte Supabase si l'utilisateur est connecté.
             await syncUserCardsToAccountIfLoggedIn();
@@ -256,7 +256,7 @@ async function initEditor() {
 
     if (toolbarEditorBtn) {
         toolbarEditorBtn.addEventListener('click', async () => {
-            if (hasUnsavedChanges && !confirm('Créer une nouvelle carte ? Les modifications non enregistrées seront perdues.')) {
+            if (hasUnsavedChanges && !confirm(t('createNewCard', 'Create a new card? Unsaved changes will be lost.'))) {
                 return;
             }
 
@@ -268,7 +268,7 @@ async function initEditor() {
             markAsSaved();
             editor.focus();
             await refreshArticlesList();
-            showStatus('✓ Nouvelle carte prête', 'success');
+            showStatus(`✓ ${t('newCardReady', 'New card ready')}`, 'success');
         });
     }
 
@@ -606,6 +606,7 @@ async function initEditor() {
         fr: {
             settingsTitle: 'Paramètres',
             settingsClose: 'Fermer les paramètres',
+            settingsButton: 'Paramètres',
             appTitle: 'Note',
             tagline: 'Éditez vos idées',
             appearance: 'APPARENCE',
@@ -656,11 +657,124 @@ async function initEditor() {
             status: 'État actuel',
             today: 'À jour',
             connectedAs: 'Connecté :',
-            languageScreenTitle: 'Langue'
+            languageScreenTitle: 'Langue',
+            navigationInput: 'Saisie',
+            navigationCards: 'Cartes',
+            navigationSearch: 'Recherche',
+            navigationAccessibility: 'Accessibilité',
+            navigationPlayer: 'Lecteur',
+            cards: 'Cartes',
+            search: 'Recherche',
+            accessibility: 'Accessibilité',
+            player: 'Lecteur',
+            inputText: 'Saisie',
+            noResults: 'Aucun résultat',
+            noCards: 'Aucune carte enregistrée',
+            untitled: 'Sans titre',
+            saveCardTitle: 'Veuillez saisir un titre avant d\'enregistrer la carte.',
+            searchResultsFor: 'Recherche :',
+            noSearchResultsFor: 'Aucun résultat pour :',
+            showToolbar: 'Afficher la barre d’outils',
+            hideToolbar: 'Masquer la barre d’outils',
+            enterLinkUrl: 'Entrez l’URL du lien :',
+            linkText: 'Texte du lien :',
+            subjectRequired: 'Veuillez saisir un objet avant d\'ajouter l\'article.',
+            unsavedChangesLeave: 'Vous avez des modifications non enregistrées. Voulez-vous vraiment quitter ?',
+            wordsLabel: 'mot',
+            wordsPluralLabel: 'mots',
+            charsLabel: 'signe',
+            charsPluralLabel: 'signes',
+            toggleDarkMode: 'Basculer vers le mode sombre',
+            toggleLightMode: 'Basculer vers le mode clair',
+            enableDyslexiaMode: 'Activer le mode dyslexie',
+            disableDyslexiaMode: 'Désactiver le mode dyslexie',
+            toolbarBold: 'Gras (Ctrl+B)',
+            toolbarItalic: 'Italique (Ctrl+I)',
+            toolbarUnderline: 'Souligné (Ctrl+U)',
+            toolbarStrike: 'Barré',
+            toolbarTextColor: 'Couleur du texte',
+            toolbarHighlightColor: 'Couleur de surbrillance',
+            toolbarAlignLeft: 'Aligner à gauche (Ctrl+L)',
+            toolbarAlignCenter: 'Centrer (Ctrl+E)',
+            toolbarAlignRight: 'Aligner à droite (Ctrl+R)',
+            toolbarJustify: 'Justifier (Ctrl+J)',
+            toolbarBulletedList: 'Liste à puces',
+            toolbarOrderedList: 'Liste numérotée',
+            toolbarOutdent: 'Réduire le retrait',
+            toolbarIndent: 'Augmenter le retrait',
+            toolbarInsertLink: 'Insérer un lien (Ctrl+K)',
+            toolbarRemoveLink: 'Supprimer le lien',
+            toolbarInsertImage: 'Insérer une image',
+            toolbarUndo: 'Annuler (Ctrl+Z)',
+            toolbarRedo: 'Rétablir (Ctrl+Y)',
+            toolbarClearFormat: 'Effacer le style',
+            toolbarSourceCode: 'Code source HTML',
+            toolbarSearch: 'Rechercher',
+            toolbarHide: 'Masquer la barre d’outils',
+            toolbarShow: 'Afficher la barre d’outils',
+            toolbarOrganize: 'Organiser les boutons de la barre d’outils',
+            toolbarSave: 'Enregistrer',
+            toolbarNew: 'Nouveau',
+            exportFormatTitle: 'Choisir le format d\'export',
+            exportTo: 'Enregistrer en :',
+            fileDownloadSuccess: 'Fichier "{filename}" enregistré avec succès !',
+            fileDownloadCancelled: 'Sauvegarde annulée',
+            fileDownloadError: 'Erreur : {message}',
+            fileDownloadedToDownloads: 'Fichier téléchargé dans Téléchargements',
+            exportWordUnavailable: 'Export Word indisponible hors connexion.',
+            createNewArticlePrompt: 'Voulez-vous créer un nouvel article ? Les modifications non enregistrées seront perdues.',
+            articleSavedStatus: 'Nouvel article créé !',
+            searchStatusPrefix: 'Recherche :',
+            createNewCard: 'Créer une nouvelle carte ? Les modifications non enregistrées seront perdues.',
+            cardSaved: 'Carte enregistrée',
+            newCardReady: 'Nouvelle carte prête',
+            chooseColor: 'Choisir la couleur',
+            removeColor: 'Retirer la couleur',
+            deleteCardConfirmation: 'Supprimer cette carte ?',
+            deleteArticleConfirmation: 'Êtes-vous sûr de vouloir supprimer cet article ?',
+            articleSaved: 'Article sauvegardé',
+            articleDeleted: 'Article supprimé',
+            createArticle: 'Voulez-vous créer un nouvel article ? Les modifications non enregistrées seront perdues.',
+            loadArticleConfirmation: 'Charger cet article ? Les modifications non enregistrées seront perdues.',
+            invalidateWordFile: 'Impossible de lire ce fichier Word (.docx).',
+            wordFileReadError: 'Impossible de lire ce fichier Word (.docx).',
+            odtImportUnavailable: 'Import OpenOffice/LibreOffice (.odt) indisponible : la librairie JSZip n\'est pas chargée.\nVérifiez que vous êtes connecté à Internet.',
+            wordLibMissing: 'Import OpenOffice/LibreOffice (.odt) indisponible : la librairie JSZip n\'est pas chargée.\nVérifiez que vous êtes connecté à Internet.',
+            odtReadError: 'Impossible de lire ce fichier .odt. Essayez de l\'enregistrer en .docx ou .txt.',
+            selectAudio: 'Choisir une musique sur le téléphone',
+            previousTrack: 'Piste précédente',
+            nextTrack: 'Piste suivante',
+            playPause: 'Lecture / Pause',
+            volume: 'Volume',
+            addYoutubeTrack: 'Ajouter une piste YouTube',
+            openAudioFile: 'Ouvrir un fichier audio du téléphone',
+            manageTracks: 'Gérer les pistes',
+            minimizeMaximize: 'Réduire/Agrandir',
+            noSavedArticles: 'Aucun article sauvegardé',
+            createNewArticle: 'Créer un nouvel article ?',
+            articleLoaded: 'Article chargé',
+            searchPlaceholder: 'Rechercher',
+            deleteAccountConfirm: 'Supprimer votre compte est définitif. Voulez-vous vraiment continuer ?',
+            deleteAccountLoginRequired: 'Vous devez être connecté pour supprimer votre compte.',
+            deleteAccountSuccess: 'Votre compte a bien été supprimé.',
+            deleteAccountTimeout: 'Le serveur de suppression de compte ne répond pas. Réessayez dans quelques instants.',
+            signOutSuccess: 'Déconnexion réussie.',
+            signOutError: 'Erreur lors de la déconnexion.',
+            signupSuccess: 'Compte créé avec succès. Vérifie ton email pour confirmer l’inscription.',
+            loginSuccess: 'Connexion réussie.',
+            loginError: 'Erreur lors de la connexion.',
+            signupError: 'Erreur lors de l’inscription.',
+            emailPasswordRequired: 'L’email et le mot de passe sont requis.',
+            deleteAccountError: 'Erreur lors de la suppression du compte.',
+            supabaseNotReady: 'Supabase n’est pas initialisé.',
+            accountSyncRequired: 'Vous devez être connecté pour synchroniser vos cartes.',
+            accountSyncSuccess: 'Vos cartes ont bien été enregistrées sur votre compte.',
+            accountSyncError: 'Erreur lors de la synchronisation des cartes.'
         },
         en: {
             settingsTitle: 'Settings',
             settingsClose: 'Close settings',
+            settingsButton: 'Settings',
             appTitle: 'Note',
             tagline: 'Write your ideas',
             appearance: 'APPEARANCE',
@@ -711,7 +825,119 @@ async function initEditor() {
             status: 'Current status',
             today: 'Up to date',
             connectedAs: 'Connected:',
-            languageScreenTitle: 'Language'
+            languageScreenTitle: 'Language',
+            navigationInput: 'Input',
+            navigationCards: 'Cards',
+            navigationSearch: 'Search',
+            navigationAccessibility: 'Accessibility',
+            navigationPlayer: 'Player',
+            cards: 'Cards',
+            search: 'Search',
+            accessibility: 'Accessibility',
+            player: 'Player',
+            inputText: 'Input',
+            noResults: 'No results',
+            noCards: 'No saved cards',
+            untitled: 'Untitled',
+            saveCardTitle: 'Please enter a title before saving the card.',
+            searchResultsFor: 'Search:',
+            noSearchResultsFor: 'No results for:',
+            showToolbar: 'Show toolbar',
+            hideToolbar: 'Hide toolbar',
+            enterLinkUrl: 'Enter the link URL:',
+            linkText: 'Link text:',
+            subjectRequired: 'Please enter a subject before adding the article.',
+            unsavedChangesLeave: 'You have unsaved changes. Do you really want to leave?',
+            wordsLabel: 'word',
+            wordsPluralLabel: 'words',
+            charsLabel: 'character',
+            charsPluralLabel: 'characters',
+            toggleDarkMode: 'Switch to dark mode',
+            toggleLightMode: 'Switch to light mode',
+            enableDyslexiaMode: 'Enable dyslexia mode',
+            disableDyslexiaMode: 'Disable dyslexia mode',
+            toolbarBold: 'Bold (Ctrl+B)',
+            toolbarItalic: 'Italic (Ctrl+I)',
+            toolbarUnderline: 'Underline (Ctrl+U)',
+            toolbarStrike: 'Strikethrough',
+            toolbarTextColor: 'Text color',
+            toolbarHighlightColor: 'Highlight color',
+            toolbarAlignLeft: 'Align left (Ctrl+L)',
+            toolbarAlignCenter: 'Center (Ctrl+E)',
+            toolbarAlignRight: 'Align right (Ctrl+R)',
+            toolbarJustify: 'Justify (Ctrl+J)',
+            toolbarBulletedList: 'Bulleted list',
+            toolbarOrderedList: 'Numbered list',
+            toolbarOutdent: 'Decrease indent',
+            toolbarIndent: 'Increase indent',
+            toolbarInsertLink: 'Insert link (Ctrl+K)',
+            toolbarRemoveLink: 'Remove link',
+            toolbarInsertImage: 'Insert image',
+            toolbarUndo: 'Undo (Ctrl+Z)',
+            toolbarRedo: 'Redo (Ctrl+Y)',
+            toolbarClearFormat: 'Clear formatting',
+            toolbarSourceCode: 'HTML source code',
+            toolbarSearch: 'Search',
+            toolbarHide: 'Hide toolbar',
+            toolbarShow: 'Show toolbar',
+            toolbarOrganize: 'Organize toolbar buttons',
+            toolbarSave: 'Save',
+            toolbarNew: 'New',
+            exportFormatTitle: 'Choose the export format',
+            exportTo: 'Save as:',
+            fileDownloadSuccess: 'File "{filename}" saved successfully!',
+            fileDownloadCancelled: 'Save cancelled',
+            fileDownloadError: 'Error: {message}',
+            fileDownloadedToDownloads: 'File downloaded to Downloads',
+            exportWordUnavailable: 'Word export is unavailable offline.',
+            createNewArticlePrompt: 'Do you want to create a new article? Unsaved changes will be lost.',
+            articleSavedStatus: 'New article created!',
+            searchStatusPrefix: 'Search:',
+            createNewCard: 'Create a new card? Unsaved changes will be lost.',
+            cardSaved: 'Card saved',
+            newCardReady: 'New card ready',
+            chooseColor: 'Choose color',
+            removeColor: 'Remove color',
+            deleteCardConfirmation: 'Delete this card?',
+            deleteArticleConfirmation: 'Are you sure you want to delete this article?',
+            articleSaved: 'Article saved',
+            articleDeleted: 'Article deleted',
+            createArticle: 'Do you want to create a new article? Unsaved changes will be lost.',
+            loadArticleConfirmation: 'Load this article? Unsaved changes will be lost.',
+            invalidateWordFile: 'Unable to read this Word file (.docx).',
+            wordFileReadError: 'Unable to read this Word file (.docx).',
+            odtImportUnavailable: 'OpenOffice/LibreOffice (.odt) import is unavailable: the JSZip library is not loaded.\nCheck that you are connected to the internet.',
+            wordLibMissing: 'OpenOffice/LibreOffice import (.odt) is unavailable: the JSZip library is not loaded.\nCheck that you are connected to the internet.',
+            odtReadError: 'Unable to read this .odt file. Try saving it as .docx or .txt.',
+            selectAudio: 'Choose music from your phone',
+            previousTrack: 'Previous track',
+            nextTrack: 'Next track',
+            playPause: 'Play / Pause',
+            volume: 'Volume',
+            addYoutubeTrack: 'Add a YouTube track',
+            openAudioFile: 'Open an audio file on your phone',
+            manageTracks: 'Manage tracks',
+            minimizeMaximize: 'Minimize/Maximize',
+            noSavedArticles: 'No saved articles',
+            createNewArticle: 'Create a new article?',
+            articleLoaded: 'Article loaded',
+            searchPlaceholder: 'Search',
+            deleteAccountConfirm: 'Deleting your account is permanent. Do you really want to continue?',
+            deleteAccountLoginRequired: 'You must be logged in to delete your account.',
+            deleteAccountSuccess: 'Your account has been deleted successfully.',
+            deleteAccountTimeout: 'The account deletion server is not responding. Please try again in a few moments.',
+            signOutSuccess: 'Disconnection successful.',
+            signOutError: 'Error while disconnecting.',
+            signupSuccess: 'Account created successfully. Check your email to confirm the registration.',
+            loginSuccess: 'Login successful.',
+            loginError: 'Error while signing in.',
+            signupError: 'Error while signing up.',
+            emailPasswordRequired: 'Email and password are required.',
+            deleteAccountError: 'Error while deleting the account.',
+            supabaseNotReady: 'Supabase is not initialized.',
+            accountSyncRequired: 'You must be connected to sync your cards.',
+            accountSyncSuccess: 'Your cards have been saved to your account.',
+            accountSyncError: 'Error while syncing cards.'
         }
     };
 
@@ -728,6 +954,14 @@ async function initEditor() {
             const value = translations[lang]?.[key] || translations.fr?.[key];
             if (value) {
                 element.textContent = value;
+            }
+        });
+
+        document.querySelectorAll('[data-i18n-alt]').forEach((element) => {
+            const key = element.dataset.i18nAlt;
+            const value = translations[lang]?.[key] || translations.fr?.[key];
+            if (value) {
+                element.setAttribute('alt', value);
             }
         });
 
@@ -754,6 +988,84 @@ async function initEditor() {
                 element.setAttribute('title', value);
             }
         });
+
+        document.querySelectorAll('.bottom-tab').forEach((button) => {
+            const route = button.dataset.route;
+            const keyMap = {
+                editor: 'navigationInput',
+                cards: 'navigationCards',
+                search: 'navigationSearch',
+                theme: 'navigationAccessibility',
+                music: 'navigationPlayer'
+            };
+            const key = keyMap[route];
+            const label = key ? (translations[lang]?.[key] || translations.fr?.[key]) : null;
+            const textNode = button.querySelector('span');
+            if (label && textNode) {
+                textNode.textContent = label;
+            }
+            if (label) {
+                button.setAttribute('aria-label', label);
+            }
+        });
+
+        document.querySelectorAll('.toolbar-btn').forEach((button) => {
+            const command = button.dataset.command;
+            const keyMap = {
+                bold: 'toolbarBold',
+                italic: 'toolbarItalic',
+                underline: 'toolbarUnderline',
+                strikeThrough: 'toolbarStrike',
+                justifyLeft: 'toolbarAlignLeft',
+                justifyCenter: 'toolbarAlignCenter',
+                justifyRight: 'toolbarAlignRight',
+                justifyFull: 'toolbarJustify',
+                insertUnorderedList: 'toolbarBulletedList',
+                insertOrderedList: 'toolbarOrderedList',
+                outdent: 'toolbarOutdent',
+                indent: 'toolbarIndent',
+                unlink: 'toolbarRemoveLink',
+                removeFormat: 'toolbarClearFormat',
+                undo: 'toolbarUndo',
+                redo: 'toolbarRedo'
+            };
+            const key = keyMap[command];
+            if (key) {
+                const value = translations[lang]?.[key] || translations.fr?.[key];
+                if (value) {
+                    button.setAttribute('title', value);
+                    button.setAttribute('aria-label', value);
+                }
+            }
+        });
+
+        const settingsButton = document.querySelector('.settings-btn');
+        if (settingsButton) {
+            settingsButton.setAttribute('aria-label', translations[lang]?.settingsButton || translations.fr.settingsButton);
+            settingsButton.setAttribute('title', translations[lang]?.settingsButton || translations.fr.settingsButton);
+        }
+
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        if (themeToggleBtn) {
+            const value = translations[lang]?.toggleDarkMode || translations.fr.toggleDarkMode;
+            themeToggleBtn.setAttribute('title', value);
+        }
+
+        const dyslexiaToggleBtn = document.getElementById('dyslexiaToggleBtn');
+        if (dyslexiaToggleBtn) {
+            const enabled = localStorage.getItem('textplaystore_dyslexia_mode') === 'true';
+            const value = enabled ? (translations[lang]?.disableDyslexiaMode || translations.fr.disableDyslexiaMode) : (translations[lang]?.enableDyslexiaMode || translations.fr.enableDyslexiaMode);
+            dyslexiaToggleBtn.setAttribute('title', value);
+            dyslexiaToggleBtn.setAttribute('aria-label', value);
+        }
+
+        const toolbarToggleBtn = document.getElementById('toolbarToggleBtn');
+        if (toolbarToggleBtn) {
+            const isCollapsed = toolbarToggleBtn.closest('.toolbar')?.classList.contains('collapsed');
+            const value = isCollapsed ? (translations[lang]?.toolbarShow || translations.fr.toolbarShow) : (translations[lang]?.toolbarHide || translations.fr.toolbarHide);
+            toolbarToggleBtn.setAttribute('title', value);
+            toolbarToggleBtn.setAttribute('aria-label', value);
+        }
     }
 
     function getSettings() {
@@ -1125,13 +1437,13 @@ async function initEditor() {
 
     async function syncUserCardsToAccount({ silent = false } = {}) {
         if (!supabaseClient) {
-            if (!silent) window.alert('Supabase n’est pas initialisé.');
+            if (!silent) window.alert(t('supabaseNotReady', 'Supabase is not initialized.'));
             return;
         }
 
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (!session?.access_token) {
-            if (!silent) window.alert('Vous devez être connecté pour synchroniser vos cartes.');
+            if (!silent) window.alert(t('accountSyncRequired', 'You must be connected to sync your cards.'));
             return;
         }
 
@@ -1139,7 +1451,7 @@ async function initEditor() {
             const articles = await _dbGetAll();
             const serializedCards = (articles || []).map((card, index) => ({
                 id: Number(card.id ?? index + 1),
-                subject: String(card.subject || 'Sans titre'),
+                subject: String(card.subject || t('untitled', 'Untitled')),
                 preview: String(card.preview || ''),
                 content: String(card.content || ''),
                 color: String(card.color || ''),
@@ -1154,15 +1466,15 @@ async function initEditor() {
                 .upsert(serializedCards, { onConflict: 'id' });
 
             if (error) {
-                throw new Error(error.message || 'Erreur lors de la synchronisation des cartes.');
+                throw new Error(error.message || t('accountSyncError', 'Error while syncing cards.'));
             }
 
-            if (!silent) window.alert('Vos cartes ont bien été enregistrées sur votre compte.');
+            if (!silent) window.alert(t('accountSyncSuccess', 'Your cards have been saved to your account.'));
         } catch (error) {
             if (silent) {
                 console.warn('Synchronisation automatique des cartes échouée', error);
             } else {
-                window.alert(error.message || 'Erreur lors de la synchronisation des cartes.');
+                window.alert(error.message || t('accountSyncError', 'Error while syncing cards.'));
             }
         }
     }
@@ -1209,7 +1521,7 @@ async function initEditor() {
                 await _dbPut({
                     ...card,
                     id: Number(card.id),
-                    subject: String(card.subject || 'Sans titre'),
+                    subject: String(card.subject || t('untitled', 'Untitled')),
                     preview: String(card.preview || ''),
                     content: String(card.content || ''),
                     color: String(card.color || ''),
@@ -1583,13 +1895,13 @@ async function initEditor() {
                 });
 
             if (!filtered.length) {
-                searchResultsList.innerHTML = '<div class="screen-empty">Aucun résultat</div>';
+                searchResultsList.innerHTML = `<div class="screen-empty">${t('noResults', 'No results')}</div>`;
                 return;
             }
 
             searchResultsList.innerHTML = filtered.map((article) => `
                 <button class="screen-item" type="button" data-article-id="${article.id}">
-                    <span class="screen-item-title">${escapeHtml(article.subject || 'Sans titre')}</span>
+                    <span class="screen-item-title">${escapeHtml(article.subject || t('untitled', 'Untitled'))}</span>
                     <span class="screen-item-meta">${escapeHtml(article.date || '')}</span>
                 </button>
             `).join('');
@@ -1609,7 +1921,7 @@ async function initEditor() {
 
         _dbGetAll().then((articles) => {
             if (!articles.length) {
-                cardsScreenList.innerHTML = '<div class="screen-empty">Aucune carte enregistrée</div>';
+                cardsScreenList.innerHTML = `<div class="screen-empty">${t('noCards', 'No saved cards')}</div>`;
                 return;
             }
 
@@ -1622,11 +1934,11 @@ async function initEditor() {
                 return `
                     <div class="screen-item card-item ${article.color ? 'has-color' : ''}" data-article-id="${article.id}" style="${cardStyle}">
                         <button class="screen-item-main" type="button" data-article-id="${article.id}">
-                            <span class="screen-item-title">${escapeHtml(article.subject || 'Sans titre')}</span>
+                            <span class="screen-item-title">${escapeHtml(article.subject || t('untitled', 'Untitled'))}</span>
                             <span class="screen-item-meta">${escapeHtml(article.preview || '')}</span>
                         </button>
-                        <button class="card-open-btn" type="button" data-article-id="${article.id}" aria-label="Choisir une couleur" title="Choisir une couleur" style="${article.color ? `border-color: ${hexToRgba(cardColor, 0.7)}; background: ${hexToRgba(cardColor, 0.14)};` : ''}">▾</button>
-                        <button class="card-delete-btn" type="button" data-article-id="${article.id}" aria-label="Supprimer la carte" title="Supprimer la carte">×</button>
+                        <button class="card-open-btn" type="button" data-article-id="${article.id}" aria-label="${t('chooseColor', 'Choose color')}" title="${t('chooseColor', 'Choose color')}" style="${article.color ? `border-color: ${hexToRgba(cardColor, 0.7)}; background: ${hexToRgba(cardColor, 0.14)};` : ''}">▾</button>
+                        <button class="card-delete-btn" type="button" data-article-id="${article.id}" aria-label="${t('deleteCardConfirmation', 'Delete this card?')}" title="${t('deleteCardConfirmation', 'Delete this card?')}">×</button>
                     </div>
                 `;
             }).join('');
@@ -1671,10 +1983,10 @@ async function initEditor() {
                             const option = document.createElement('button');
                             option.type = 'button';
                             option.className = 'card-color-option';
-                            option.title = 'Classer en couleur';
+                            option.title = `${t('chooseColor', 'Choose color')}`;
                             option.dataset.color = color;
                             option.style.background = color;
-                            option.setAttribute('aria-label', `Choisir la couleur ${color}`);
+                            option.setAttribute('aria-label', `${t('chooseColor', 'Choose color')} ${color}`);
                             if (currentArticle?.color === color) {
                                 option.classList.add('selected');
                             }
@@ -1694,8 +2006,8 @@ async function initEditor() {
                         const clearButton = document.createElement('button');
                         clearButton.type = 'button';
                         clearButton.className = 'card-color-option clear';
-                        clearButton.title = 'Retirer la couleur';
-                        clearButton.setAttribute('aria-label', 'Retirer la couleur');
+                        clearButton.title = t('removeColor', 'Remove color');
+                        clearButton.setAttribute('aria-label', t('removeColor', 'Remove color'));
                         clearButton.textContent = '×';
                         if (!currentArticle?.color) {
                             clearButton.classList.add('selected');
@@ -1730,12 +2042,12 @@ async function initEditor() {
                 button.addEventListener('click', async (event) => {
                     event.stopPropagation();
                     const articleId = Number(button.dataset.articleId);
-                    if (!confirm('Supprimer cette carte ?')) return;
+                    if (!confirm(t('deleteCardConfirmation', 'Delete this card?'))) return;
                     await _dbDelete(articleId);
                     if (currentArticleId === articleId) {
                         currentArticleId = null;
                         articleSubject.value = '';
-                        editor.innerHTML = '<p>Commencez à écrire ou tapez / pour choisir un bloc</p>';
+                        editor.innerHTML = `<p>${t('editorPlaceholder', 'Start writing or type / to choose a block')}</p>`;
                         hasUnsavedChanges = false;
                         markAsSaved();
                     }
@@ -1781,10 +2093,10 @@ async function initEditor() {
 
         const status = checkForAppUpdate();
         const isAvailable = status === 'available';
-        statusValue.textContent = isAvailable ? 'Disponible' : 'À jour';
+        statusValue.textContent = isAvailable ? t('available', 'Available') : t('upToDate', 'Up to date');
         updatesStateText.textContent = isAvailable
-            ? 'Une mise à jour est disponible dans le Play Store.'
-            : 'Votre application est à jour.';
+            ? t('updateAvailablePlayStore', 'An update is available in the Play Store.')
+            : t('appUpToDate', 'Your application is up to date.');
     }
 
     dyslexiaToggleBtn?.addEventListener('click', () => {
@@ -1840,7 +2152,7 @@ async function initEditor() {
             editor.focus();
             const statusMessage = document.getElementById('statusMessage');
             if (statusMessage) {
-                statusMessage.textContent = `Recherche : "${query}"`;
+                statusMessage.textContent = `${t('searchResultsFor', 'Search:')} "${query}"`;
                 statusMessage.classList.remove('is-error');
             }
             return;
@@ -1851,7 +2163,7 @@ async function initEditor() {
             editor.focus();
             const statusMessage = document.getElementById('statusMessage');
             if (statusMessage) {
-                statusMessage.textContent = `Recherche : "${query}"`;
+                statusMessage.textContent = `${t('searchResultsFor', 'Search:')} "${query}"`;
                 statusMessage.classList.remove('is-error');
             }
             return;
@@ -1859,7 +2171,7 @@ async function initEditor() {
 
         const statusMessage = document.getElementById('statusMessage');
         if (statusMessage) {
-            statusMessage.textContent = `Aucun résultat pour : "${query}"`;
+            statusMessage.textContent = `${t('noSearchResultsFor', 'No results for:')} "${query}"`;
             statusMessage.classList.add('is-error');
         }
         editor.focus();
@@ -1882,8 +2194,8 @@ async function initEditor() {
         toolbarToggleBtn.addEventListener('click', () => {
             const isCollapsed = toolbar.classList.toggle('collapsed');
             dockToolbarToBottomNav(isCollapsed);
-            toolbarToggleBtn.setAttribute('title', isCollapsed ? 'Afficher la barre d’outils' : 'Masquer la barre d’outils');
-            toolbarToggleBtn.setAttribute('aria-label', isCollapsed ? 'Afficher la barre d’outils' : 'Masquer la barre d’outils');
+            toolbarToggleBtn.setAttribute('title', isCollapsed ? t('showToolbar', 'Show toolbar') : t('hideToolbar', 'Hide toolbar'));
+            toolbarToggleBtn.setAttribute('aria-label', isCollapsed ? t('showToolbar', 'Show toolbar') : t('hideToolbar', 'Hide toolbar'));
         });
     }
 
@@ -2048,8 +2360,8 @@ async function initEditor() {
         linkBtn.addEventListener('click', (e) => {
             e.preventDefault();
             const selection = window.getSelection().toString();
-            const url = prompt('Entrez l\'URL du lien :', selection ? '' : 'https://');
-            const text = selection || prompt('Texte du lien :');
+            const url = prompt(t('enterLinkUrl', 'Enter the link URL:'), selection ? '' : 'https://');
+            const text = selection || prompt(t('linkText', 'Link text:'));
             
             if (url && text) {
                 if (selection) {
@@ -2143,7 +2455,7 @@ async function initEditor() {
             try {
                 const subject = articleSubject.value.trim();
                 if (!subject) {
-                    alert('Veuillez saisir un objet avant d\'ajouter l\'article.');
+                    window.alert(t('subjectRequired', 'Please enter a subject before adding the article.'));
                     return;
                 }
                 await saveArticleToList(subject, editor.innerHTML, { forceNew: true });
@@ -2258,7 +2570,7 @@ async function initEditor() {
                     };
 
                     const finishWithError = () => {
-                        alert('Impossible de lire ce fichier Word (.docx).');
+                        alert(t('wordFileReadError', 'Unable to read this Word file (.docx).'));
                     };
 
                     if (typeof mammoth === 'undefined') {
@@ -2292,7 +2604,7 @@ async function initEditor() {
             // Fichier OpenDocument .odt → JSZip + parsing du XML content.xml
             if (ext === 'odt') {
                 if (typeof JSZip === 'undefined') {
-                    alert('Import OpenOffice/LibreOffice (.odt) indisponible : la librairie JSZip n\'est pas chargée.\nVérifiez que vous êtes connecté à Internet.');
+                    alert(t('odtImportUnavailable', 'OpenOffice/LibreOffice (.odt) import unavailable: the JSZip library is not loaded.\nCheck that you are connected to the internet.'));
                     return;
                 }
                 const reader = new FileReader();
@@ -2305,7 +2617,7 @@ async function initEditor() {
                         })
                         .catch((err) => {
                             console.error('Erreur import .odt', err);
-                            alert('Impossible de lire ce fichier .odt. Essayez de l\'enregistrer en .docx ou .txt.');
+                            alert(t('odtReadError', 'Unable to read this .odt file. Try saving it as .docx or .txt.'));
                         });
                 };
                 reader.readAsArrayBuffer(file);
@@ -2394,7 +2706,7 @@ async function initEditor() {
         
         if (hasUnsavedChanges) {
             e.preventDefault();
-            e.returnValue = 'Vous avez des modifications non enregistrées. Voulez-vous vraiment quitter ?';
+            e.returnValue = t('unsavedChangesLeave', 'You have unsaved changes. Do you really want to leave?');
             return e.returnValue;
         }
     });
@@ -2417,8 +2729,8 @@ async function initEditor() {
         const words = text ? text.split(/\s+/).filter(Boolean).length : 0;
         const chars = text.length;
 
-        wordsEl.textContent = `${words} ${words <= 1 ? 'mot' : 'mots'}`;
-        charsEl.textContent = `${chars} ${chars <= 1 ? 'signe' : 'signes'}`;
+        wordsEl.textContent = `${words} ${words <= 1 ? t('wordsLabel', 'word') : t('wordsPluralLabel', 'words')}`;
+        charsEl.textContent = `${chars} ${chars <= 1 ? t('charsLabel', 'character') : t('charsPluralLabel', 'characters')}`;
     }
 
     /**
@@ -2446,7 +2758,7 @@ async function initEditor() {
         if (themeToggleBtn) {
             themeToggleBtn.classList.toggle('is-dark', isDarkMode);
             themeToggleBtn.setAttribute('aria-pressed', String(isDarkMode));
-            themeToggleBtn.setAttribute('aria-label', isDarkMode ? 'Basculer vers le mode clair' : 'Basculer vers le mode sombre');
+            themeToggleBtn.setAttribute('aria-label', isDarkMode ? t('toggleLightMode', 'Switch to light mode') : t('toggleDarkMode', 'Switch to dark mode'));
         }
 
         if (dyslexiaToggleBtn) {
@@ -2547,7 +2859,7 @@ async function initEditor() {
         const plainText = editor.innerText;
 
         if (!subject) {
-            showStatus('\u26a0\ufe0f Veuillez saisir un objet pour l\'article', 'error');
+            showStatus(`⚠️ ${t('subjectRequired', 'Please enter a subject before adding the article.')}`, 'error');
             return;
         }
 
@@ -2558,13 +2870,13 @@ async function initEditor() {
         const modal = document.createElement('div');
         modal.style.cssText = 'background:#1e1e1e;border:1px solid #444;border-radius:10px;padding:28px 32px;min-width:280px;text-align:center;color:#f1f1f1;font-family:inherit';
         modal.innerHTML = `
-          <p style="margin:0 0 6px;font-size:13px;color:#aaa;">Choisir le format d'export</p>
-          <p style="margin:0 0 22px;font-size:16px;font-weight:600;">Enregistrer en :</p>
+          <p style="margin:0 0 6px;font-size:13px;color:#aaa;">${t('exportFormatTitle', 'Choose the export format')}</p>
+          <p style="margin:0 0 22px;font-size:16px;font-weight:600;">${t('exportTo', 'Save as:')}</p>
           <div style="display:flex;gap:12px;justify-content:center;margin-bottom:16px">
-            <button id="_dlTxt" style="padding:10px 22px;border-radius:6px;border:1px solid #555;background:#2a2a2a;color:#f1f1f1;cursor:pointer;font-size:14px;">Texte brut (.txt)</button>
-            <button id="_dlDoc" style="padding:10px 22px;border-radius:6px;border:1px solid #555;background:#2a2a2a;color:#f1f1f1;cursor:pointer;font-size:14px;">Word (.docx)</button>
+            <button id="_dlTxt" style="padding:10px 22px;border-radius:6px;border:1px solid #555;background:#2a2a2a;color:#f1f1f1;cursor:pointer;font-size:14px;">${t('plainTextExport', 'Plain text (.txt)')}</button>
+            <button id="_dlDoc" style="padding:10px 22px;border-radius:6px;border:1px solid #555;background:#2a2a2a;color:#f1f1f1;cursor:pointer;font-size:14px;">${t('wordExport', 'Word (.docx)')}</button>
           </div>
-          <button id="_dlCancel" style="background:none;border:none;color:#888;cursor:pointer;font-size:13px;">Annuler</button>`;
+          <button id="_dlCancel" style="background:none;border:none;color:#888;cursor:pointer;font-size:13px;">${t('cancel', 'Cancel')}</button>`;
 
         overlay.appendChild(modal);
         document.body.appendChild(overlay);
@@ -2607,12 +2919,12 @@ async function initEditor() {
                 const writable = await handle.createWritable();
                 await writable.write(blob);
                 await writable.close();
-                showStatus(`\u2713 Fichier "${filename}" enregistr\u00e9 avec succ\u00e8s !`, 'success');
+                showStatus(t('fileDownloadSuccess', 'File "{filename}" saved successfully!').replace('{filename}', filename), 'success');
             } catch (err) {
                 if (err.name === 'AbortError') {
-                    showStatus('Sauvegarde annul\u00e9e', 'error');
+                    showStatus(t('fileDownloadCancelled', 'Save cancelled'), 'error');
                 } else {
-                    showStatus(`\u274c Erreur : ${err.message}`, 'error');
+                    showStatus(t('fileDownloadError', 'Error: {message}').replace('{message}', err.message), 'error');
                 }
             }
         } else {
@@ -2623,7 +2935,7 @@ async function initEditor() {
             link.click();
             document.body.removeChild(link);
             URL.revokeObjectURL(link.href);
-            showStatus(`\u2713 Fichier t\u00e9l\u00e9charg\u00e9 dans T\u00e9l\u00e9chargements`, 'success');
+            showStatus(t('fileDownloadedToDownloads', 'File downloaded to Downloads'), 'success');
         }
     }
 
@@ -2632,7 +2944,7 @@ async function initEditor() {
      */
     async function downloadWordFile(subject, htmlContent) {
         if (typeof htmlDocx === 'undefined') {
-            showStatus('❌ Export Word indisponible hors connexion.', 'error');
+            showStatus(t('exportWordUnavailable', 'Word export is unavailable offline.'), 'error');
             return;
         }
 
@@ -2670,12 +2982,12 @@ async function initEditor() {
                 const writable = await handle.createWritable();
                 await writable.write(blob);
                 await writable.close();
-                showStatus(`✓ Fichier "${filename}" enregistré avec succès !`, 'success');
+                showStatus(t('fileDownloadSuccess', 'File "{filename}" saved successfully!').replace('{filename}', filename), 'success');
             } catch (err) {
                 if (err.name === 'AbortError') {
-                    showStatus('Sauvegarde annulée', 'error');
+                    showStatus(t('fileDownloadCancelled', 'Save cancelled'), 'error');
                 } else {
-                    showStatus(`❌ Erreur : ${err.message}`, 'error');
+                    showStatus(t('fileDownloadError', 'Error: {message}').replace('{message}', err.message), 'error');
                 }
             }
         } else {
@@ -2686,7 +2998,7 @@ async function initEditor() {
             link.click();
             document.body.removeChild(link);
             URL.revokeObjectURL(link.href);
-            showStatus(`✓ Fichier téléchargé dans Téléchargements`, 'success');
+            showStatus(t('fileDownloadedToDownloads', 'File downloaded to Downloads'), 'success');
         }
     }
 
@@ -2694,7 +3006,7 @@ async function initEditor() {
      * Crée un nouvel article vierge
      */
     async function createNewArticle() {
-        if (hasUnsavedChanges && !confirm('Voulez-vous créer un nouvel article ? Les modifications non enregistrées seront perdues.')) {
+        if (hasUnsavedChanges && !confirm(t('createNewArticlePrompt', 'Do you want to create a new article? Unsaved changes will be lost.'))) {
             return;
         }
         
@@ -2705,7 +3017,7 @@ async function initEditor() {
         hasUnsavedChanges = false;
         markAsSaved();
         await refreshArticlesList();
-        showStatus('✓ Nouvel article créé !', 'success');
+        showStatus(`✓ ${t('articleSavedStatus', 'New article created!')}`, 'success');
     }
 
     /**
@@ -2808,7 +3120,7 @@ async function initEditor() {
         const articles = await _dbGetAll();
         
         if (articles.length === 0) {
-            articlesList.innerHTML = '<div class="no-articles">Aucun article sauvegardé</div>';
+            articlesList.innerHTML = `<div class="no-articles">${t('noSavedArticles', 'No saved articles')}</div>`;
             return;
         }
 
@@ -2818,7 +3130,7 @@ async function initEditor() {
                 ? `--card-color: ${cardColor}; background: linear-gradient(90deg, ${hexToRgba(cardColor, 0.22)} 0%, var(--editor-bg-tertiary) 38%);`
                 : `--card-color: transparent; background: var(--editor-bg-tertiary);`;
 
-            const subject = escapeHtml(article.subject || 'Sans titre');
+            const subject = escapeHtml(article.subject || t('untitled', 'Untitled'));
             const preview = escapeHtml(article.preview || 'Sans contenu');
 
             return `
@@ -2828,16 +3140,16 @@ async function initEditor() {
                     <div class="article-card-footer">
                         <span class="article-card-date">${article.date}</span>
                         <div class="article-card-actions">
-                            <button class="article-card-color" data-id="${article.id}" onclick="event.stopPropagation()" title="Changer la couleur de la carte" aria-label="Changer la couleur de la carte">
+                            <button class="article-card-color" data-id="${article.id}" onclick="event.stopPropagation()" title="${t('chooseColor', 'Choose color')}" aria-label="${t('chooseColor', 'Choose color')}">
                                 <span class="article-card-color-dot" style="background:${cardColor};"></span>
                             </button>
-                            <button class="article-card-move-up" data-id="${article.id}" data-index="${index}" onclick="event.stopPropagation()" title="Monter l'article" aria-label="Monter l'article" ${index === 0 ? 'disabled' : ''}>
+                            <button class="article-card-move-up" data-id="${article.id}" data-index="${index}" onclick="event.stopPropagation()" title="${t('moveUp', 'Move up')}" aria-label="${t('moveUp', 'Move up')}" ${index === 0 ? 'disabled' : ''}>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
                             </button>
-                            <button class="article-card-move-down" data-id="${article.id}" data-index="${index}" onclick="event.stopPropagation()" title="Descendre l'article" aria-label="Descendre l'article" ${index === articles.length - 1 ? 'disabled' : ''}>
+                            <button class="article-card-move-down" data-id="${article.id}" data-index="${index}" onclick="event.stopPropagation()" title="${t('moveDown', 'Move down')}" aria-label="${t('moveDown', 'Move down')}" ${index === articles.length - 1 ? 'disabled' : ''}>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
                             </button>
-                            <button class="article-card-delete" data-id="${article.id}" onclick="event.stopPropagation()" title="Supprimer l'article" aria-label="Supprimer l'article">
+                            <button class="article-card-delete" data-id="${article.id}" onclick="event.stopPropagation()" title="${t('deleteArticleConfirmation', 'Delete this article?')}" aria-label="${t('deleteArticleConfirmation', 'Delete this article?')}">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
                             </button>
                         </div>
@@ -2905,7 +3217,7 @@ async function initEditor() {
      * Charge un article depuis la liste (IndexedDB)
      */
     async function loadArticleFromList(id) {
-        if (hasUnsavedChanges && !confirm('Charger cet article ? Les modifications non enregistrées seront perdues.')) {
+        if (hasUnsavedChanges && !confirm(t('loadArticleConfirmation', 'Load this article? Unsaved changes will be lost.'))) {
             return;
         }
         
@@ -2929,7 +3241,7 @@ async function initEditor() {
      * Supprime un article de la liste (IndexedDB)
      */
     async function deleteArticleFromList(id) {
-        if (!confirm('Êtes-vous sûr de vouloir supprimer cet article ?')) {
+        if (!confirm(t('deleteArticleConfirmation', 'Are you sure you want to delete this article?'))) {
             return;
         }
         

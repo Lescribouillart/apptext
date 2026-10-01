@@ -19,7 +19,7 @@
                 <p class="tagline" data-i18n="tagline">Éditez vos idées</p>
             </div>
 
-            <button class="settings-btn" type="button" aria-label="Paramètres" title="Paramètres">
+            <button class="settings-btn" type="button" aria-label="Paramètres" title="Paramètres" data-i18n-aria="settingsButton" data-i18n-title="settingsButton">
                 <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
                     <path d="M19.14 12.94c.04-.31.06-.62.06-.94s-.02-.63-.06-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.61-.18l-2.39.96a7.1 7.1 0 0 0-1.63-.94L14.4 2.5a.5.5 0 0 0-.5-.34h-3.8a.5.5 0 0 0-.5.34l-.33 2.46c-.58.23-1.12.54-1.63.94l-2.39-.96a.5.5 0 0 0-.61.18L2.71 8.84a.5.5 0 0 0 .12.64l2.03 1.58c-.04.31-.06.62-.06.94s.02.63.06.94L2.83 14.52a.5.5 0 0 0-.12.64l1.92 3.32c.14.24.43.32.61.18l2.39-.96c.51.4 1.05.71 1.63.94l.33 2.46c.04.2.24.34.5.34h3.8c.26 0 .46-.14.5-.34l.33-2.46c.58-.23 1.12-.54 1.63-.94l2.39.96c.18.14.47.06.61-.18l1.92-3.32a.5.5 0 0 0-.12-.64l-2.03-1.58ZM12 15.5A3.5 3.5 0 1 1 12 8a3.5 3.5 0 0 1 0 7.5Z" fill="currentColor"/>
                 </svg>
@@ -125,7 +125,7 @@
     </div>
 
     <main class="main" id="main-content">
-        <section id="screen-editor" class="app-screen" aria-label="Écran de saisie du texte">
+        <section id="screen-editor" class="app-screen" aria-label="Input screen" data-i18n-aria="navigationInput">
             <!-- Barre supérieure avec toolbar intégrée -->
             <div class="top-bar">
                 <!-- Boutons d'action -->
@@ -161,22 +161,22 @@
                         <div class="toolbar editor-toolbar oo-toolbar">
 
                             <!-- Groupe 1 : Style de paragraphe -->
-                            <select class="toolbar-select oo-select-style" id="formatSelect" title="Style de paragraphe">
-                                <option value="p">Paragraphe</option>
-                                <option value="h1">Titre 1</option>
-                                <option value="h2">Titre 2</option>
-                                <option value="h3">Titre 3</option>
-                                <option value="h4">Titre 4</option>
-                                <option value="h5">Titre 5</option>
-                                <option value="h6">Titre 6</option>
-                                <option value="blockquote">Citation</option>
+                            <select class="toolbar-select oo-select-style" id="formatSelect" title="Style de paragraph" data-i18n-title="toolbarParagraphStyle">
+                                <option value="p">Paragraph</option>
+                                <option value="h1">Title 1</option>
+                                <option value="h2">Title 2</option>
+                                <option value="h3">Title 3</option>
+                                <option value="h4">Title 4</option>
+                                <option value="h5">Title 5</option>
+                                <option value="h6">Title 6</option>
+                                <option value="blockquote">Quote</option>
                                 <option value="pre">Code</option>
                             </select>
 
                             <div class="toolbar-separator"></div>
 
                             <!-- Groupe 2 : Police & Taille -->
-                            <select class="toolbar-select oo-select-font" id="fontFamilySelect" title="Police de caractères">
+                            <select class="toolbar-select oo-select-font" id="fontFamilySelect" title="Font family" data-i18n-title="toolbarFontFamily">
                                 <option value="">Police par défaut</option>
                                 <option value="Arial, sans-serif">Arial</option>
                                 <option value="'Times New Roman', serif">Times New Roman</option>
@@ -186,7 +186,7 @@
                                 <option value="Helvetica, sans-serif">Helvetica</option>
                                 <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
                             </select>
-                            <select class="toolbar-select oo-select-size" id="fontSizeSelect" title="Taille de police">
+                            <select class="toolbar-select oo-select-size" id="fontSizeSelect" title="Font size" data-i18n-title="toolbarFontSize">
                                 <option value="1">8pt</option>
                                 <option value="2">10pt</option>
                                 <option value="3" selected>12pt</option>
@@ -199,16 +199,16 @@
                             <div class="toolbar-separator"></div>
 
                             <!-- Groupe 3 : Mise en forme du texte -->
-                            <button class="toolbar-btn oo-btn" data-command="bold" title="Gras (Ctrl+B)">
+                            <button class="toolbar-btn oo-btn" data-command="bold" title="Bold (Ctrl+B)" data-i18n-title="toolbarBold" data-i18n-aria="toolbarBold">
                                 <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M15.6 10.79c.97-.67 1.65-1.77 1.65-2.79 0-2.26-1.75-4-4-4H7v14h7.04c2.09 0 3.71-1.7 3.71-3.79 0-1.52-.86-2.82-2.15-3.42zM10 6.5h3c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-3v-3zm3.5 9H10v-3h3.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5z"/></svg>
                             </button>
-                            <button class="toolbar-btn oo-btn" data-command="italic" title="Italique (Ctrl+I)">
+                            <button class="toolbar-btn oo-btn" data-command="italic" title="Italic (Ctrl+I)" data-i18n-title="toolbarItalic" data-i18n-aria="toolbarItalic">
                                 <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M10 4v3h2.21l-3.42 8H6v3h8v-3h-2.21l3.42-8H18V4h-8z"/></svg>
                             </button>
-                            <button class="toolbar-btn oo-btn" data-command="underline" title="Souligné (Ctrl+U)">
+                            <button class="toolbar-btn oo-btn" data-command="underline" title="Underline (Ctrl+U)" data-i18n-title="toolbarUnderline" data-i18n-aria="toolbarUnderline">
                                 <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 17c3.31 0 6-2.69 6-6V3h-2.5v8c0 1.93-1.57 3.5-3.5 3.5S8.5 12.93 8.5 11V3H6v8c0 3.31 2.69 6 6 6zm-7 2v2h14v-2H5z"/></svg>
                             </button>
-                            <button class="toolbar-btn oo-btn" data-command="strikeThrough" title="Barré">
+                            <button class="toolbar-btn oo-btn" data-command="strikeThrough" title="Strikethrough" data-i18n-title="toolbarStrike" data-i18n-aria="toolbarStrike">
                                 <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M10 19h4v-3h-4v3zM5 4v3h5v3h4V7h5V4H5zM3 14h18v-2H3v2z"/></svg>
                             </button>
 
@@ -216,14 +216,14 @@
 
                             <!-- Groupe 4 : Couleurs -->
                             <div class="color-picker-wrapper oo-color-wrap">
-                                    <button class="toolbar-btn oo-btn oo-color-btn" id="textColorBtn" type="button" title="Couleur du texte">
+                                    <button class="toolbar-btn oo-btn oo-color-btn" id="textColorBtn" type="button" title="Text color" data-i18n-title="toolbarTextColor" data-i18n-aria="toolbarTextColor">
                                     <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M11.14 3L5.5 21h2.11l1.3-4h6.18l1.3 4h2.11L12.86 3h-1.72zm-1.62 12 2.48-7.64L14.48 15H9.52z"/></svg>
                                     <span class="oo-color-bar" id="textColorBar" style="background:#000000"></span>
                                 </button>
                                 <input type="color" id="textColor" class="color-input" value="#000000">
                             </div>
                             <div class="color-picker-wrapper oo-color-wrap">
-                                    <button class="toolbar-btn oo-btn oo-color-btn" id="bgColorBtn" type="button" title="Couleur de surbrillance">
+                                    <button class="toolbar-btn oo-btn oo-color-btn" id="bgColorBtn" type="button" title="Highlight color" data-i18n-title="toolbarHighlightColor" data-i18n-aria="toolbarHighlightColor">
                                     <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M16.56 8.94L7.62 0 6.21 1.41l2.38 2.38-5.15 5.15c-.59.59-.59 1.54 0 2.12l5.5 5.5c.29.29.68.44 1.06.44s.77-.15 1.06-.44l5.5-5.5c.59-.58.59-1.53 0-2.12zM5.21 10 10 5.21 14.79 10H5.21zM19 11.5s-2 2.17-2 3.5c0 1.1.9 2 2 2s2-.9 2-2c0-1.33-2-3.5-2-3.5z"/><rect x="0" y="20" width="24" height="4" fill="currentColor" opacity=".36"/></svg>
                                     <span class="oo-color-bar" id="bgColorBar" style="background:#ffff00"></span>
                                 </button>
@@ -233,83 +233,83 @@
                             <div class="toolbar-separator"></div>
 
                             <!-- Groupe 5 : Alignement -->
-                            <button class="toolbar-btn oo-btn" data-command="justifyLeft" title="Aligner à gauche (Ctrl+L)">
+                            <button class="toolbar-btn oo-btn" data-command="justifyLeft" title="Align left (Ctrl+L)" data-i18n-title="toolbarAlignLeft" data-i18n-aria="toolbarAlignLeft">
                                 <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M15 15H3v2h12v-2zm0-8H3v2h12V7zM3 13h18v-2H3v2zm0 8h18v-2H3v2zM3 3v2h18V3H3z"/></svg>
                             </button>
-                            <button class="toolbar-btn oo-btn" data-command="justifyCenter" title="Centrer (Ctrl+E)">
+                            <button class="toolbar-btn oo-btn" data-command="justifyCenter" title="Center (Ctrl+E)" data-i18n-title="toolbarAlignCenter" data-i18n-aria="toolbarAlignCenter">
                                 <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M7 15v2h10v-2H7zm-4 6h18v-2H3v2zm0-8h18v-2H3v2zm4-6v2h10V7H7zM3 3v2h18V3H3z"/></svg>
                             </button>
-                            <button class="toolbar-btn oo-btn" data-command="justifyRight" title="Aligner à droite (Ctrl+R)">
+                            <button class="toolbar-btn oo-btn" data-command="justifyRight" title="Align right (Ctrl+R)" data-i18n-title="toolbarAlignRight" data-i18n-aria="toolbarAlignRight">
                                 <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M3 21h18v-2H3v2zm6-4h12v-2H9v2zm-6-4h18v-2H3v2zm6-4h12V7H9v2zM3 3v2h18V3H3z"/></svg>
                             </button>
-                            <button class="toolbar-btn oo-btn" data-command="justifyFull" title="Justifier (Ctrl+J)">
+                            <button class="toolbar-btn oo-btn" data-command="justifyFull" title="Justify (Ctrl+J)" data-i18n-title="toolbarJustify" data-i18n-aria="toolbarJustify">
                                 <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M3 21h18v-2H3v2zm0-4h18v-2H3v2zm0-4h18v-2H3v2zm0-4h18V7H3v2zm0-6v2h18V3H3z"/></svg>
                             </button>
 
                             <div class="toolbar-separator"></div>
 
                             <!-- Groupe 6 : Listes & Retraits -->
-                            <button class="toolbar-btn oo-btn" data-command="insertUnorderedList" title="Liste à puces">
+                            <button class="toolbar-btn oo-btn" data-command="insertUnorderedList" title="Bulleted list" data-i18n-title="toolbarBulletedList" data-i18n-aria="toolbarBulletedList">
                                 <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M4 10.5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5zm0-6c-.83 0-1.5.67-1.5 1.5S3.17 7.5 4 7.5 5.5 6.83 5.5 6 4.83 4.5 4 4.5zm0 12c-.83 0-1.5.68-1.5 1.5s.68 1.5 1.5 1.5 1.5-.68 1.5-1.5-.67-1.5-1.5-1.5zM7 19h14v-2H7v2zm0-6h14v-2H7v2zm0-8v2h14V5H7z"/></svg>
                             </button>
-                            <button class="toolbar-btn oo-btn" data-command="insertOrderedList" title="Liste numérotée">
+                            <button class="toolbar-btn oo-btn" data-command="insertOrderedList" title="Numbered list" data-i18n-title="toolbarOrderedList" data-i18n-aria="toolbarOrderedList">
                                 <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M2 17h2v.5H3v1h1v.5H2v1h3v-4H2v1zm1-9h1V4H2v1h1v3zm-1 3h1.8L2 13.1v.9h3v-1H3.2L5 10.9V10H2v1zm5-6v2h14V5H7zm0 14h14v-2H7v2zm0-6h14v-2H7v2z"/></svg>
                             </button>
-                            <button class="toolbar-btn oo-btn" data-command="outdent" title="Réduire le retrait">
+                            <button class="toolbar-btn oo-btn" data-command="outdent" title="Decrease indent" data-i18n-title="toolbarOutdent" data-i18n-aria="toolbarOutdent">
                                 <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M11 17h10v-2H11v2zm-8-5 4 4V8l-4 4zm0 9h18v-2H3v2zM3 3v2h18V3H3zm8 6h10V7H11v2zm0 4h10v-2H11v2z"/></svg>
                             </button>
-                            <button class="toolbar-btn oo-btn" data-command="indent" title="Augmenter le retrait">
+                            <button class="toolbar-btn oo-btn" data-command="indent" title="Increase indent" data-i18n-title="toolbarIndent" data-i18n-aria="toolbarIndent">
                                 <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M3 21h18v-2H3v2zM3 8v8l4-4-4-4zm8 9h10v-2H11v2zM3 3v2h18V3H3zm8 6h10V7H11v2zm0 4h10v-2H11v2z"/></svg>
                             </button>
 
                             <div class="toolbar-separator"></div>
 
                             <!-- Groupe 7 : Lien / Image -->
-                            <button class="toolbar-btn oo-btn" id="linkBtn" title="Insérer un lien (Ctrl+K)">
+                            <button class="toolbar-btn oo-btn" id="linkBtn" title="Insert link (Ctrl+K)" data-i18n-title="toolbarInsertLink" data-i18n-aria="toolbarInsertLink">
                                 <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
                             </button>
-                            <button class="toolbar-btn oo-btn" id="unlinkBtn" data-command="unlink" title="Supprimer le lien">
+                            <button class="toolbar-btn oo-btn" id="unlinkBtn" data-command="unlink" title="Remove link" data-i18n-title="toolbarRemoveLink" data-i18n-aria="toolbarRemoveLink">
                                 <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M17 7h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1 0 1.43-.98 2.63-2.31 2.98l1.46 1.46C20.59 15.99 22 14.17 22 12c0-2.76-2.24-5-5-5zm-1 4h-2.19l2 2H16v-2zM2 4.27l3.11 3.11C3.29 8.12 2 9.91 2 12c0 2.76 2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1 0-1.59 1.21-2.9 2.76-3.07L8.73 11H8v2h2.73l2 2H8v1.9h3.27L13 18.73V17h4l1.73 1.73L20 17.46 3.27 2.73 2 4.27z"/></svg>
                             </button>
-                            <button class="toolbar-btn oo-btn" id="imageBtn" title="Insérer une image">
+                            <button class="toolbar-btn oo-btn" id="imageBtn" title="Insert image" data-i18n-title="toolbarInsertImage" data-i18n-aria="toolbarInsertImage">
                                 <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
                             </button>
 
                             <div class="toolbar-separator"></div>
 
                             <!-- Groupe 8 : Annuler / Rétablir / Nettoyer / Source -->
-                            <button class="toolbar-btn oo-btn" data-command="undo" title="Annuler (Ctrl+Z)">
+                            <button class="toolbar-btn oo-btn" data-command="undo" title="Undo (Ctrl+Z)" data-i18n-title="toolbarUndo" data-i18n-aria="toolbarUndo">
                                 <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/></svg>
                             </button>
-                            <button class="toolbar-btn oo-btn" data-command="redo" title="Rétablir (Ctrl+Y)">
+                            <button class="toolbar-btn oo-btn" data-command="redo" title="Redo (Ctrl+Y)" data-i18n-title="toolbarRedo" data-i18n-aria="toolbarRedo">
                                 <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M18.4 10.6C16.55 8.99 14.15 8 11.5 8c-4.65 0-8.58 3.03-9.96 7.22L3.9 16c1.05-3.19 4.05-5.5 7.6-5.5 1.95 0 3.73.72 5.12 1.88L13 16h9V7l-3.6 3.6z"/></svg>
                             </button>
-                            <button class="toolbar-btn oo-btn" id="clearStyleBtn" data-command="removeFormat" title="Effacer le style">
+                            <button class="toolbar-btn oo-btn" id="clearStyleBtn" data-command="removeFormat" title="Clear formatting" data-i18n-title="toolbarClearFormat" data-i18n-aria="toolbarClearFormat">
                                 <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M3.27 5 2 6.27l6.97 6.97L6.5 19h3l1.57-3.66L16.73 21 18 19.73 3.27 5zM6 5v.18L8.82 8h2.4l-.72 1.68 2.1 2.1L14.21 8H20V5H6z"/></svg>
                             </button>
-                            <button class="toolbar-btn oo-btn" id="sourceBtn" title="Code source HTML">
+                            <button class="toolbar-btn oo-btn" id="sourceBtn" title="HTML source code" data-i18n-title="toolbarSourceCode" data-i18n-aria="toolbarSourceCode">
                                 <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M9.4 16.6 4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0 4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
                             </button>
 
-                            <div class="toolbar-search-wrap" aria-label="Recherche dans le texte">
-                                <input id="toolbarSearchInput" class="toolbar-search-input" type="search" placeholder="Rechercher" aria-label="Rechercher dans le texte" />
-                                <button class="toolbar-btn oo-btn toolbar-search-btn" id="toolbarSearchBtn" type="button" title="Rechercher">
+                            <div class="toolbar-search-wrap" aria-label="Recherche dans le texte" data-i18n-aria="search">
+                                <input id="toolbarSearchInput" class="toolbar-search-input" type="search" placeholder="Rechercher" aria-label="Rechercher dans le texte" data-i18n-placeholder="search" data-i18n-aria="search" />
+                                <button class="toolbar-btn oo-btn toolbar-search-btn" id="toolbarSearchBtn" type="button" title="Rechercher" data-i18n-title="search" data-i18n-aria="search">
                                     <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6"/><path d="m16 16 5 5"/></svg>
                                 </button>
                             </div>
 
                             <div class="toolbar-separator toolbar-end-separator"></div>
-                            <button class="toolbar-btn oo-btn toolbar-toggle-btn" id="toolbarToggleBtn" type="button" title="Masquer la barre d'outils" aria-label="Masquer la barre d'outils">
+                            <button class="toolbar-btn oo-btn toolbar-toggle-btn" id="toolbarToggleBtn" type="button" title="Hide toolbar" aria-label="Hide toolbar" data-i18n-title="toolbarHide" data-i18n-aria="toolbarHide">
                                 <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M7 14l5-5 5 5H7z"/></svg>
                             </button>
-                            <button class="toolbar-btn oo-btn organize-toolbar-btn" id="organizeToolbarBtn" type="button" title="Organiser les boutons de la barre d'outils" aria-label="Organiser les boutons de la barre d'outils">
+                            <button class="toolbar-btn oo-btn organize-toolbar-btn" id="organizeToolbarBtn" type="button" title="Organize toolbar buttons" aria-label="Organize toolbar buttons" data-i18n-title="toolbarOrganize" data-i18n-aria="toolbarOrganize">
                                 <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 6h8v2H8zm0 5h8v2H8zm0 5h8v2H8zM4 6h2v2H4zm0 5h2v2H4zm0 5h2v2H4z"/></svg>
                             </button>
-                            <button class="toolbar-btn oo-btn toolbar-save-btn" id="toolbarSaveBtn" type="button" title="Enregistrer" aria-label="Enregistrer">
-                                <img src="assets/icons/disquette.png" alt="Enregistrer" width="18" height="18" style="display:block;object-fit:contain;" />
+                            <button class="toolbar-btn oo-btn toolbar-save-btn" id="toolbarSaveBtn" type="button" title="Save" aria-label="Save" data-i18n-title="toolbarSave" data-i18n-aria="toolbarSave">
+                                <img src="assets/icons/disquette.png" alt="Save" width="18" height="18" style="display:block;object-fit:contain;" data-i18n-alt="toolbarSave" />
                             </button>
-                            <button class="toolbar-btn oo-btn toolbar-editor-btn" id="toolbarEditorBtn" type="button" title="Nouveau" aria-label="Nouveau">
-                                <img src="assets/icons/crayon.png" alt="Nouveau" width="18" height="18" style="display:block;object-fit:contain;" />
+                            <button class="toolbar-btn oo-btn toolbar-editor-btn" id="toolbarEditorBtn" type="button" title="New" aria-label="New" data-i18n-title="toolbarNew" data-i18n-aria="toolbarNew">
+                                <img src="assets/icons/crayon.png" alt="New" width="18" height="18" style="display:block;object-fit:contain;" data-i18n-alt="toolbarNew" />
                             </button>
 
                         </div>
@@ -328,7 +328,7 @@
             </div>
         </section>
 
-        <section id="screen-search" class="app-screen" aria-label="Écran de recherche">
+        <section id="screen-search" class="app-screen" aria-label="Search screen" data-i18n-aria="navigationSearch">
             <div class="screen-header">
                 <h2>Recherche</h2>
             </div>
@@ -341,7 +341,7 @@
             </div>
         </section>
 
-        <section id="screen-theme" class="app-screen" aria-label="Écran de réglage du thème">
+        <section id="screen-theme" class="app-screen" aria-label="Theme screen" data-i18n-aria="theme">
             <div class="screen-content theme-screen">
                 <div class="theme-card">
                     <div class="theme-options">
@@ -382,7 +382,7 @@
             </div>
         </section>
 
-        <section id="screen-language" class="app-screen" aria-label="Écran de langue">
+        <section id="screen-language" class="app-screen" aria-label="Language screen" data-i18n-aria="language">
             <div class="screen-header screen-header-with-back">
                 <button class="screen-back-btn" id="languageBackBtn" type="button" aria-label="Retour aux paramètres">
                     <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
@@ -401,7 +401,7 @@
             </div>
         </section>
 
-        <section id="screen-account" class="app-screen" aria-label="Écran d'inscription">
+        <section id="screen-account" class="app-screen" aria-label="Account screen" data-i18n-aria="accountScreenTitle">
             <div class="screen-header screen-header-with-back">
                 <button class="screen-back-btn" id="accountBackBtn" type="button" aria-label="Retour aux paramètres">
                     <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
@@ -462,14 +462,14 @@
             </div>
         </section>
 
-        <section id="screen-licenses" class="app-screen" aria-label="Écran des licences">
+        <section id="screen-licenses" class="app-screen" aria-label="Licenses screen" data-i18n-aria="licensesTitle">
             <div class="screen-header screen-header-with-back">
                 <button class="screen-back-btn" id="licensesBackBtn" type="button" aria-label="Retour aux paramètres">
                     <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
                         <path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z" fill="currentColor"/>
                     </svg>
                 </button>
-                <h2>Licences</h2>
+                <h2 data-i18n="licensesTitle">Licences</h2>
             </div>
             <div class="screen-content">
                 <div class="licenses-panel">
@@ -492,14 +492,14 @@
             </div>
         </section>
 
-        <section id="screen-updates" class="app-screen" aria-label="Écran des mises à jour">
+        <section id="screen-updates" class="app-screen" aria-label="Updates screen" data-i18n-aria="updates">
             <div class="screen-header screen-header-with-back">
                 <button class="screen-back-btn" id="updatesBackBtn" type="button" aria-label="Retour aux paramètres">
                     <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
                         <path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z" fill="currentColor"/>
                     </svg>
                 </button>
-                <h2>Mises à jour</h2>
+                <h2 data-i18n="updates">Mises à jour</h2>
             </div>
             <div class="screen-content">
                 <div class="updates-panel">
@@ -520,18 +520,18 @@
             </div>
         </section>
 
-        <section id="screen-cards" class="app-screen" aria-label="Écran de cartes">
+        <section id="screen-cards" class="app-screen" aria-label="Cards screen" data-i18n-aria="cards">
             <div class="screen-header">
-                <h2>Cartes</h2>
+                <h2 data-i18n="cards">Cartes</h2>
             </div>
             <div class="screen-content">
                 <div id="cardsScreenList" class="screen-list cards-list"></div>
             </div>
         </section>
 
-        <section id="screen-music" class="app-screen" aria-label="Écran de musique">
+        <section id="screen-music" class="app-screen" aria-label="Music screen" data-i18n-aria="player">
             <div class="screen-header" style="display:none;">
-                <h2>Musique</h2>
+                <h2 data-i18n="player">Lecteur</h2>
             </div>
             <div class="screen-content music-screen-content">
                 <div class="top-bar-youtube music-screen-player">
@@ -542,16 +542,16 @@
                         </a>
 
                         <div class="sc-controls">
-                            <button class="sc-skip-btn" id="scPrevBtn" title="Piste précédente" aria-label="Piste précédente">
+                            <button class="sc-skip-btn" id="scPrevBtn" title="Piste précédente" aria-label="Piste précédente" data-i18n-title="previousTrack" data-i18n-aria="previousTrack">
                                 <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="currentColor">
                                     <path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/>
                                 </svg>
                             </button>
-                            <button class="sc-play-btn" id="scPlayBtn" title="Lecture / Pause" aria-label="Lecture / Pause">
+                            <button class="sc-play-btn" id="scPlayBtn" title="Lecture / Pause" aria-label="Lecture / Pause" data-i18n-title="playPause" data-i18n-aria="playPause">
                                 <svg class="sc-icon-play" viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M8 5v14l11-7z"/></svg>
                                 <svg class="sc-icon-pause" viewBox="0 0 24 24" fill="currentColor" width="20" height="20" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
                             </button>
-                            <button class="sc-skip-btn" id="scNextBtn" title="Piste suivante" aria-label="Piste suivante">
+                            <button class="sc-skip-btn" id="scNextBtn" title="Piste suivante" aria-label="Piste suivante" data-i18n-title="nextTrack" data-i18n-aria="nextTrack">
                                 <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="currentColor">
                                     <path d="M6 18l8.5-6L6 6v12zm8.5-6v6H17V6h-2.5z"/>
                                 </svg>
@@ -576,23 +576,23 @@
 
                         <div class="sc-right">
                             <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16" style="flex-shrink:0;color:#ffffff;"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
-                            <input type="range" class="sc-volume" id="scVolume" min="0" max="100" value="80" title="Volume">
+                            <input type="range" class="sc-volume" id="scVolume" min="0" max="100" value="80" title="Volume" data-i18n-title="volume" data-i18n-aria="volume">
                         </div>
 
                         <div class="sc-actions">
-                            <button class="sc-action-btn youtube-btn" id="youtubeAddBtn" title="Ajouter une piste YouTube" aria-label="Ajouter une piste YouTube">
+                            <button class="sc-action-btn youtube-btn" id="youtubeAddBtn" title="Ajouter une piste YouTube" aria-label="Ajouter une piste YouTube" data-i18n-title="addYoutubeTrack" data-i18n-aria="addYoutubeTrack">
                                 <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none">
                                     <rect x="2.5" y="5" width="19" height="14" rx="4" fill="#FF0033"/>
                                     <path d="M10 9.2L15.5 12L10 14.8V9.2Z" fill="white"/>
                                 </svg>
                             </button>
-                            <button class="sc-action-btn" id="localMusicBtn" title="Ouvrir un fichier audio du téléphone" aria-label="Ouvrir un fichier audio du téléphone">♫</button>
-                            <button class="sc-action-btn" id="youtubeManageBtn" title="Gérer les pistes">
+                            <button class="sc-action-btn" id="localMusicBtn" title="Ouvrir un fichier audio du téléphone" aria-label="Ouvrir un fichier audio du téléphone" data-i18n-title="openAudioFile" data-i18n-aria="openAudioFile">♫</button>
+                            <button class="sc-action-btn" id="youtubeManageBtn" title="Gérer les pistes" data-i18n-title="manageTracks" data-i18n-aria="manageTracks">
                                 <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
                             </button>
-                            <button class="sc-action-btn" id="youtubeToggle" title="Réduire/Agrandir">−</button>
+                            <button class="sc-action-btn" id="youtubeToggle" title="Réduire/Agrandir" data-i18n-title="minimizeMaximize" data-i18n-aria="minimizeMaximize">−</button>
                         </div>
-                        <input id="localMusicInput" type="file" accept="audio/*" style="display:none;" aria-label="Choisir une musique sur le téléphone">
+                        <input id="localMusicInput" type="file" accept="audio/*" style="display:none;" aria-label="Choisir une musique sur le téléphone" data-i18n-aria="selectAudio">
                         <audio id="localAudioPlayer" preload="metadata" style="display:none;"></audio>
                     </div>
                 </div>
@@ -601,25 +601,25 @@
     </main>
 
     <nav class="bottom-nav" aria-label="Navigation principale">
-        <button class="bottom-tab active" type="button" data-route="editor" aria-label="Écran Saisie du texte">
-            <img class="nav-editor-icon" src="assets/icons/crayon.png" alt="Saisie" width="22" height="22" style="display:block;object-fit:contain;">
-            <span>Saisie</span>
+        <button class="bottom-tab active" type="button" data-route="editor" aria-label="Input" data-i18n-aria="navigationInput" data-i18n-title="navigationInput">
+            <img class="nav-editor-icon" src="assets/icons/crayon.png" alt="Input" width="22" height="22" style="display:block;object-fit:contain;" data-i18n-alt="navigationInput">
+            <span data-i18n="inputText">Input</span>
         </button>
-        <button class="bottom-tab" type="button" data-route="cards" aria-label="Écran Cartes">
+        <button class="bottom-tab" type="button" data-route="cards" aria-label="Cards" data-i18n-aria="navigationCards" data-i18n-title="navigationCards">
             <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5h13A2.5 2.5 0 0 1 21 7.5v9A2.5 2.5 0 0 1 18.5 19h-13A2.5 2.5 0 0 1 3 16.5v-9Z"/><path d="M7 9h10M7 13h6"/></svg>
-            <span>Cartes</span>
+            <span data-i18n="cards">Cards</span>
         </button>
-        <button class="bottom-tab" type="button" data-route="search" aria-label="Écran Recherche">
+        <button class="bottom-tab" type="button" data-route="search" aria-label="Search" data-i18n-aria="navigationSearch" data-i18n-title="navigationSearch">
             <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6"/><path d="m16 16 5 5"/></svg>
-            <span>Recherche</span>
+            <span data-i18n="search">Search</span>
         </button>
-        <button class="bottom-tab bottom-tab-mode" type="button" data-route="theme" aria-label="Écran Mode jour/nuit">
-            <img class="nav-mode-accessibility" src="assets/icons/accessibilite.png" alt="Accessibilité" width="22" height="22" style="display:block;object-fit:contain;">
-            <span>accessibilité</span>
+        <button class="bottom-tab bottom-tab-mode" type="button" data-route="theme" aria-label="Accessibility" data-i18n-aria="navigationAccessibility" data-i18n-title="navigationAccessibility">
+            <img class="nav-mode-accessibility" src="assets/icons/accessibilite.png" alt="Accessibility" width="22" height="22" style="display:block;object-fit:contain;" data-i18n-alt="navigationAccessibility">
+            <span data-i18n="accessibility">Accessibility</span>
         </button>
-        <button class="bottom-tab" type="button" data-route="music" aria-label="Écran Lecteur">
-            <img class="nav-music-icon" src="assets/icons/disquevinyle.png" alt="Lecteur" width="22" height="22" style="display:block;object-fit:contain;">
-            <span>Lecteur</span>
+        <button class="bottom-tab" type="button" data-route="music" aria-label="Player" data-i18n-aria="navigationPlayer" data-i18n-title="navigationPlayer">
+            <img class="nav-music-icon" src="assets/icons/disquevinyle.png" alt="Player" width="22" height="22" style="display:block;object-fit:contain;" data-i18n-alt="navigationPlayer">
+            <span data-i18n="player">Player</span>
         </button>
     </nav>
 
