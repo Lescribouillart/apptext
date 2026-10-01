@@ -2,9 +2,12 @@
   "name": "frontend",
   "version": "1.0.0",
   "description": "Le frontend est l’interface utilisateur de l’application de prise de notes et d’édition de texte. Il fournit :",
-  "main": "musique.js",
+  "main": "src/musique.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "node scripts/build-dist.js",
+    "sync:android": "npm run build && npx cap sync android",
+    "open:android": "npx cap open android",
+    "test": "node --check src/publication.js"
   },
   "keywords": [],
   "author": "",

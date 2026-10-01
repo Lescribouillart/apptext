@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const frontendDir = path.resolve(__dirname, '..');
+const srcDir = path.join(frontendDir, 'src');
 const distDir = path.join(frontendDir, 'dist');
 
 function copyItem(src, dest) {
@@ -19,7 +20,7 @@ function copyItem(src, dest) {
 }
 
 function ensureFileCopy(fileName) {
-  const src = path.join(frontendDir, fileName);
+  const src = path.join(srcDir, fileName);
   const dest = path.join(distDir, fileName);
   if (fs.existsSync(src)) {
     copyItem(src, dest);
@@ -38,4 +39,4 @@ for (const folder of ['assets', 'illustrheader']) {
   }
 }
 
-console.log('dist generated from current project files');
+console.log('dist generated from src files');
