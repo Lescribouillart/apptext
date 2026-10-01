@@ -1,8 +1,9 @@
 const fs = require('fs');
 const path = require('path');
 
-const root = process.cwd();
-const distDir = path.join(root, 'dist');
+const frontendDir = path.resolve(__dirname, '..');
+const projectRoot = path.resolve(frontendDir, '..');
+const distDir = path.join(projectRoot, 'dist');
 
 function copyItem(src, dest) {
   const stat = fs.statSync(src);
@@ -19,7 +20,7 @@ function copyItem(src, dest) {
 }
 
 function ensureFileCopy(fileName) {
-  const src = path.join(root, fileName);
+  const src = path.join(frontendDir, fileName);
   const dest = path.join(distDir, fileName);
   if (fs.existsSync(src)) {
     copyItem(src, dest);
@@ -28,10 +29,10 @@ function ensureFileCopy(fileName) {
 
 fs.mkdirSync(distDir, { recursive: true });
 
-['index.html', 'style.css', 'publication.js', 'musique.js'].forEach(ensureFileCopy);
+['index.html', 'style.css', 'publication.js', 'musique.js', 'suggestions.js'].forEach(ensureFileCopy);
 
 for (const folder of ['assets', 'illustrheader']) {
-  const src = path.join(root, folder);
+  const src = path.join(frontendDir, folder);
   const dest = path.join(distDir, folder);
   if (fs.existsSync(src)) {
     copyItem(src, dest);
