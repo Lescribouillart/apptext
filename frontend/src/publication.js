@@ -628,7 +628,6 @@ async function initEditor() {
             import: 'Importer',
             export: 'Exporter',
             addTitle: 'Ajouter un titre',
-            editorPlaceholder: 'Commencez à écrire ou tapez / pour choisir un bloc',
             backToSettings: 'Retour aux paramètres',
             accountScreenTitle: 'Compte',
             createAccount: 'Créer un compte',
@@ -804,7 +803,6 @@ async function initEditor() {
             import: 'Import',
             export: 'Export',
             addTitle: 'Add a title',
-            editorPlaceholder: 'Start writing or type / to choose a block',
             backToSettings: 'Back to settings',
             accountScreenTitle: 'Account',
             createAccount: 'Create account',
@@ -2064,7 +2062,7 @@ async function initEditor() {
                     if (currentArticleId === articleId) {
                         currentArticleId = null;
                         articleSubject.value = '';
-                        editor.innerHTML = `<p>${t('editorPlaceholder', 'Start writing or type / to choose a block')}</p>`;
+                        editor.innerHTML = '';
                         hasUnsavedChanges = false;
                         markAsSaved();
                     }
@@ -3304,12 +3302,21 @@ async function initEditor() {
     function loadFromLocalStorage() {
         const savedContent = localStorage.getItem('scribouillart_editor_content');
         const savedSubject = localStorage.getItem('scribouillart_editor_subject');
-        
-        if (savedContent) {
+
+        // Nettoyage d'un ancien texte d'aide persistant qui ne doit plus jamais s'afficher.
+        const obsoletePlaceholders = [
+            'Commencez à écrire ou tapez / pour choisir un bloc',
+            'Start writing or type / to choose a block'
+        ];
+        const isObsoletePlaceholder = savedContent && obsoletePlaceholders.some((text) => savedContent.includes(text));
+
+        if (isObsoletePlaceholder) {
+            localStorage.removeItem('scribouillart_editor_content');
+        } else if (savedContent) {
             editor.innerHTML = savedContent;
             updateWordCounter();
         }
-        
+
         if (savedSubject) {
             articleSubject.value = savedSubject;
         }

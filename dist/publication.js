@@ -1443,7 +1443,7 @@ async function initEditor() {
                     if (currentArticleId === articleId) {
                         currentArticleId = null;
                         articleSubject.value = '';
-                        editor.innerHTML = '<p>Commencez à écrire ou tapez / pour choisir un bloc</p>';
+                        editor.innerHTML = '';
                         hasUnsavedChanges = false;
                         markAsSaved();
                     }
