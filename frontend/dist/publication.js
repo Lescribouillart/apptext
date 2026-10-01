@@ -964,6 +964,13 @@ async function initEditor() {
         await syncUserCardsToAccount({ silent: true });
     }
 
+    async function restoreUserMediaFromAccount() {
+        if (!supabaseClient || typeof window.restoreUserTracksFromAccount !== 'function') return;
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session?.access_token) return;
+        await window.restoreUserTracksFromAccount();
+    }
+
     async function restoreUserCardsFromAccount() {
         if (!supabaseClient) return;
 
@@ -1071,6 +1078,7 @@ async function initEditor() {
             accountDeleteBtn?.classList.remove('hidden');
             accountGuestBtn?.classList.add('hidden');
             setAccountGateActive(false);
+            await restoreUserMediaFromAccount();
             return;
         }
 
@@ -1291,6 +1299,7 @@ async function initEditor() {
             accountLoginForm.reset();
             await syncAccountSessionState();
             await restoreUserCardsFromAccount();
+            await restoreUserMediaFromAccount();
             window.alert('Connexion réussie.');
         });
     }
@@ -1298,6 +1307,7 @@ async function initEditor() {
     if (supabaseClient) {
         supabaseClient.auth.onAuthStateChange(async () => {
             await syncAccountSessionState();
+            await restoreUserMediaFromAccount();
         });
         syncAccountSessionState();
         enforceAccountGateOnStartup();

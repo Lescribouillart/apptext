@@ -56,6 +56,126 @@ function _saveTracks() {
     } catch(e) {}
 }
 
+function _normalizeTrackForAccount(track, index) {
+    var safeTrack = track || {};
+    return {
+        id: String(safeTrack.id || 'track-' + (index + 1)),
+        title: String(safeTrack.title || 'Piste sans titre'),
+        type: safeTrack.type === 'local' ? 'local' : 'youtube',
+        source: safeTrack.type === 'local' ? 'local' : 'youtube',
+        url: safeTrack.url || null,
+        thumb: safeTrack.thumb || null,
+        sortOrder: Number(index),
+        createdAt: safeTrack.createdAt || new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+    };
+}
+
+async function syncUserTracksToAccount({ silent } = {}) {
+    var client = window.noteSupabase;
+    if (!client) {
+        if (!silent) window.alert('Supabase n’est pas initialisé.');
+        return;
+    }
+
+    var sessionResponse = await client.auth.getSession();
+    var session = sessionResponse && sessionResponse.data ? sessionResponse.data.session : null;
+    if (!session || !session.access_token) {
+        if (!silent) window.alert('Vous devez être connecté pour synchroniser les pistes.');
+        return;
+    }
+
+    try {
+        var rows = (Array.isArray(tracks) ? tracks : []).map(function(track, index) {
+            return {
+                id: String(track && track.id ? track.id : 'track-' + (index + 1)),
+                user_id: session.user.id,
+                type: track && track.type === 'local' ? 'local' : 'youtube',
+                title: String((track && track.title) || 'Piste sans titre'),
+                source: track && track.type === 'local' ? 'local' : 'youtube',
+                payload: _normalizeTrackForAccount(track, index),
+                "sortOrder": Number(index),
+                "createdAt": (track && track.createdAt) || new Date().toISOString(),
+                "updatedAt": new Date().toISOString()
+            };
+        });
+
+        var { error } = await client
+            .from('user_media')
+            .upsert(rows, { onConflict: 'id' });
+
+        if (error) {
+            throw new Error(error.message || 'Erreur lors de la synchronisation des pistes.');
+        }
+    } catch (error) {
+        if (silent) {
+            console.warn('Synchronisation automatique des pistes échouée', error);
+        } else {
+            window.alert(error.message || 'Erreur lors de la synchronisation des pistes.');
+        }
+    }
+}
+
+async function syncUserTracksToAccountIfLoggedIn() {
+    if (!window.noteSupabase) return;
+    var sessionResponse = await window.noteSupabase.auth.getSession();
+    var session = sessionResponse && sessionResponse.data ? sessionResponse.data.session : null;
+    if (!session || !session.access_token) return;
+    await syncUserTracksToAccount({ silent: true });
+}
+
+async function restoreUserTracksFromAccount() {
+    var client = window.noteSupabase;
+    if (!client) return;
+
+    var sessionResponse = await client.auth.getSession();
+    var session = sessionResponse && sessionResponse.data ? sessionResponse.data.session : null;
+    if (!session || !session.access_token) return;
+
+    try {
+        var { data, error } = await client
+            .from('user_media')
+            .select('*')
+            .eq('user_id', session.user.id)
+            .order('sortOrder', { ascending: false });
+
+        if (error) {
+            throw new Error(error.message || 'Impossible de restaurer les pistes.');
+        }
+
+        if (!Array.isArray(data) || data.length === 0) return;
+
+        var restored = data
+            .filter(function(row) { return row && row.payload; })
+            .map(function(row) {
+                var payload = row.payload || {};
+                return {
+                    id: String(payload.id || row.id),
+                    title: String(payload.title || 'Piste sans titre'),
+                    type: payload.type === 'local' ? 'local' : 'youtube',
+                    source: payload.source === 'local' ? 'local' : 'youtube',
+                    url: payload.url || null,
+                    thumb: payload.thumb || null,
+                    createdAt: payload.createdAt || row.createdAt,
+                    updatedAt: payload.updatedAt || row.updatedAt
+                };
+            })
+            .filter(function(track) { return track && track.id; });
+
+        if (!restored.length) return;
+
+        tracks = restored;
+        currentTrackIndex = 0;
+        _saveTracks();
+        updateTrackTitle();
+    } catch (error) {
+        console.warn('Restauration des pistes du compte échouée', error);
+    }
+}
+
+window.syncUserTracksToAccountIfLoggedIn = syncUserTracksToAccountIfLoggedIn;
+window.restoreUserTracksFromAccount = restoreUserTracksFromAccount;
+
 function readFileAsDataUrl(file) {
     return new Promise(function(resolve, reject) {
         var reader = new FileReader();
@@ -179,6 +299,7 @@ function _showManageTracksModal() {
                 var idx = parseInt(btn.dataset.idx);
                 tracks.splice(idx, 1);
                 _saveTracks();
+                syncUserTracksToAccountIfLoggedIn();
                 if (tracks.length === 0) {
                     currentTrackIndex = 0;
                     updateTrackTitle();
@@ -255,6 +376,7 @@ function _showAddTrackModal() {
 
         tracks.push({ id: id, title: title });
         _saveTracks();
+        syncUserTracksToAccountIfLoggedIn();
         close();
 
         // Aller directement sur la piste ajoutée
@@ -537,6 +659,7 @@ async function handleLocalAudioSelection(event) {
         tracks.push(localTrack);
         await _storeLocalTrackData(localTrack);
         _saveTracks();
+        syncUserTracksToAccountIfLoggedIn();
 
         currentTrackIndex = tracks.length - 1;
         updateTrackTitle();
