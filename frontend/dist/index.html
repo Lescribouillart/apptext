@@ -161,8 +161,8 @@
                         <div class="toolbar editor-toolbar oo-toolbar">
 
                             <!-- Groupe 1 : Style de paragraphe -->
-                            <select class="toolbar-select oo-select-style" id="formatSelect" title="Style de paragraph" data-i18n-title="toolbarParagraphStyle">
-                                <option value="p">Paragraph</option>
+                            <select class="toolbar-select oo-select-style" id="formatSelect" title="Style de paragraphe" data-i18n-title="toolbarParagraphStyle">
+                                <option value="p" data-i18n="toolbarParagraph">Paragraphe</option>
                                 <option value="h1">Title 1</option>
                                 <option value="h2">Title 2</option>
                                 <option value="h3">Title 3</option>
@@ -176,8 +176,8 @@
                             <div class="toolbar-separator"></div>
 
                             <!-- Groupe 2 : Police & Taille -->
-                            <select class="toolbar-select oo-select-font" id="fontFamilySelect" title="Font family" data-i18n-title="toolbarFontFamily">
-                                <option value="">Police par défaut</option>
+                            <select class="toolbar-select oo-select-font" id="fontFamilySelect" title="Police" data-i18n-title="toolbarFontFamily">
+                                <option value="" data-i18n="defaultFontOption">Police par défaut</option>
                                 <option value="Arial, sans-serif">Arial</option>
                                 <option value="'Times New Roman', serif">Times New Roman</option>
                                 <option value="'Courier New', monospace">Courier New</option>
@@ -330,12 +330,12 @@
 
         <section id="screen-search" class="app-screen" aria-label="Search screen" data-i18n-aria="navigationSearch">
             <div class="screen-header">
-                <h2>Recherche</h2>
+                <h2 data-i18n="search">Recherche</h2>
             </div>
             <div class="screen-content">
                 <div class="search-panel">
-                    <label class="search-label" for="globalSearchInput">Rechercher dans mes textes</label>
-                    <input id="globalSearchInput" type="search" class="screen-search-input" placeholder="Recherche rapide..." />
+                    <label class="search-label" for="globalSearchInput" data-i18n="searchInMyTexts">Rechercher dans mes textes</label>
+                    <input id="globalSearchInput" type="search" class="screen-search-input" placeholder="Recherche rapide..." data-i18n-placeholder="searchQuick" />
                 </div>
                 <div id="searchResultsList" class="screen-list"></div>
             </div>
