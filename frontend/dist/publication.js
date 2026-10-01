@@ -1193,7 +1193,10 @@ async function initEditor() {
     }
 
     async function enforceAccountGateOnStartup() {
-        if (!supabaseClient) return;
+        if (!supabaseClient) {
+            setAccountGateActive(false);
+            return;
+        }
 
         let isGuest = false;
         try {
@@ -1207,6 +1210,8 @@ async function initEditor() {
         if (!session && !isGuest) {
             setAccountGateActive(true);
             setRoute('account');
+        } else {
+            setAccountGateActive(false);
         }
     }
 
