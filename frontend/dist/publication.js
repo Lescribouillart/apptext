@@ -897,9 +897,6 @@ async function initEditor() {
     const accountConfirmPassword = document.getElementById('accountConfirmPassword');
     const accountLoginEmail = document.getElementById('accountLoginEmail');
     const accountLoginPassword = document.getElementById('accountLoginPassword');
-    const accountSyncPanel = document.getElementById('accountSyncPanel');
-    const accountSyncConfirmBtn = document.getElementById('accountSyncConfirmBtn');
-    const accountSyncCancelBtn = document.getElementById('accountSyncCancelBtn');
     const accountModeButtons = document.querySelectorAll('.account-mode-btn');
     const accountSessionStatus = document.getElementById('accountSessionStatus');
     const accountSignOutBtn = document.getElementById('accountSignOutBtn');
@@ -914,16 +911,6 @@ async function initEditor() {
         accountSignOutBtn?.classList.toggle('hidden', !showSessionButtons);
         accountDeleteBtn?.classList.toggle('hidden', !showSessionButtons);
         accountGuestBtn?.classList.toggle('hidden', isSignedIn);
-    }
-
-    function showAccountSyncPrompt() {
-        accountSyncPanel?.classList.remove('hidden');
-        accountSyncPanel?.setAttribute('aria-hidden', 'false');
-    }
-
-    function hideAccountSyncPrompt() {
-        accountSyncPanel?.classList.add('hidden');
-        accountSyncPanel?.setAttribute('aria-hidden', 'true');
     }
 
     async function syncUserCardsToAccount({ silent = false } = {}) {
@@ -1084,7 +1071,6 @@ async function initEditor() {
             accountDeleteBtn?.classList.remove('hidden');
             accountGuestBtn?.classList.add('hidden');
             setAccountGateActive(false);
-            hideAccountSyncPrompt();
             return;
         }
 
@@ -1305,19 +1291,9 @@ async function initEditor() {
             accountLoginForm.reset();
             await syncAccountSessionState();
             await restoreUserCardsFromAccount();
-            showAccountSyncPrompt();
             window.alert('Connexion réussie.');
         });
     }
-
-    accountSyncConfirmBtn?.addEventListener('click', async () => {
-        hideAccountSyncPrompt();
-        await syncUserCardsToAccount();
-    });
-
-    accountSyncCancelBtn?.addEventListener('click', () => {
-        hideAccountSyncPrompt();
-    });
 
     if (supabaseClient) {
         supabaseClient.auth.onAuthStateChange(async () => {
