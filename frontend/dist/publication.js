@@ -5,6 +5,10 @@ const _DB_VERSION = 1;
 const _DB_STORE = 'articles';
 let _db = null;
 
+// Backend sécurisé (service role) requis pour les opérations admin comme la suppression de compte.
+const BACKEND_API_BASE_URL = 'https://note-backend.onrender.com';
+
+
 function _openDB() {
     return new Promise((resolve, reject) => {
         if (_db) { resolve(_db); return; }
@@ -1085,15 +1089,20 @@ async function initEditor() {
         }
 
         try {
-            if (!supabaseClient.auth.admin) {
-                window.alert('La suppression de compte doit passer par une fonction serveur sécurisée.');
-                return;
-            }
+            // La suppression d'un compte nécessite les droits admin Supabase (service role),
+            // donc elle doit passer par le backend, jamais par le client anon.
+            const response = await fetch(`${BACKEND_API_BASE_URL}/api/delete-account`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            });
 
-            const { error } = await supabaseClient.auth.admin.deleteUser(session.user.id);
+            const result = await response.json().catch(() => ({}));
 
-            if (error) {
-                throw new Error(error.message || 'Erreur lors de la suppression du compte.');
+            if (!response.ok) {
+                throw new Error(result.error || 'Erreur lors de la suppression du compte.');
             }
 
             await supabaseClient.auth.signOut();
