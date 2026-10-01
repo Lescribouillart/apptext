@@ -928,18 +928,24 @@ async function initEditor() {
 
         try {
             const articles = await _dbGetAll();
-            const response = await fetch('http://localhost:3001/api/sync-cards', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${session.access_token}`
-                },
-                body: JSON.stringify({ cards: articles })
-            });
+            const serializedCards = (articles || []).map((card, index) => ({
+                id: Number(card.id ?? index + 1),
+                subject: String(card.subject || 'Sans titre'),
+                preview: String(card.preview || ''),
+                content: String(card.content || ''),
+                color: String(card.color || ''),
+                sortOrder: Number(card.sortOrder ?? index),
+                createdAt: String(card.createdAt || new Date().toISOString()),
+                updatedAt: String(card.updatedAt || new Date().toISOString()),
+                user_id: session.user.id
+            }));
 
-            const payload = await response.json().catch(() => ({}));
-            if (!response.ok) {
-                throw new Error(payload.error || 'Erreur lors de la synchronisation des cartes.');
+            const { error } = await supabaseClient
+                .from('user_cards')
+                .upsert(serializedCards, { onConflict: 'id' });
+
+            if (error) {
+                throw new Error(error.message || 'Erreur lors de la synchronisation des cartes.');
             }
 
             window.alert('Vos cartes ont bien été enregistrées sur votre compte.');
@@ -955,19 +961,17 @@ async function initEditor() {
         if (!session?.access_token) return;
 
         try {
-            const response = await fetch('http://localhost:3001/api/get-cards', {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${session.access_token}`
-                }
-            });
+            const { data, error } = await supabaseClient
+                .from('user_cards')
+                .select('*')
+                .eq('user_id', session.user.id)
+                .order('sortOrder', { ascending: false });
 
-            const payload = await response.json().catch(() => ({}));
-            if (!response.ok) {
-                return;
+            if (error) {
+                throw new Error(error.message || 'Impossible de restaurer les cartes.');
             }
 
-            const cards = Array.isArray(payload.cards) ? payload.cards : [];
+            const cards = Array.isArray(data) ? data : [];
             if (!cards.length) return;
 
             const currentCards = await _dbGetAll();
@@ -1081,19 +1085,15 @@ async function initEditor() {
         }
 
         try {
-            const response = await fetch('http://localhost:3001/api/delete-account', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${accessToken}`
-                },
-                body: JSON.stringify({})
-            });
+            if (!supabaseClient.auth.admin) {
+                window.alert('La suppression de compte doit passer par une fonction serveur sécurisée.');
+                return;
+            }
 
-            const payload = await response.json().catch(() => ({}));
+            const { error } = await supabaseClient.auth.admin.deleteUser(session.user.id);
 
-            if (!response.ok) {
-                throw new Error(payload.error || 'Erreur lors de la suppression du compte.');
+            if (error) {
+                throw new Error(error.message || 'Erreur lors de la suppression du compte.');
             }
 
             await supabaseClient.auth.signOut();
