@@ -1192,9 +1192,17 @@ async function initEditor() {
         accountBackBtn?.classList.toggle('hidden', isActive);
     }
 
+    function clearStartupLock() {
+        document.body.classList.remove('startup-locked');
+    }
+
     async function enforceAccountGateOnStartup() {
+        document.body.classList.add('startup-locked');
+
         if (!supabaseClient) {
             setAccountGateActive(false);
+            setRoute('editor');
+            clearStartupLock();
             return;
         }
 
@@ -1212,7 +1220,10 @@ async function initEditor() {
             setRoute('account');
         } else {
             setAccountGateActive(false);
+            setRoute('editor');
         }
+
+        clearStartupLock();
     }
 
     if (accountForm && supabaseClient) {

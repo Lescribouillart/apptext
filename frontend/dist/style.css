@@ -1807,6 +1807,11 @@ body:not(.dark-mode) .add-icon-btn img {
     filter: brightness(1.04);
 }
 
+body.startup-locked .header,
+body.startup-locked .main {
+    visibility: hidden;
+}
+
 .app-screen {
     display: none;
     flex: 1;
