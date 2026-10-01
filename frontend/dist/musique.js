@@ -60,7 +60,7 @@ function _normalizeTrackForAccount(track, index) {
     var safeTrack = track || {};
     return {
         id: String(safeTrack.id || 'track-' + (index + 1)),
-        title: String(safeTrack.title || 'Piste sans titre'),
+        title: String(safeTrack.title || 'Untitled track'),
         type: safeTrack.type === 'local' ? 'local' : 'youtube',
         source: safeTrack.type === 'local' ? 'local' : 'youtube',
         url: safeTrack.url || null,
@@ -71,17 +71,26 @@ function _normalizeTrackForAccount(track, index) {
     };
 }
 
+function isEnglishUi() {
+    try {
+        var settings = JSON.parse(localStorage.getItem('textplaystore_settings') || '{}');
+        return settings.language === 'en' || document.documentElement.lang === 'en';
+    } catch (error) {
+        return document.documentElement.lang === 'en';
+    }
+}
+
 async function syncUserTracksToAccount({ silent } = {}) {
     var client = window.noteSupabase;
     if (!client) {
-        if (!silent) window.alert('Supabase n’est pas initialisé.');
+        if (!silent) window.alert(isEnglishUi() ? 'Supabase is not initialized.' : 'Supabase n’est pas initialisé.');
         return;
     }
 
     var sessionResponse = await client.auth.getSession();
     var session = sessionResponse && sessionResponse.data ? sessionResponse.data.session : null;
     if (!session || !session.access_token) {
-        if (!silent) window.alert('Vous devez être connecté pour synchroniser les pistes.');
+        if (!silent) window.alert(isEnglishUi() ? 'You must be logged in to sync tracks.' : 'Vous devez être connecté pour synchroniser les pistes.');
         return;
     }
 
@@ -91,7 +100,7 @@ async function syncUserTracksToAccount({ silent } = {}) {
                 id: String(track && track.id ? track.id : 'track-' + (index + 1)),
                 user_id: session.user.id,
                 type: track && track.type === 'local' ? 'local' : 'youtube',
-                title: String((track && track.title) || 'Piste sans titre'),
+                title: String((track && track.title) || 'Untitled track'),
                 source: track && track.type === 'local' ? 'local' : 'youtube',
                 payload: _normalizeTrackForAccount(track, index),
                 "sortOrder": Number(index),
@@ -105,13 +114,13 @@ async function syncUserTracksToAccount({ silent } = {}) {
             .upsert(rows, { onConflict: 'id' });
 
         if (error) {
-            throw new Error(error.message || 'Erreur lors de la synchronisation des pistes.');
+            throw new Error(error.message || (isEnglishUi() ? 'Error while syncing tracks.' : 'Erreur lors de la synchronisation des pistes.'));
         }
     } catch (error) {
         if (silent) {
-            console.warn('Synchronisation automatique des pistes échouée', error);
+            console.warn(isEnglishUi() ? 'Automatic track sync failed' : 'Synchronisation automatique des pistes échouée', error);
         } else {
-            window.alert(error.message || 'Erreur lors de la synchronisation des pistes.');
+            window.alert(error.message || (isEnglishUi() ? 'Error while syncing tracks.' : 'Erreur lors de la synchronisation des pistes.'));
         }
     }
 }
@@ -151,7 +160,7 @@ async function restoreUserTracksFromAccount() {
                 var payload = row.payload || {};
                 return {
                     id: String(payload.id || row.id),
-                    title: String(payload.title || 'Piste sans titre'),
+                    title: String(payload.title || 'Untitled track'),
                     type: payload.type === 'local' ? 'local' : 'youtube',
                     source: payload.source === 'local' ? 'local' : 'youtube',
                     url: payload.url || null,
@@ -274,8 +283,13 @@ function _showManageTracksModal() {
     var close = function() { document.body.removeChild(overlay); };
 
     function render() {
+        var titleLabel = isEnglishUi() ? 'Tracks' : 'Pistes';
+        var closeLabel = isEnglishUi() ? 'Close' : 'Fermer';
+        var playLabel = isEnglishUi() ? 'Play' : 'Lire';
+        var deleteLabel = isEnglishUi() ? 'Delete' : 'Supprimer';
+
         modal.innerHTML = [
-            '<p style="margin:0 0 16px;font-size:15px;font-weight:600">Pistes (' + tracks.length + ')</p>',
+            '<p style="margin:0 0 16px;font-size:15px;font-weight:600">' + titleLabel + ' (' + tracks.length + ')</p>',
             '<div id="_trackListContainer" style="overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:6px;margin-bottom:16px">',
             tracks.map(function(t, i) {
                 var isCurrent = i === currentTrackIndex;
@@ -283,13 +297,13 @@ function _showManageTracksModal() {
                     '<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:6px;background:' + (isCurrent ? '#2a3f55' : '#2a2a2a') + ';border:1px solid ' + (isCurrent ? '#4a8ec2' : '#444') + '">',
                     '<span style="font-size:11px;color:#888;min-width:16px;text-align:right">' + (i + 1) + '</span>',
                     '<span style="flex:1;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + t.title + '">' + t.title + '</span>',
-                    '<button data-idx="' + i + '" class="_playTrackBtn" title="Lire" style="background:none;border:none;color:#aaa;cursor:pointer;padding:2px 4px;font-size:14px">&#9654;</button>',
-                    '<button data-idx="' + i + '" class="_delTrackBtn" title="Supprimer" style="background:none;border:none;color:#d63638;cursor:pointer;padding:2px 4px;font-size:15px">&times;</button>',
+                    '<button data-idx="' + i + '" class="_playTrackBtn" title="' + playLabel + '" style="background:none;border:none;color:#aaa;cursor:pointer;padding:2px 4px;font-size:14px">&#9654;</button>',
+                    '<button data-idx="' + i + '" class="_delTrackBtn" title="' + deleteLabel + '" style="background:none;border:none;color:#d63638;cursor:pointer;padding:2px 4px;font-size:15px">&times;</button>',
                     '</div>'
                 ].join('');
             }).join(''),
             '</div>',
-            '<div style="text-align:right"><button id="_manageClose" style="background:#2a2a2a;border:1px solid #555;border-radius:6px;color:#f1f1f1;cursor:pointer;font-size:13px;padding:6px 16px">Fermer</button></div>'
+            '<div style="text-align:right"><button id="_manageClose" style="background:#2a2a2a;border:1px solid #555;border-radius:6px;color:#f1f1f1;cursor:pointer;font-size:13px;padding:6px 16px">' + closeLabel + '</button></div>'
         ].join('');
 
         modal.querySelector('#_manageClose').addEventListener('click', close);
@@ -339,15 +353,21 @@ function _showAddTrackModal() {
 
     var modal = document.createElement('div');
     modal.style.cssText = 'background:#1e1e1e;border:1px solid #444;border-radius:10px;padding:24px 28px;min-width:320px;color:#f1f1f1;font-family:inherit';
+    var addTrackTitle = isEnglishUi() ? 'Add a track' : 'Ajouter une piste';
+    var youtubeLabel = isEnglishUi() ? 'YouTube link (video, live, radio…) or ID' : 'Lien YouTube (vidéo, live, radio…) ou ID';
+    var displayedTitleLabel = isEnglishUi() ? 'Displayed title' : 'Titre affiché';
+    var cancelLabel = isEnglishUi() ? 'Cancel' : 'Annuler';
+    var addLabel = isEnglishUi() ? 'Add' : 'Ajouter';
+
     modal.innerHTML = [
-        '<p style="margin:0 0 16px;font-size:15px;font-weight:600">Ajouter une piste</p>',
-        '<label style="font-size:12px;color:#aaa;display:block;margin-bottom:4px">Lien YouTube (vidéo, live, radio…) ou ID</label>',
+        '<p style="margin:0 0 16px;font-size:15px;font-weight:600">' + addTrackTitle + '</p>',
+        '<label style="font-size:12px;color:#aaa;display:block;margin-bottom:4px">' + youtubeLabel + '</label>',
         '<input id="_addUrl" type="text" placeholder="https://www.youtube.com/watch?v=..." style="width:100%;padding:8px 10px;border-radius:6px;border:1px solid #555;background:#2a2a2a;color:#f1f1f1;font-size:13px;box-sizing:border-box;margin-bottom:12px">',
-        '<label style="font-size:12px;color:#aaa;display:block;margin-bottom:4px">Titre affiché</label>',
-        '<input id="_addTitle" type="text" placeholder="Ma radio, ma playlist…" style="width:100%;padding:8px 10px;border-radius:6px;border:1px solid #555;background:#2a2a2a;color:#f1f1f1;font-size:13px;box-sizing:border-box;margin-bottom:18px">',
+        '<label style="font-size:12px;color:#aaa;display:block;margin-bottom:4px">' + displayedTitleLabel + '</label>',
+        '<input id="_addTitle" type="text" placeholder="My radio, my playlist…" style="width:100%;padding:8px 10px;border-radius:6px;border:1px solid #555;background:#2a2a2a;color:#f1f1f1;font-size:13px;box-sizing:border-box;margin-bottom:18px">',
         '<div style="display:flex;gap:10px;justify-content:flex-end">',
-        '<button id="_addCancel" style="background:none;border:none;color:#888;cursor:pointer;font-size:13px;padding:6px 12px">Annuler</button>',
-        '<button id="_addConfirm" style="background:#4a8ec2;border:none;border-radius:6px;color:#fff;cursor:pointer;font-size:13px;padding:6px 16px">Ajouter</button>',
+        '<button id="_addCancel" style="background:none;border:none;color:#888;cursor:pointer;font-size:13px;padding:6px 12px">' + cancelLabel + '</button>',
+        '<button id="_addConfirm" style="background:#4a8ec2;border:none;border-radius:6px;color:#fff;cursor:pointer;font-size:13px;padding:6px 16px">' + addLabel + '</button>',
         '</div>'
     ].join('');
 
@@ -370,7 +390,7 @@ function _showAddTrackModal() {
 
         if (!id) {
             urlInput.style.borderColor = '#d63638';
-            urlInput.placeholder = 'Lien YouTube non reconnu…';
+            urlInput.placeholder = isEnglishUi() ? 'YouTube link not recognized…' : 'Lien YouTube non reconnu…';
             return;
         }
 

@@ -137,6 +137,27 @@ async function initEditor() {
     const dyslexiaToggleBtn = document.getElementById('dyslexiaToggleBtn');
     const youtubeToggle = document.getElementById('youtubeToggle');
 
+    const settingsState = {
+        spellcheck: true,
+        lineNumbers: false,
+        wrap: true,
+        autoSave: true,
+        defaultFormat: '.txt',
+        theme: 'dark',
+        language: 'fr',
+        dyslexia: localStorage.getItem('textplaystore_dyslexia_mode') === 'true',
+        fontSize: '14px',
+        fontFamily: 'System Sans-Serif',
+        updateLabels: {
+            theme: 'Sombre',
+            fontSize: 'Moyenne (14px)',
+            fontFamily: 'System Sans-Serif',
+            defaultFormat: '.txt'
+        }
+    };
+
+    let translations = { fr: {}, en: {} };
+
     let currentArticleId = null;
     let isSourceMode = false;
     let hasUnsavedChanges = false;
@@ -154,9 +175,6 @@ async function initEditor() {
     if (articlesList) {
         await refreshArticlesList();
     }
-
-    // Charger la préférence du mode nuit
-    loadDarkModePreference();
 
     function getToolbarOrder() {
         const toolbar = document.querySelector('.editor-toolbar');
@@ -554,8 +572,6 @@ async function initEditor() {
         updateWordCounter();
     });
 
-    updateWordCounter();
-
     articleSubject.addEventListener('input', () => {
         hasUnsavedChanges = true;
         markAsModified();
@@ -583,26 +599,7 @@ async function initEditor() {
     const licensesBackBtn = document.getElementById('licensesBackBtn');
     const updatesBackBtn = document.getElementById('updatesBackBtn');
 
-    const settingsState = {
-        spellcheck: true,
-        lineNumbers: false,
-        wrap: true,
-        autoSave: true,
-        defaultFormat: '.txt',
-        theme: 'dark',
-        language: 'fr',
-        dyslexia: localStorage.getItem('textplaystore_dyslexia_mode') === 'true',
-        fontSize: '14px',
-        fontFamily: 'System Sans-Serif',
-        updateLabels: {
-            theme: 'Sombre',
-            fontSize: 'Moyenne (14px)',
-            fontFamily: 'System Sans-Serif',
-            defaultFormat: '.txt'
-        }
-    };
-
-    const translations = {
+    translations = {
         fr: {
             settingsTitle: 'Paramètres',
             settingsClose: 'Fermer les paramètres',
@@ -940,6 +937,10 @@ async function initEditor() {
             accountSyncError: 'Error while syncing cards.'
         }
     };
+
+    // Charger la préférence du mode nuit
+    loadDarkModePreference();
+    updateWordCounter();
 
     function t(key, fallback = key) {
         const lang = getSettings().language === 'en' ? 'en' : 'fr';
