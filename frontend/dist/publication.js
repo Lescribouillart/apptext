@@ -245,6 +245,9 @@ async function initEditor() {
             hasUnsavedChanges = false;
             markAsSaved();
             showStatus('✓ Carte enregistrée', 'success');
+
+            // Pousse aussi la carte vers le compte Supabase si l'utilisateur est connecté.
+            await syncUserCardsToAccountIfLoggedIn();
         });
     }
 
@@ -918,15 +921,15 @@ async function initEditor() {
         accountSyncPanel?.setAttribute('aria-hidden', 'true');
     }
 
-    async function syncUserCardsToAccount() {
+    async function syncUserCardsToAccount({ silent = false } = {}) {
         if (!supabaseClient) {
-            window.alert('Supabase n’est pas initialisé.');
+            if (!silent) window.alert('Supabase n’est pas initialisé.');
             return;
         }
 
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (!session?.access_token) {
-            window.alert('Vous devez être connecté pour synchroniser vos cartes.');
+            if (!silent) window.alert('Vous devez être connecté pour synchroniser vos cartes.');
             return;
         }
 
@@ -952,10 +955,21 @@ async function initEditor() {
                 throw new Error(error.message || 'Erreur lors de la synchronisation des cartes.');
             }
 
-            window.alert('Vos cartes ont bien été enregistrées sur votre compte.');
+            if (!silent) window.alert('Vos cartes ont bien été enregistrées sur votre compte.');
         } catch (error) {
-            window.alert(error.message || 'Erreur lors de la synchronisation des cartes.');
+            if (silent) {
+                console.warn('Synchronisation automatique des cartes échouée', error);
+            } else {
+                window.alert(error.message || 'Erreur lors de la synchronisation des cartes.');
+            }
         }
+    }
+
+    async function syncUserCardsToAccountIfLoggedIn() {
+        if (!supabaseClient) return;
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session?.access_token) return;
+        await syncUserCardsToAccount({ silent: true });
     }
 
     async function restoreUserCardsFromAccount() {
