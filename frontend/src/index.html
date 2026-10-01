@@ -16,7 +16,7 @@
                     <h1 class="logo">Note</h1>
                     <img class="header-brand-icon" src="assets/icons/logonote.png" alt="Logo Note" />
                 </a>
-                <p class="tagline">Éditez vos idées</p>
+                <p class="tagline" data-i18n="tagline">Éditez vos idées</p>
             </div>
 
             <button class="settings-btn" type="button" aria-label="Paramètres" title="Paramètres">
@@ -30,34 +30,34 @@
     <div class="settings-overlay hidden" id="settingsOverlay" aria-hidden="true">
         <div class="settings-panel" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
             <div class="settings-header">
-                <button class="settings-back-btn" id="settingsCloseBtn" type="button" aria-label="Fermer les paramètres">
+                <button class="settings-back-btn" id="settingsCloseBtn" type="button" aria-label="Fermer les paramètres" data-i18n-aria="settingsClose">
                     <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
                         <path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z" fill="currentColor"/>
                     </svg>
                 </button>
-                <h2 id="settingsTitle">Paramètres</h2>
+                <h2 id="settingsTitle" data-i18n="settingsTitle">Paramètres</h2>
             </div>
 
             <div class="settings-content">
                 <section class="settings-group">
-                    <h3>APPARENCE</h3>
+                    <h3 data-i18n="appearance">APPARENCE</h3>
                     <div class="settings-row">
                         <div class="settings-label-block">
-                            <span class="settings-label">Thème</span>
-                            <span class="settings-hint">Choisir l'apparence visuelle</span>
+                            <span class="settings-label" data-i18n="theme">Thème</span>
+                            <span class="settings-hint" data-i18n="themeHint">Choisir l'apparence visuelle</span>
                         </div>
                         <button class="settings-value" type="button" data-setting="theme">Sombre <span>›</span></button>
                     </div>
                     <div class="settings-row info-row">
                         <button class="settings-value-full" type="button" data-setting="language">
-                            <span class="settings-label">Langue</span>
+                            <span class="settings-label" data-i18n="language">Langue</span>
                             <span class="settings-arrow">›</span>
                         </button>
                     </div>
                     <div class="settings-row switch-row">
                         <div class="settings-label-block">
-                            <span class="settings-label">Dyslexie</span>
-                            <span class="settings-hint">Activer le mode de lecture adapté</span>
+                            <span class="settings-label" data-i18n="dyslexia">Dyslexie</span>
+                            <span class="settings-hint" data-i18n="dyslexiaHint">Activer le mode de lecture adapté</span>
                         </div>
                         <button class="switch" type="button" data-setting="dyslexia" aria-label="Activer le mode dyslexie">
                             <span class="switch-thumb"></span>
@@ -66,11 +66,11 @@
                 </section>
 
                 <section class="settings-group">
-                    <h3>ÉDITEUR</h3>
+                    <h3 data-i18n="editorSection">ÉDITEUR</h3>
                     <div class="settings-row switch-row">
                         <div class="settings-label-block">
-                            <span class="settings-label">Correcteur orthographique</span>
-                            <span class="settings-hint">Surlignez les fautes de frappe</span>
+                            <span class="settings-label" data-i18n="spellcheck">Correcteur orthographique</span>
+                            <span class="settings-hint" data-i18n="spellcheckHint">Surlignez les fautes de frappe</span>
                         </div>
                         <button class="switch is-on" type="button" data-setting="spellcheck" aria-label="Activer le correcteur orthographique">
                             <span class="switch-thumb"></span>
@@ -79,11 +79,11 @@
                 </section>
 
                 <section class="settings-group">
-                    <h3>SAUVEGARDE</h3>
+                    <h3 data-i18n="saveSection">SAUVEGARDE</h3>
                     <div class="settings-row switch-row">
                         <div class="settings-label-block">
-                            <span class="settings-label">Sauvegarde automatique</span>
-                            <span class="settings-hint">Enregistrer à chaque modification</span>
+                            <span class="settings-label" data-i18n="autosave">Sauvegarde automatique</span>
+                            <span class="settings-hint" data-i18n="autosaveHint">Enregistrer à chaque modification</span>
                         </div>
                         <button class="switch is-on" type="button" data-setting="autoSave" aria-label="Activer la sauvegarde automatique">
                             <span class="switch-thumb"></span>
@@ -92,30 +92,30 @@
                 </section>
 
                 <section class="settings-group">
-                    <h3>COMPTE</h3>
+                    <h3 data-i18n="accountSection">COMPTE</h3>
                     <div class="settings-row info-row">
                         <button class="settings-value-full" type="button" data-setting="account">
-                            <span class="settings-label">Mon compte</span>
+                            <span class="settings-label" data-i18n="myAccount">Mon compte</span>
                             <span class="settings-arrow">›</span>
                         </button>
                     </div>
                 </section>
 
                 <section class="settings-group settings-group-footer">
-                    <h3>À PROPOS</h3>
+                    <h3 data-i18n="aboutSection">À PROPOS</h3>
                     <div class="settings-row info-row">
-                        <span class="settings-label">Version</span>
+                        <span class="settings-label" data-i18n="version">Version</span>
                         <span class="settings-meta">1.0</span>
                     </div>
                     <div class="settings-row info-row">
                         <button class="settings-value-full" type="button" data-setting="licenses">
-                            <span class="settings-label">Licences</span>
+                            <span class="settings-label" data-i18n="licenses">Licences</span>
                             <span class="settings-arrow">›</span>
                         </button>
                     </div>
                     <div class="settings-row info-row">
                         <button class="settings-value-full" type="button" data-setting="updates">
-                            <span class="settings-label">Mises à jour</span>
+                            <span class="settings-label" data-i18n="updates">Mises à jour</span>
                             <span class="settings-arrow">›</span>
                         </button>
                     </div>
@@ -130,8 +130,8 @@
             <div class="top-bar">
                 <!-- Boutons d'action -->
                 <div class="top-bar-actions">
-                    <button class="wp-button" id="loadBtn">Importer</button>
-                    <button class="wp-button" id="saveAsBtn">Exporter</button>
+                    <button class="wp-button" id="loadBtn" data-i18n="import">Importer</button>
+                    <button class="wp-button" id="saveAsBtn" data-i18n="export">Exporter</button>
                 </div>
             </div>
 
@@ -145,7 +145,7 @@
                                 type="text" 
                                 id="articleSubject" 
                                 class="article-subject" 
-                                placeholder="Ajouter un titre"
+                                placeholder="Ajouter un titre" data-i18n-placeholder="addTitle"
                                 maxlength="100"
                             >
                         </div>
@@ -153,7 +153,7 @@
                         <!-- Zone d'édition -->
                         <div class="editor-area" id="editorArea">
                             <div class="editor-surface" id="editor" contenteditable="true" spellcheck="true" lang="fr">
-                                <p>Commencez à écrire ou tapez / pour choisir un bloc</p>
+                                <p data-i18n="editorPlaceholder">Commencez à écrire ou tapez / pour choisir un bloc</p>
                             </div>
                         </div>
 
@@ -389,7 +389,7 @@
                         <path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z" fill="currentColor"/>
                     </svg>
                 </button>
-                <h2>Langue</h2>
+                <h2 data-i18n="languageScreenTitle">Langue</h2>
             </div>
             <div class="screen-content">
                 <div class="account-panel">
@@ -408,55 +408,55 @@
                         <path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z" fill="currentColor"/>
                     </svg>
                 </button>
-                <h2>Compte</h2>
+                <h2 data-i18n="accountScreenTitle">Compte</h2>
             </div>
             <div class="screen-content">
                 <div class="account-panel">
                     <div class="account-card">
                         <div class="account-mode-switch" role="tablist" aria-label="Mode de compte">
-                            <button class="account-mode-btn is-active" type="button" data-account-mode="signup" aria-selected="true">Créer un compte</button>
-                            <button class="account-mode-btn" type="button" data-account-mode="signin" aria-selected="false">Se connecter</button>
+                            <button class="account-mode-btn is-active" type="button" data-account-mode="signup" aria-selected="true" data-i18n="createAccount">Créer un compte</button>
+                            <button class="account-mode-btn" type="button" data-account-mode="signin" aria-selected="false" data-i18n="signIn">Se connecter</button>
                         </div>
 
-                        <div id="accountSessionStatus" class="account-session-status">Vous n'êtes pas connecté.</div>
+                        <div id="accountSessionStatus" class="account-session-status" data-i18n="notConnected">Vous n'êtes pas connecté.</div>
 
                         <form id="accountForm" class="account-form" data-mode="signup">
                             <label class="account-field">
-                                <span>Nom</span>
-                                <input id="accountName" name="fullName" type="text" placeholder="Votre nom" aria-label="Nom" />
+                                <span data-i18n="name">Nom</span>
+                                <input id="accountName" name="fullName" type="text" placeholder="Votre nom" aria-label="Nom" data-i18n-placeholder="name" />
                             </label>
                             <label class="account-field">
-                                <span>Email</span>
-                                <input id="accountEmail" name="email" type="email" placeholder="votre@email.com" aria-label="Email" />
+                                <span data-i18n="email">Email</span>
+                                <input id="accountEmail" name="email" type="email" placeholder="votre@email.com" aria-label="Email" data-i18n-placeholder="email" />
                             </label>
                             <label class="account-field">
-                                <span>Mot de passe</span>
-                                <input id="accountPassword" name="password" type="password" placeholder="••••••••" aria-label="Mot de passe" />
+                                <span data-i18n="password">Mot de passe</span>
+                                <input id="accountPassword" name="password" type="password" placeholder="••••••••" aria-label="Mot de passe" data-i18n-placeholder="password" />
                             </label>
                             <label class="account-field">
-                                <span>Confirmer le mot de passe</span>
-                                <input id="accountConfirmPassword" name="confirmPassword" type="password" placeholder="Répétez le mot de passe" aria-label="Confirmer le mot de passe" />
+                                <span data-i18n="confirmPassword">Confirmer le mot de passe</span>
+                                <input id="accountConfirmPassword" name="confirmPassword" type="password" placeholder="Répétez le mot de passe" aria-label="Confirmer le mot de passe" data-i18n-placeholder="confirmPassword" />
                             </label>
-                            <button type="submit" class="account-submit">S'inscrire</button>
+                            <button type="submit" class="account-submit" data-i18n="signUp">S'inscrire</button>
                         </form>
 
                         <form id="accountLoginForm" class="account-form hidden" data-mode="signin">
                             <label class="account-field">
-                                <span>Email</span>
-                                <input id="accountLoginEmail" name="email" type="email" placeholder="votre@email.com" aria-label="Email de connexion" />
+                                <span data-i18n="email">Email</span>
+                                <input id="accountLoginEmail" name="email" type="email" placeholder="votre@email.com" aria-label="Email de connexion" data-i18n-placeholder="email" />
                             </label>
                             <label class="account-field">
-                                <span>Mot de passe</span>
-                                <input id="accountLoginPassword" name="password" type="password" placeholder="••••••••" aria-label="Mot de passe de connexion" />
+                                <span data-i18n="password">Mot de passe</span>
+                                <input id="accountLoginPassword" name="password" type="password" placeholder="••••••••" aria-label="Mot de passe de connexion" data-i18n-placeholder="password" />
                             </label>
-                            <button type="submit" class="account-submit">Se connecter</button>
+                            <button type="submit" class="account-submit" data-i18n="login">Se connecter</button>
                         </form>
 
-                        <div class="account-guest-divider"><span>ou</span></div>
-                        <button id="accountGuestBtn" type="button" class="account-guest">Continuer en invité</button>
+                        <div class="account-guest-divider"><span data-i18n="or">ou</span></div>
+                        <button id="accountGuestBtn" type="button" class="account-guest" data-i18n="continueGuest">Continuer en invité</button>
 
-                        <button id="accountSignOutBtn" type="button" class="account-signout hidden">Se déconnecter</button>
-                        <button id="accountDeleteBtn" type="button" class="account-delete hidden">Supprimer mon compte</button>
+                        <button id="accountSignOutBtn" type="button" class="account-signout hidden" data-i18n="signOut">Se déconnecter</button>
+                        <button id="accountDeleteBtn" type="button" class="account-delete hidden" data-i18n="deleteAccount">Supprimer mon compte</button>
                     </div>
                 </div>
             </div>

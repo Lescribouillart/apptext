@@ -602,6 +602,160 @@ async function initEditor() {
         }
     };
 
+    const translations = {
+        fr: {
+            settingsTitle: 'Paramètres',
+            settingsClose: 'Fermer les paramètres',
+            appTitle: 'Note',
+            tagline: 'Éditez vos idées',
+            appearance: 'APPARENCE',
+            theme: 'Thème',
+            themeHint: 'Choisir l\'apparence visuelle',
+            themeDark: 'Sombre',
+            themeLight: 'Clair',
+            language: 'Langue',
+            dyslexia: 'Dyslexie',
+            dyslexiaHint: 'Activer le mode de lecture adapté',
+            editorSection: 'ÉDITEUR',
+            spellcheck: 'Correcteur orthographique',
+            spellcheckHint: 'Surlignez les fautes de frappe',
+            saveSection: 'SAUVEGARDE',
+            autosave: 'Sauvegarde automatique',
+            autosaveHint: 'Enregistrer à chaque modification',
+            accountSection: 'COMPTE',
+            myAccount: 'Mon compte',
+            aboutSection: 'À PROPOS',
+            licenses: 'Licences',
+            updates: 'Mises à jour',
+            import: 'Importer',
+            export: 'Exporter',
+            addTitle: 'Ajouter un titre',
+            editorPlaceholder: 'Commencez à écrire ou tapez / pour choisir un bloc',
+            backToSettings: 'Retour aux paramètres',
+            accountScreenTitle: 'Compte',
+            createAccount: 'Créer un compte',
+            signIn: 'Se connecter',
+            notConnected: 'Vous n’êtes pas connecté.',
+            accountMode: 'Mode de compte',
+            name: 'Nom',
+            email: 'Email',
+            password: 'Mot de passe',
+            confirmPassword: 'Confirmer le mot de passe',
+            signUp: 'S\'inscrire',
+            login: 'Se connecter',
+            or: 'ou',
+            continueGuest: 'Continuer en invité',
+            signOut: 'Se déconnecter',
+            deleteAccount: 'Supprimer mon compte',
+            licensesTitle: 'Licences',
+            version: 'Version',
+            versionInstalled: 'Version installée',
+            appUpToDate: 'Votre application est à jour.',
+            versionCheck: 'Vérification automatique de la version disponible pour l’application.',
+            lastKnownVersion: 'Dernière version connue',
+            status: 'État actuel',
+            today: 'À jour',
+            connectedAs: 'Connecté :',
+            languageScreenTitle: 'Langue'
+        },
+        en: {
+            settingsTitle: 'Settings',
+            settingsClose: 'Close settings',
+            appTitle: 'Note',
+            tagline: 'Write your ideas',
+            appearance: 'APPEARANCE',
+            theme: 'Theme',
+            themeHint: 'Choose the visual style',
+            themeDark: 'Dark',
+            themeLight: 'Light',
+            language: 'Language',
+            dyslexia: 'Dyslexia',
+            dyslexiaHint: 'Enable the adapted reading mode',
+            editorSection: 'EDITOR',
+            spellcheck: 'Spell check',
+            spellcheckHint: 'Highlight typos',
+            saveSection: 'SAVE',
+            autosave: 'Auto-save',
+            autosaveHint: 'Save on every change',
+            accountSection: 'ACCOUNT',
+            myAccount: 'My account',
+            aboutSection: 'ABOUT',
+            licenses: 'Licenses',
+            updates: 'Updates',
+            import: 'Import',
+            export: 'Export',
+            addTitle: 'Add a title',
+            editorPlaceholder: 'Start writing or type / to choose a block',
+            backToSettings: 'Back to settings',
+            accountScreenTitle: 'Account',
+            createAccount: 'Create account',
+            signIn: 'Sign in',
+            notConnected: 'You are not connected.',
+            accountMode: 'Account mode',
+            name: 'Name',
+            email: 'Email',
+            password: 'Password',
+            confirmPassword: 'Confirm password',
+            signUp: 'Sign up',
+            login: 'Log in',
+            or: 'or',
+            continueGuest: 'Continue as guest',
+            signOut: 'Sign out',
+            deleteAccount: 'Delete my account',
+            licensesTitle: 'Licenses',
+            version: 'Version',
+            versionInstalled: 'Installed version',
+            appUpToDate: 'Your application is up to date.',
+            versionCheck: 'Automatic check for the latest available app version.',
+            lastKnownVersion: 'Last known version',
+            status: 'Current status',
+            today: 'Up to date',
+            connectedAs: 'Connected:',
+            languageScreenTitle: 'Language'
+        }
+    };
+
+    function t(key, fallback = key) {
+        const lang = getSettings().language === 'en' ? 'en' : 'fr';
+        return translations[lang]?.[key] || translations.fr?.[key] || fallback;
+    }
+
+    function applyInterfaceTranslations() {
+        const lang = getSettings().language === 'en' ? 'en' : 'fr';
+
+        document.querySelectorAll('[data-i18n]').forEach((element) => {
+            const key = element.dataset.i18n;
+            const value = translations[lang]?.[key] || translations.fr?.[key];
+            if (value) {
+                element.textContent = value;
+            }
+        });
+
+        document.querySelectorAll('[data-i18n-placeholder]').forEach((element) => {
+            const key = element.dataset.i18nPlaceholder;
+            const value = translations[lang]?.[key] || translations.fr?.[key];
+            if (value) {
+                element.placeholder = value;
+            }
+        });
+
+        document.querySelectorAll('[data-i18n-aria]').forEach((element) => {
+            const key = element.dataset.i18nAria;
+            const value = translations[lang]?.[key] || translations.fr?.[key];
+            if (value) {
+                element.setAttribute('aria-label', value);
+            }
+        });
+
+        document.querySelectorAll('[data-i18n-title]').forEach((element) => {
+            const key = element.dataset.i18nTitle;
+            const value = translations[lang]?.[key] || translations.fr?.[key];
+            if (value) {
+                element.setAttribute('title', value);
+            }
+        });
+    }
+
     function getSettings() {
         try {
             const saved = JSON.parse(localStorage.getItem('textplaystore_settings') || '{}');
@@ -629,7 +783,7 @@ async function initEditor() {
         const themeBtn = document.querySelector('[data-setting="theme"]');
         if (!themeBtn) return;
         const isDarkMode = document.body.classList.contains('dark-mode');
-        const themeName = isDarkMode ? 'Sombre' : 'Clair';
+        const themeName = isDarkMode ? t('themeDark', 'Dark') : t('themeLight', 'Light');
         themeBtn.innerHTML = `${themeName} <span>›</span>`;
     }
 
@@ -702,7 +856,7 @@ async function initEditor() {
         const updateBtn = document.querySelector('[data-setting="updates"]');
         if (!updateBtn) return;
 
-        updateBtn.innerHTML = '<span class="settings-label">Mises à jour</span><span class="settings-arrow">›</span>';
+        updateBtn.innerHTML = `<span class="settings-label">${t('updates', 'Updates')}</span><span class="settings-arrow">›</span>`;
     }
 
     function checkForAppUpdate() {
@@ -736,6 +890,7 @@ async function initEditor() {
         syncUpdateStatusLabel();
 
         document.documentElement.lang = state.language === 'en' ? 'en' : 'fr';
+        applyInterfaceTranslations();
         document.body.classList.toggle('dark-mode', state.theme === 'dark');
         document.body.classList.toggle('light-mode', state.theme === 'light');
         document.body.classList.toggle('dyslexia-mode', localStorage.getItem('textplaystore_dyslexia_mode') === 'true' || !!state.dyslexia);
@@ -1112,8 +1267,8 @@ async function initEditor() {
 
         if (accountSessionStatus) {
             accountSessionStatus.textContent = session
-                ? `Connecté : ${displayEmail}`
-                : 'Vous n’êtes pas connecté.';
+                ? `${t('connectedAs', 'Connected:')} ${displayEmail}`
+                : t('notConnected', 'You are not connected.');
         }
 
         const isSignedIn = Boolean(session);
@@ -1144,18 +1299,18 @@ async function initEditor() {
 
     async function deleteCurrentAccount() {
         if (!supabaseClient) {
-            window.alert('Supabase n’est pas initialisé.');
+            window.alert(t('supabaseNotReady', 'Supabase is not initialized.'));
             return;
         }
 
-        const confirmed = window.confirm('Supprimer votre compte est définitif. Voulez-vous vraiment continuer ?');
+        const confirmed = window.confirm(t('deleteAccountConfirm', 'Deleting your account is permanent. Do you really want to continue?'));
         if (!confirmed) return;
 
         const { data: { session } } = await supabaseClient.auth.getSession();
         const accessToken = session?.access_token;
 
         if (!accessToken) {
-            window.alert('Vous devez être connecté pour supprimer votre compte.');
+            window.alert(t('deleteAccountLoginRequired', 'You must be logged in to delete your account.'));
             return;
         }
 
@@ -1188,12 +1343,12 @@ async function initEditor() {
 
             await supabaseClient.auth.signOut();
             await syncAccountSessionState();
-            window.alert('Votre compte a bien été supprimé.');
+            window.alert(t('deleteAccountSuccess', 'Your account has been deleted successfully.'));
         } catch (error) {
             const isTimeout = error.name === 'AbortError';
             window.alert(isTimeout
-                ? 'Le serveur de suppression de compte ne répond pas. Réessayez dans quelques instants.'
-                : (error.message || 'Erreur lors de la suppression du compte.'));
+                ? t('deleteAccountTimeout', 'The account deletion server is not responding. Please try again in a few moments.')
+                : (error.message || t('deleteAccountError', 'Error while deleting the account.')));
         }
     }
 
@@ -1209,14 +1364,14 @@ async function initEditor() {
             const { error } = await supabaseClient.auth.signOut();
 
             if (error) {
-                window.alert(error.message || 'Erreur lors de la déconnexion.');
+                window.alert(error.message || t('signOutError', 'Error while disconnecting.'));
                 return;
             }
 
             accountForm?.reset();
             accountLoginForm?.reset();
             await syncAccountSessionState();
-            window.alert('Déconnexion réussie.');
+            window.alert(t('signOutSuccess', 'Disconnection successful.'));
         });
     }
 
@@ -1285,22 +1440,22 @@ async function initEditor() {
             const confirmPassword = accountConfirmPassword?.value || '';
 
             if (!name || !email || !password || !confirmPassword) {
-                window.alert('Tous les champs sont requis.');
+                window.alert(t('allFieldsRequired', 'All fields are required.'));
                 return;
             }
 
             if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                window.alert('L’adresse email est invalide.');
+                window.alert(t('invalidEmail', 'The email address is invalid.'));
                 return;
             }
 
             if (password.length < 8) {
-                window.alert('Le mot de passe doit contenir au moins 8 caractères.');
+                window.alert(t('passwordMinLength', 'The password must contain at least 8 characters.'));
                 return;
             }
 
             if (password !== confirmPassword) {
-                window.alert('Les mots de passe ne correspondent pas.');
+                window.alert(t('passwordMismatch', 'The passwords do not match.'));
                 return;
             }
 
@@ -1315,11 +1470,11 @@ async function initEditor() {
             });
 
             if (error) {
-                window.alert(error.message || 'Erreur lors de l’inscription.');
+                window.alert(error.message || t('signupError', 'Error while signing up.'));
                 return;
             }
 
-            window.alert('Compte créé avec succès. Vérifie ton email pour confirmer l’inscription.');
+            window.alert(t('signupSuccess', 'Account created successfully. Check your email to confirm the registration.'));
             accountForm.reset();
         });
     }
@@ -1332,12 +1487,12 @@ async function initEditor() {
             const password = accountLoginPassword?.value || '';
 
             if (!email || !password) {
-                window.alert('L’email et le mot de passe sont requis.');
+                window.alert(t('emailPasswordRequired', 'Email and password are required.'));
                 return;
             }
 
             if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                window.alert('L’adresse email est invalide.');
+                window.alert(t('invalidEmail', 'The email address is invalid.'));
                 return;
             }
 
@@ -1347,7 +1502,7 @@ async function initEditor() {
             });
 
             if (error) {
-                window.alert(error.message || 'Erreur lors de la connexion.');
+                window.alert(error.message || t('loginError', 'Error while signing in.'));
                 return;
             }
 
@@ -1355,7 +1510,7 @@ async function initEditor() {
             await syncAccountSessionState();
             await restoreUserCardsFromAccount();
             await restoreUserMediaFromAccount();
-            window.alert('Connexion réussie.');
+            window.alert(t('loginSuccess', 'Login successful.'));
         });
     }
 
