@@ -8,6 +8,9 @@ let _db = null;
 // Backend sécurisé (service role) requis pour les opérations admin comme la suppression de compte.
 const BACKEND_API_BASE_URL = 'https://note-backend-ateu.onrender.com';
 
+// Permet d'utiliser l'application sans compte, une fois ce choix fait il n'est plus redemandé.
+const GUEST_MODE_STORAGE_KEY = 'textplaystore_guest_mode';
+
 
 function _openDB() {
     return new Promise((resolve, reject) => {
@@ -901,6 +904,7 @@ async function initEditor() {
     const accountSessionStatus = document.getElementById('accountSessionStatus');
     const accountSignOutBtn = document.getElementById('accountSignOutBtn');
     const accountDeleteBtn = document.getElementById('accountDeleteBtn');
+    const accountGuestBtn = document.getElementById('accountGuestBtn');
     const supabaseClient = window.noteSupabase;
     let currentAccountSession = null;
     let currentAccountMode = 'signup';
@@ -909,6 +913,7 @@ async function initEditor() {
         const showSessionButtons = isSignedIn && mode === 'signin';
         accountSignOutBtn?.classList.toggle('hidden', !showSessionButtons);
         accountDeleteBtn?.classList.toggle('hidden', !showSessionButtons);
+        accountGuestBtn?.classList.toggle('hidden', isSignedIn);
     }
 
     function showAccountSyncPrompt() {
@@ -1036,6 +1041,7 @@ async function initEditor() {
             accountLoginForm?.setAttribute('aria-hidden', 'true');
             accountSignOutBtn?.classList.remove('hidden');
             accountDeleteBtn?.classList.remove('hidden');
+            accountGuestBtn?.classList.add('hidden');
             return;
         }
 
@@ -1076,6 +1082,8 @@ async function initEditor() {
             });
             accountSignOutBtn?.classList.remove('hidden');
             accountDeleteBtn?.classList.remove('hidden');
+            accountGuestBtn?.classList.add('hidden');
+            setAccountGateActive(false);
             hideAccountSyncPrompt();
             return;
         }
@@ -1165,6 +1173,41 @@ async function initEditor() {
 
     if (accountDeleteBtn) {
         accountDeleteBtn.addEventListener('click', deleteCurrentAccount);
+    }
+
+    function continueAsGuest() {
+        try {
+            localStorage.setItem(GUEST_MODE_STORAGE_KEY, 'true');
+        } catch (error) {
+            console.warn('Impossible d’enregistrer le mode invité', error);
+        }
+        setAccountGateActive(false);
+        setRoute('editor');
+    }
+
+    accountGuestBtn?.addEventListener('click', continueAsGuest);
+
+    function setAccountGateActive(isActive) {
+        document.body.classList.toggle('account-gate-active', isActive);
+        accountBackBtn?.classList.toggle('hidden', isActive);
+    }
+
+    async function enforceAccountGateOnStartup() {
+        if (!supabaseClient) return;
+
+        let isGuest = false;
+        try {
+            isGuest = localStorage.getItem(GUEST_MODE_STORAGE_KEY) === 'true';
+        } catch (error) {
+            isGuest = false;
+        }
+
+        const { data: { session } } = await supabaseClient.auth.getSession();
+
+        if (!session && !isGuest) {
+            setAccountGateActive(true);
+            setRoute('account');
+        }
     }
 
     if (accountForm && supabaseClient) {
@@ -1265,6 +1308,7 @@ async function initEditor() {
             await syncAccountSessionState();
         });
         syncAccountSessionState();
+        enforceAccountGateOnStartup();
     }
 
     settingsOverlay?.addEventListener('click', (event) => {

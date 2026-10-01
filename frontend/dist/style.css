@@ -2155,6 +2155,41 @@ body:not(.dark-mode) .add-icon-btn img {
     color: #fff;
 }
 
+.account-guest-divider {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: var(--editor-text-muted);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.account-guest-divider::before,
+.account-guest-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(255,255,255,0.08);
+}
+
+.account-guest {
+    margin-top: 0;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 10px;
+    background: rgba(255,255,255,0.03);
+    color: var(--editor-text-primary);
+    font-weight: 600;
+    padding: 0.8rem 1rem;
+    cursor: pointer;
+}
+
+/* Tant que l'utilisateur n'a pas créé de compte ni choisi le mode invité, on masque la navigation. */
+body.account-gate-active .bottom-nav,
+body.account-gate-active .settings-btn {
+    display: none !important;
+}
+
 .licenses-header,
 .updates-header {
     display: flex;
