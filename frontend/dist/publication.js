@@ -6,7 +6,7 @@ const _DB_STORE = 'articles';
 let _db = null;
 
 // Backend sécurisé (service role) requis pour les opérations admin comme la suppression de compte.
-const BACKEND_API_BASE_URL = 'https://note-backend.onrender.com';
+const BACKEND_API_BASE_URL = 'https://note-backend-ateu.onrender.com';
 
 
 function _openDB() {
@@ -1105,13 +1105,23 @@ async function initEditor() {
         try {
             // La suppression d'un compte nécessite les droits admin Supabase (service role),
             // donc elle doit passer par le backend, jamais par le client anon.
-            const response = await fetch(`${BACKEND_API_BASE_URL}/api/delete-account`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${accessToken}`
-                }
-            });
+            // L'instance gratuite Render peut mettre jusqu'à 50s à se réveiller après inactivité.
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 60000);
+
+            let response;
+            try {
+                response = await fetch(`${BACKEND_API_BASE_URL}/api/delete-account`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${accessToken}`
+                    },
+                    signal: controller.signal
+                });
+            } finally {
+                clearTimeout(timeoutId);
+            }
 
             const result = await response.json().catch(() => ({}));
 
@@ -1123,7 +1133,10 @@ async function initEditor() {
             await syncAccountSessionState();
             window.alert('Votre compte a bien été supprimé.');
         } catch (error) {
-            window.alert(error.message || 'Erreur lors de la suppression du compte.');
+            const isTimeout = error.name === 'AbortError';
+            window.alert(isTimeout
+                ? 'Le serveur de suppression de compte ne répond pas. Réessayez dans quelques instants.'
+                : (error.message || 'Erreur lors de la suppression du compte.'));
         }
     }
 

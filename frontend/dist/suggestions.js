@@ -1,5 +1,5 @@
 (function (global) {
-    const API_BASE_URL = 'https://note-backend.onrender.com';
+    const API_BASE_URL = 'https://note-backend-ateu.onrender.com';
 
     const STOP_WORDS = new Set([
         'le', 'la', 'les', 'un', 'une', 'des', 'dans', 'pour', 'avec', 'sans',
