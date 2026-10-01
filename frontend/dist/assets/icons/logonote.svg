@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-label="Logo Note app icon">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#68A9D4"/>
+      <stop offset="100%" stop-color="#2E6F9C"/>
+    </linearGradient>
+    <linearGradient id="paper" x1="0" x2="1">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#EDF5FB"/>
+    </linearGradient>
+    <linearGradient id="noteAccent" x1="0" x2="1">
+      <stop offset="0%" stop-color="#FF7A68"/>
+      <stop offset="100%" stop-color="#E24A3C"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="64" y="64" width="896" height="896" rx="200" fill="url(#bg)"/>
+  <circle cx="512" cy="512" r="380" fill="#FFFFFF" opacity="0.08"/>
+
+  <g transform="translate(0 8)">
+    <g transform="translate(260 235)">
+      <rect x="0" y="0" width="500" height="560" rx="70" fill="url(#paper)" stroke="#163A53" stroke-width="18"/>
+      <path d="M352 0 L500 0 L500 148 C500 184 472 212 436 212 L352 212 Z" fill="url(#noteAccent)"/>
+      <path d="M352 0 L500 0 L500 148 C500 184 472 212 436 212 L352 212 Z" fill="none" stroke="#163A53" stroke-width="16"/>
+
+      <rect x="88" y="128" width="196" height="28" rx="14" fill="#4A7DA6" opacity="0.9"/>
+      <rect x="88" y="190" width="252" height="28" rx="14" fill="#8AB2D1" opacity="0.9"/>
+      <rect x="88" y="252" width="230" height="28" rx="14" fill="#8AB2D1" opacity="0.9"/>
+      <rect x="88" y="332" width="160" height="160" rx="28" fill="#F9D59A" stroke="#163A53" stroke-width="14"/>
+      <circle cx="168" cy="412" r="42" fill="#FFFFFF"/>
+      <path d="M138 410 C150 370, 188 366, 206 410" fill="none" stroke="#163A53" stroke-width="14" stroke-linecap="round"/>
+      <path d="M120 488 C158 462, 200 462, 238 488" fill="none" stroke="#163A53" stroke-width="14" stroke-linecap="round"/>
+      <path d="M280 442 L410 442" stroke="#163A53" stroke-width="16" stroke-linecap="round"/>
+      <path d="M280 500 L435 500" stroke="#163A53" stroke-width="16" stroke-linecap="round"/>
+    </g>
+  </g>
+</svg>
