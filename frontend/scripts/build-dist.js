@@ -2,8 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const frontendDir = path.resolve(__dirname, '..');
-const projectRoot = path.resolve(frontendDir, '..');
-const distDir = path.join(projectRoot, 'dist');
+const distDir = path.join(frontendDir, 'dist');
 
 function copyItem(src, dest) {
   const stat = fs.statSync(src);
