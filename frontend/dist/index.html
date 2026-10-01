@@ -48,6 +48,12 @@
                         </div>
                         <button class="settings-value" type="button" data-setting="theme">Sombre <span>›</span></button>
                     </div>
+                    <div class="settings-row info-row">
+                        <button class="settings-value-full" type="button" data-setting="language">
+                            <span class="settings-label">Langue</span>
+                            <span class="settings-arrow">›</span>
+                        </button>
+                    </div>
                     <div class="settings-row switch-row">
                         <div class="settings-label-block">
                             <span class="settings-label">Dyslexie</span>
@@ -371,6 +377,25 @@
                                 </span>
                             </button>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="screen-language" class="app-screen" aria-label="Écran de langue">
+            <div class="screen-header screen-header-with-back">
+                <button class="screen-back-btn" id="languageBackBtn" type="button" aria-label="Retour aux paramètres">
+                    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+                        <path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z" fill="currentColor"/>
+                    </svg>
+                </button>
+                <h2>Langue</h2>
+            </div>
+            <div class="screen-content">
+                <div class="account-panel">
+                    <div class="account-card">
+                        <button class="language-option-btn" type="button" data-language="fr">Français</button>
+                        <button class="language-option-btn" type="button" data-language="en">English</button>
                     </div>
                 </div>
             </div>

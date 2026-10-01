@@ -2421,6 +2421,35 @@ body.dark-mode .dyslexia-toggle[aria-pressed="true"] .dyslexia-toggle-thumb {
     background: linear-gradient(180deg, #a9c2ff 0%, #7ea4ff 100%);
 }
 
+.language-option-btn {
+    width: 100%;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.04);
+    color: var(--editor-text-primary);
+    border-radius: 12px;
+    padding: 1rem 1.2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.language-option-btn + .language-option-btn {
+    margin-top: 0.8rem;
+}
+
+.language-option-btn:hover,
+.language-option-btn:focus-visible {
+    background: rgba(125, 166, 255, 0.12);
+    border-color: rgba(125, 166, 255, 0.45);
+}
+
+.language-option-btn.is-selected {
+    background: rgba(125, 166, 255, 0.2);
+    border-color: rgba(125, 166, 255, 0.7);
+}
+
 body.dyslexia-mode,
 body.dyslexia-mode * {
     font-family: Arial, "Segoe UI", sans-serif !important;

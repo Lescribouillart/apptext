@@ -566,6 +566,7 @@ async function initEditor() {
         editor: document.getElementById('screen-editor'),
         search: document.getElementById('screen-search'),
         theme: document.getElementById('screen-theme'),
+        language: document.getElementById('screen-language'),
         account: document.getElementById('screen-account'),
         licenses: document.getElementById('screen-licenses'),
         updates: document.getElementById('screen-updates'),
@@ -578,6 +579,7 @@ async function initEditor() {
     const settingsBtn = document.querySelector('.settings-btn');
     const settingsContent = document.querySelector('.settings-content');
     const accountBackBtn = document.getElementById('accountBackBtn');
+    const languageBackBtn = document.getElementById('languageBackBtn');
     const licensesBackBtn = document.getElementById('licensesBackBtn');
     const updatesBackBtn = document.getElementById('updatesBackBtn');
 
@@ -588,6 +590,7 @@ async function initEditor() {
         autoSave: true,
         defaultFormat: '.txt',
         theme: 'dark',
+        language: 'fr',
         dyslexia: localStorage.getItem('textplaystore_dyslexia_mode') === 'true',
         fontSize: '14px',
         fontFamily: 'System Sans-Serif',
@@ -663,6 +666,23 @@ async function initEditor() {
         formatBtn.innerHTML = `${state.defaultFormat || '.txt'} <span>›</span>`;
     }
 
+    function syncLanguageLabel() {
+        const languageBtn = document.querySelector('[data-setting="language"]');
+        if (!languageBtn) return;
+        const state = getSettings();
+        const languageName = state.language === 'en' ? 'English' : 'Français';
+        languageBtn.innerHTML = `${languageName} <span>›</span>`;
+    }
+
+    function syncLanguageButtons() {
+        const selectedLanguage = getSettings().language || 'fr';
+        document.querySelectorAll('.language-option-btn').forEach((button) => {
+            const isSelected = (button.dataset.language || 'fr') === selectedLanguage;
+            button.classList.toggle('is-selected', isSelected);
+            button.setAttribute('aria-pressed', String(isSelected));
+        });
+    }
+
     function compareVersions(currentVersion, latestVersion) {
         const current = String(currentVersion || '0.0.0').split('.').map(Number);
         const latest = String(latestVersion || '0.0.0').split('.').map(Number);
@@ -711,8 +731,11 @@ async function initEditor() {
         syncFontSizeLabel();
         syncFontFamilyLabel();
         syncDefaultFormatLabel();
+        syncLanguageLabel();
+        syncLanguageButtons();
         syncUpdateStatusLabel();
 
+        document.documentElement.lang = state.language === 'en' ? 'en' : 'fr';
         document.body.classList.toggle('dark-mode', state.theme === 'dark');
         document.body.classList.toggle('light-mode', state.theme === 'light');
         document.body.classList.toggle('dyslexia-mode', localStorage.getItem('textplaystore_dyslexia_mode') === 'true' || !!state.dyslexia);
@@ -833,6 +856,19 @@ async function initEditor() {
                     return;
                 }
 
+                if (key === 'language') {
+                    const nextLanguage = state.language === 'fr' ? 'en' : 'fr';
+                    saveSettings({ language: nextLanguage });
+                    applySettingsState();
+                    return;
+                }
+
+                if (key === 'language') {
+                    setSettingsOpen(false);
+                    setRoute('language');
+                    return;
+                }
+
                 if (key === 'account') {
                     setSettingsOpen(false);
                     setRoute('account');
@@ -870,6 +906,11 @@ async function initEditor() {
         setSettingsOpen(true);
     });
 
+    languageBackBtn?.addEventListener('click', () => {
+        setRoute('editor');
+        setSettingsOpen(true);
+    });
+
     accountBackBtn?.addEventListener('click', () => {
         setRoute('editor');
         setSettingsOpen(true);
@@ -887,6 +928,20 @@ async function initEditor() {
 
     settingsCloseBtn?.addEventListener('click', () => {
         setSettingsOpen(false);
+    });
+
+    document.querySelectorAll('.language-option-btn').forEach((button) => {
+        button.addEventListener('click', () => {
+            const nextLanguage = button.dataset.language || 'fr';
+            const state = getSettings();
+            saveSettings({ language: nextLanguage });
+            applySettingsState();
+            setRoute('editor');
+            setSettingsOpen(true);
+            if (state.language !== nextLanguage) {
+                window.alert(nextLanguage === 'en' ? 'Language changed to English.' : 'Langue modifiée en français.');
+            }
+        });
     });
 
     const accountForm = document.getElementById('accountForm');
