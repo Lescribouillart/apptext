@@ -2099,8 +2099,26 @@ body.startup-locked .main {
     padding: 0;
 }
 
+.account-avatar-action img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 .account-avatar-action.crop {
     color: #9cc9ff;
+    background: rgba(255,255,255,0.04);
+}
+
+.account-avatar-action.crop img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 0;
+    display: block;
 }
 
 .account-avatar-action.confirm {
