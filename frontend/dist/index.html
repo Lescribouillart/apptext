@@ -445,6 +445,11 @@
                             </div>
                         </label>
 
+                        <label id="accountSessionStatusField" class="account-field hidden">
+                            <span>Adresse mail</span>
+                            <input id="accountSessionStatus" name="accountEmail" type="email" readonly aria-label="Adresse mail" placeholder="adresse@mail.com" />
+                        </label>
+
                         <div id="accountAvatarCropModal" class="account-avatar-crop-modal hidden" role="dialog" aria-modal="true" aria-labelledby="accountAvatarCropTitle">
                             <div class="account-avatar-crop-panel">
                                 <div class="account-avatar-crop-header">
@@ -468,8 +473,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <div id="accountSessionStatus" class="account-session-status" data-i18n="notConnected">Vous n'êtes pas connecté.</div>
 
                         <form id="accountForm" class="account-form" data-mode="signup">
                             <label class="account-field">

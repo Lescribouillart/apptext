@@ -1440,6 +1440,7 @@ async function initEditor() {
     const accountLoginEmail = document.getElementById('accountLoginEmail');
     const accountLoginPassword = document.getElementById('accountLoginPassword');
     const accountModeButtons = document.querySelectorAll('.account-mode-btn');
+    const accountSessionStatusField = document.getElementById('accountSessionStatusField');
     const accountSessionStatus = document.getElementById('accountSessionStatus');
     const accountDisplayNameField = document.getElementById('accountDisplayNameField');
     const accountDisplayName = document.getElementById('accountDisplayName');
@@ -1912,9 +1913,11 @@ async function initEditor() {
         const displayEmail = session?.user?.email || 'Utilisateur';
 
         if (accountSessionStatus) {
-            accountSessionStatus.textContent = session
-                ? `${t('connectedAs', 'Connected:')} ${displayEmail}`
-                : t('notConnected', 'You are not connected.');
+            accountSessionStatus.value = session ? displayEmail : '';
+        }
+
+        if (accountSessionStatusField) {
+            accountSessionStatusField.classList.toggle('hidden', !session);
         }
 
         if (accountDisplayNameField && accountDisplayName) {
