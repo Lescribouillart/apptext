@@ -3246,6 +3246,44 @@ async function initEditor() {
         overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
     }
 
+    async function saveExportToDevice(blob, filename, mimeType) {
+        const filesystem = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Filesystem;
+        if (filesystem) {
+            try {
+                const data = mimeType && mimeType.startsWith('text/') ? await blob.text() : await blob.arrayBuffer();
+                await filesystem.writeFile({
+                    path: filename,
+                    data,
+                    directory: 'DOCUMENTS'
+                });
+                showStatus(`✓ Fichier enregistré dans Documents/${filename}`, 'success');
+                return true;
+            } catch (err) {
+                console.warn('Filesystem export failed, fallback to browser download', err);
+            }
+        }
+
+        return false;
+    }
+
+    function triggerDirectDownload(blob, filename) {
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '') || !!window.Capacitor;
+
+        link.href = url;
+        link.download = filename;
+        link.rel = 'noopener';
+        if (isMobile) {
+            link.target = '_blank';
+        }
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        showStatus(t('fileDownloadedToDownloads', 'File downloaded to Downloads'), 'success');
+    }
+
     /**
      * Télécharge le contenu en texte brut (.txt) — sans balises
      */
@@ -3260,8 +3298,9 @@ async function initEditor() {
             .substring(0, 50);
         const filename = `${cleanSubject}-${timestamp}.txt`;
         const blob = new Blob([plainText], { type: 'text/plain;charset=utf-8' });
+        const canUseNativePicker = 'showSaveFilePicker' in window && !/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '') && !window.Capacitor;
 
-        if ('showSaveFilePicker' in window) {
+        if (canUseNativePicker) {
             try {
                 const handle = await window.showSaveFilePicker({
                     suggestedName: filename,
@@ -3278,15 +3317,12 @@ async function initEditor() {
                     showStatus(t('fileDownloadError', 'Error: {message}').replace('{message}', err.message), 'error');
                 }
             }
-        } else {
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = filename;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(link.href);
-            showStatus(t('fileDownloadedToDownloads', 'File downloaded to Downloads'), 'success');
+            return;
+        }
+
+        const saved = await saveExportToDevice(blob, filename, 'text/plain;charset=utf-8');
+        if (!saved) {
+            triggerDirectDownload(blob, filename);
         }
     }
 
@@ -3320,8 +3356,9 @@ async function initEditor() {
 </style></head><body>${htmlContent}</body></html>`;
 
         const blob = htmlDocx.asBlob(fullHtml);
+        const canUseNativePicker = 'showSaveFilePicker' in window && !/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '') && !window.Capacitor;
 
-        if ('showSaveFilePicker' in window) {
+        if (canUseNativePicker) {
             try {
                 const handle = await window.showSaveFilePicker({
                     suggestedName: filename,
@@ -3341,15 +3378,12 @@ async function initEditor() {
                     showStatus(t('fileDownloadError', 'Error: {message}').replace('{message}', err.message), 'error');
                 }
             }
-        } else {
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = filename;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(link.href);
-            showStatus(t('fileDownloadedToDownloads', 'File downloaded to Downloads'), 'success');
+            return;
+        }
+
+        const saved = await saveExportToDevice(blob, filename, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+        if (!saved) {
+            triggerDirectDownload(blob, filename);
         }
     }
 
