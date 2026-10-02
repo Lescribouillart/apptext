@@ -1495,6 +1495,29 @@ async function initEditor() {
         }
     }
 
+    async function syncStoredAccountAvatarToSupabase(dataUrl) {
+        if (!supabaseClient || !currentAccountSession) return;
+
+        try {
+            await supabaseClient.auth.updateUser({
+                data: {
+                    avatar: dataUrl || null
+                }
+            });
+        } catch (error) {
+            console.warn('Impossible de synchroniser la photo de profil sur le compte', error);
+        }
+    }
+
+    async function restoreStoredAccountAvatarFromSupabase(session) {
+        const sessionAvatar = session?.user?.user_metadata?.avatar || '';
+        if (!sessionAvatar) return;
+
+        saveStoredAccountAvatar(sessionAvatar);
+        pendingAvatarDataUrl = sessionAvatar;
+        applyStoredAccountAvatar();
+    }
+
     function saveStoredAccountAvatar(dataUrl) {
         try {
             if (dataUrl) {
@@ -1745,18 +1768,20 @@ async function initEditor() {
         openAvatarCropForSelectedImage();
     });
 
-    accountAvatarConfirmBtn?.addEventListener('click', () => {
+    accountAvatarConfirmBtn?.addEventListener('click', async () => {
         if (!pendingAvatarDataUrl) {
             return;
         }
 
         saveStoredAccountAvatar(pendingAvatarDataUrl);
+        await syncStoredAccountAvatarToSupabase(pendingAvatarDataUrl);
         applyStoredAccountAvatar();
     });
 
-    accountAvatarDeleteBtn?.addEventListener('click', () => {
+    accountAvatarDeleteBtn?.addEventListener('click', async () => {
         pendingAvatarDataUrl = '';
         saveStoredAccountAvatar('');
+        await syncStoredAccountAvatarToSupabase('');
         applyStoredAccountAvatar();
         if (accountAvatarInput) {
             accountAvatarInput.value = '';
@@ -1926,6 +1951,15 @@ async function initEditor() {
 
         if (accountAvatarField) {
             accountAvatarField.classList.toggle('hidden', !session);
+        }
+
+        if (session) {
+            const storedAvatar = getStoredAccountAvatar();
+            const accountAvatar = session?.user?.user_metadata?.avatar || '';
+            if (!storedAvatar && accountAvatar) {
+                saveStoredAccountAvatar(accountAvatar);
+            }
+            await restoreStoredAccountAvatarFromSupabase(session);
         }
 
         applyStoredAccountAvatar();

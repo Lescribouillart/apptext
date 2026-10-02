@@ -130,15 +130,6 @@
 
     <main class="main" id="main-content">
         <section id="screen-editor" class="app-screen" aria-label="Input screen" data-i18n-aria="navigationInput">
-            <!-- Barre supérieure avec toolbar intégrée -->
-            <div class="top-bar">
-                <!-- Boutons d'action -->
-                <div class="top-bar-actions">
-                    <button class="wp-button" id="loadBtn" data-i18n="import">Importer</button>
-                    <button class="wp-button" id="saveAsBtn" data-i18n="export" onclick="if (window.publishArticle) { window.publishArticle(); return false; } return false;">Exporter</button>
-                </div>
-            </div>
-
             <div class="editor-container" id="editorContainer">
                 <!-- Zone principale de l'éditeur -->
                 <div class="editor-main">
@@ -576,7 +567,10 @@
 
         <section id="screen-cards" class="app-screen" aria-label="Cards screen" data-i18n-aria="cards">
             <div class="screen-header">
-                <h2 data-i18n="cards">Cartes</h2>
+                <div class="top-bar-actions">
+                    <button class="wp-button" id="loadBtn" data-i18n="import">Importer</button>
+                    <button class="wp-button" id="saveAsBtn" data-i18n="export" onclick="if (window.publishArticle) { window.publishArticle(); return false; } return false;">Exporter</button>
+                </div>
             </div>
             <div class="screen-content">
                 <div id="cardsScreenList" class="screen-list cards-list"></div>
