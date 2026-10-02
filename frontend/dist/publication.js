@@ -3215,6 +3215,25 @@ async function initEditor() {
     }
 
     async function saveExportToDevice(blob, filename, mimeType) {
+        // 1) Comme pour Importer, on passe par la boîte de dialogue native d'Android
+        //    (ici le "partage") pour que l'utilisateur choisisse où déposer le fichier.
+        try {
+            const file = new File([blob], filename, { type: mimeType || 'application/octet-stream' });
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                await navigator.share({ files: [file] });
+                showStatus(`✓ Fichier "${filename}" prêt à être enregistré`, 'success');
+                return true;
+            }
+        } catch (error) {
+            if (error && error.name === 'AbortError') {
+                // L'utilisateur a fermé la boîte de dialogue : on ne tente pas de repli.
+                return true;
+            }
+            console.warn('Partage natif indisponible, repli sur le stockage de l\'application', error);
+        }
+
+        // 2) Repli garanti : écriture directe dans le stockage propre à l'application,
+        //    accessible sans permission sur toutes les versions d'Android.
         const capacitor = window.Capacitor;
         const filesystem = capacitor && (capacitor.Plugins?.Filesystem || capacitor.Filesystem);
         const isNative = !!(capacitor && capacitor.isNativePlatform && capacitor.isNativePlatform());
@@ -3223,43 +3242,35 @@ async function initEditor() {
             return false;
         }
 
-        try {
-            if (filesystem.checkPermissions) {
-                const status = await filesystem.checkPermissions();
-                if (status && status.publicStorage === 'denied' && filesystem.requestPermissions) {
-                    await filesystem.requestPermissions();
-                }
-            }
+        const isTextMime = !mimeType || mimeType.startsWith('text/');
+        const data = isTextMime ? await blob.text() : await blobToBase64(blob);
 
-            if (mimeType && mimeType.startsWith('text/')) {
-                await filesystem.writeFile({
+        const directoriesToTry = ['EXTERNAL_STORAGE', 'DOCUMENTS', 'EXTERNAL'];
+        for (const directory of directoriesToTry) {
+            try {
+                const result = await filesystem.writeFile({
                     path: filename,
-                    data: await blob.text(),
-                    directory: 'DOCUMENTS',
-                    encoding: 'utf8'
+                    data,
+                    directory,
+                    ...(isTextMime ? { encoding: 'utf8' } : {})
                 });
-            } else {
-                const arrayBuffer = await blob.arrayBuffer();
-                const bytes = new Uint8Array(arrayBuffer);
-                let binary = '';
-                bytes.forEach((byte) => {
-                    binary += String.fromCharCode(byte);
-                });
-
-                await filesystem.writeFile({
-                    path: filename,
-                    data: btoa(binary),
-                    directory: 'DOCUMENTS'
-                });
+                showStatus(`✓ Fichier enregistré : ${result?.uri || filename}`, 'success');
+                return true;
+            } catch (error) {
+                console.warn(`Écriture dans ${directory} impossible`, error);
             }
-
-            showStatus(`✓ Fichier enregistré dans Documents/${filename}`, 'success');
-            return true;
-        } catch (err) {
-            console.warn('Filesystem export failed, fallback to browser download', err);
         }
 
         return false;
+    }
+
+    function blobToBase64(blob) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(String(reader.result).split(',')[1] || '');
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+        });
     }
 
     function triggerDirectDownload(blob, filename) {
