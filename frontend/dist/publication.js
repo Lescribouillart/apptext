@@ -1436,12 +1436,64 @@ async function initEditor() {
     const accountLoginPassword = document.getElementById('accountLoginPassword');
     const accountModeButtons = document.querySelectorAll('.account-mode-btn');
     const accountSessionStatus = document.getElementById('accountSessionStatus');
+    const accountDisplayNameField = document.getElementById('accountDisplayNameField');
+    const accountDisplayName = document.getElementById('accountDisplayName');
     const accountSignOutBtn = document.getElementById('accountSignOutBtn');
     const accountDeleteBtn = document.getElementById('accountDeleteBtn');
     const accountGuestBtn = document.getElementById('accountGuestBtn');
     const supabaseClient = window.noteSupabase;
+    const ACCOUNT_NICKNAME_STORAGE_KEY = 'note.account.displayName';
     let currentAccountSession = null;
     let currentAccountMode = 'signup';
+
+    function getStoredAccountNickname() {
+        try {
+            return localStorage.getItem(ACCOUNT_NICKNAME_STORAGE_KEY) || '';
+        } catch (error) {
+            return '';
+        }
+    }
+
+    function saveStoredAccountNickname(value) {
+        try {
+            if (value && value.trim()) {
+                localStorage.setItem(ACCOUNT_NICKNAME_STORAGE_KEY, value.trim());
+            } else {
+                localStorage.removeItem(ACCOUNT_NICKNAME_STORAGE_KEY);
+            }
+        } catch (error) {
+            console.warn('Impossible d’enregistrer le pseudo du compte', error);
+        }
+    }
+
+    function updateConnectedDisplayName(session) {
+        if (!accountDisplayNameField || !accountDisplayName) return;
+
+        const fallbackName = session?.user?.user_metadata?.nickname
+            || session?.user?.user_metadata?.full_name
+            || session?.user?.email?.split('@')[0]
+            || 'Utilisateur';
+
+        accountDisplayName.value = getStoredAccountNickname() || fallbackName;
+        accountDisplayNameField.classList.toggle('hidden', !session);
+    }
+
+    accountDisplayName?.addEventListener('input', async () => {
+        const value = (accountDisplayName.value || '').trim();
+        saveStoredAccountNickname(value);
+
+        if (!supabaseClient || !currentAccountSession) return;
+
+        try {
+            await supabaseClient.auth.updateUser({
+                data: {
+                    nickname: value || null
+                }
+            });
+        } catch (error) {
+            console.warn('Impossible de sauvegarder le pseudo dans le compte Supabase', error);
+        }
+    });
 
     function updateAccountSessionButtons(mode, isSignedIn) {
         const showSessionButtons = isSignedIn && mode === 'signin';
@@ -1596,6 +1648,10 @@ async function initEditor() {
             accountSessionStatus.textContent = session
                 ? `${t('connectedAs', 'Connected:')} ${displayEmail}`
                 : t('notConnected', 'You are not connected.');
+        }
+
+        if (accountDisplayNameField && accountDisplayName) {
+            updateConnectedDisplayName(session);
         }
 
         const isSignedIn = Boolean(session);

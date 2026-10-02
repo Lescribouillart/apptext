@@ -416,6 +416,11 @@
                             <button class="account-mode-btn" type="button" data-account-mode="signin" aria-selected="false" data-i18n="signIn">Se connecter</button>
                         </div>
 
+                        <label id="accountDisplayNameField" class="account-field hidden">
+                            <span data-i18n="nickname">Pseudo</span>
+                            <input id="accountDisplayName" name="displayName" type="text" maxlength="24" placeholder="Votre pseudo" aria-label="Pseudo" />
+                        </label>
+
                         <div id="accountSessionStatus" class="account-session-status" data-i18n="notConnected">Vous n'êtes pas connecté.</div>
 
                         <form id="accountForm" class="account-form" data-mode="signup">
