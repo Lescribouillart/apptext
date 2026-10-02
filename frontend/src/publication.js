@@ -3200,50 +3200,16 @@ async function initEditor() {
     }
 
     /**
-     * Affiche un dialogue de choix de format puis lance le téléchargement
+     * Exporte directement le contenu de la carte en texte brut.
+     * On supprime l'étape intermédiaire de choix de format pour aller
+     * directement vers l'enregistrement sur le bureau du téléphone.
      */
     function publishArticle() {
-        const existingOverlay = document.getElementById('exportFormatOverlay');
-        if (existingOverlay) {
-            return;
-        }
-
         const subject = articleSubject.value.trim();
         const exportSubject = subject || t('untitledDocument', 'Document');
-        const htmlContent = editor.innerHTML;
         const plainText = editor.innerText;
 
-        // Création du dialogue de choix
-        const overlay = document.createElement('div');
-        overlay.id = 'exportFormatOverlay';
-        overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center';
-
-        const modal = document.createElement('div');
-        modal.style.cssText = 'background:#1e1e1e;border:1px solid #444;border-radius:10px;padding:28px 32px;min-width:280px;text-align:center;color:#f1f1f1;font-family:inherit';
-        modal.innerHTML = `
-          <p style="margin:0 0 6px;font-size:13px;color:#aaa;">${t('exportFormatTitle', 'Choose the export format')}</p>
-          <p style="margin:0 0 22px;font-size:16px;font-weight:600;">${t('exportTo', 'Save as:')} ${escapeHtml(exportSubject)}</p>
-          <div style="display:flex;gap:12px;justify-content:center;margin-bottom:16px">
-            <button id="_dlTxt" style="padding:10px 22px;border-radius:6px;border:1px solid #555;background:#2a2a2a;color:#f1f1f1;cursor:pointer;font-size:14px;">${t('plainTextExport', 'Plain text (.txt)')}</button>
-            <button id="_dlDoc" style="padding:10px 22px;border-radius:6px;border:1px solid #555;background:#2a2a2a;color:#f1f1f1;cursor:pointer;font-size:14px;">${t('wordExport', 'Word (.docx)')}</button>
-          </div>
-          <button id="_dlCancel" style="background:none;border:none;color:#888;cursor:pointer;font-size:13px;">${t('cancel', 'Cancel')}</button>`;
-
-        overlay.appendChild(modal);
-        document.body.appendChild(overlay);
-
-        const close = () => document.body.removeChild(overlay);
-
-        modal.querySelector('#_dlTxt').addEventListener('click', async () => {
-            close();
-            await downloadTextFile(exportSubject, plainText);
-        });
-        modal.querySelector('#_dlDoc').addEventListener('click', async () => {
-            close();
-            await downloadWordFile(exportSubject, htmlContent);
-        });
-        modal.querySelector('#_dlCancel').addEventListener('click', close);
-        overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+        downloadTextFile(exportSubject, plainText);
     }
 
     async function saveExportToDevice(blob, filename, mimeType) {
