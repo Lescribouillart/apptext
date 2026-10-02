@@ -135,7 +135,7 @@
                 <!-- Boutons d'action -->
                 <div class="top-bar-actions">
                     <button class="wp-button" id="loadBtn" data-i18n="import">Importer</button>
-                    <button class="wp-button" id="saveAsBtn" data-i18n="export">Exporter</button>
+                    <button class="wp-button" id="saveAsBtn" data-i18n="export" onclick="if (window.publishArticle) { window.publishArticle(); return false; } return false;">Exporter</button>
                 </div>
             </div>
 

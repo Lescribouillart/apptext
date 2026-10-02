@@ -2788,10 +2788,12 @@ async function initEditor() {
 
     // Bouton Enregistrer sous : export .txt / .docx sur le PC
     if (saveAsBtn) {
-        saveAsBtn.addEventListener('click', () => {
+        saveAsBtn.addEventListener('click', (event) => {
+            event.preventDefault();
             publishArticle();
         });
     }
+    window.publishArticle = publishArticle;
 
     // Bouton Ajouter : crée une nouvelle carte dans l’éditeur courant
     if (addBtn) {
@@ -3201,24 +3203,26 @@ async function initEditor() {
      * Affiche un dialogue de choix de format puis lance le téléchargement
      */
     function publishArticle() {
-        const subject = articleSubject.value.trim();
-        const htmlContent = editor.innerHTML;
-        const plainText = editor.innerText;
-
-        if (!subject) {
-            showStatus(`⚠️ ${t('subjectRequired', 'Please enter a subject before adding the article.')}`, 'error');
+        const existingOverlay = document.getElementById('exportFormatOverlay');
+        if (existingOverlay) {
             return;
         }
 
+        const subject = articleSubject.value.trim();
+        const exportSubject = subject || t('untitledDocument', 'Document');
+        const htmlContent = editor.innerHTML;
+        const plainText = editor.innerText;
+
         // Création du dialogue de choix
         const overlay = document.createElement('div');
+        overlay.id = 'exportFormatOverlay';
         overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center';
 
         const modal = document.createElement('div');
         modal.style.cssText = 'background:#1e1e1e;border:1px solid #444;border-radius:10px;padding:28px 32px;min-width:280px;text-align:center;color:#f1f1f1;font-family:inherit';
         modal.innerHTML = `
           <p style="margin:0 0 6px;font-size:13px;color:#aaa;">${t('exportFormatTitle', 'Choose the export format')}</p>
-          <p style="margin:0 0 22px;font-size:16px;font-weight:600;">${t('exportTo', 'Save as:')}</p>
+          <p style="margin:0 0 22px;font-size:16px;font-weight:600;">${t('exportTo', 'Save as:')} ${escapeHtml(exportSubject)}</p>
           <div style="display:flex;gap:12px;justify-content:center;margin-bottom:16px">
             <button id="_dlTxt" style="padding:10px 22px;border-radius:6px;border:1px solid #555;background:#2a2a2a;color:#f1f1f1;cursor:pointer;font-size:14px;">${t('plainTextExport', 'Plain text (.txt)')}</button>
             <button id="_dlDoc" style="padding:10px 22px;border-radius:6px;border:1px solid #555;background:#2a2a2a;color:#f1f1f1;cursor:pointer;font-size:14px;">${t('wordExport', 'Word (.docx)')}</button>
@@ -3232,11 +3236,11 @@ async function initEditor() {
 
         modal.querySelector('#_dlTxt').addEventListener('click', async () => {
             close();
-            await downloadTextFile(subject, plainText);
+            await downloadTextFile(exportSubject, plainText);
         });
         modal.querySelector('#_dlDoc').addEventListener('click', async () => {
             close();
-            await downloadWordFile(subject, htmlContent);
+            await downloadWordFile(exportSubject, htmlContent);
         });
         modal.querySelector('#_dlCancel').addEventListener('click', close);
         overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
