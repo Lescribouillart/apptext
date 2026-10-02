@@ -1447,6 +1447,7 @@ async function initEditor() {
     const accountAvatarInput = document.getElementById('accountAvatarInput');
     const accountAvatarPreview = document.getElementById('accountAvatarPreview');
     const accountAvatarName = document.getElementById('accountAvatarName');
+    const accountAvatarCropBtn = document.getElementById('accountAvatarCropBtn');
     const accountAvatarConfirmBtn = document.getElementById('accountAvatarConfirmBtn');
     const accountAvatarDeleteBtn = document.getElementById('accountAvatarDeleteBtn');
     const accountAvatarCropModal = document.getElementById('accountAvatarCropModal');
@@ -1603,9 +1604,12 @@ async function initEditor() {
             accountAvatarCropModal.classList.add('hidden');
         }
         cropAvatarSource = '';
-        if (accountAvatarInput) {
-            accountAvatarInput.value = '';
-        }
+    }
+
+    function openAvatarCropForSelectedImage() {
+        const source = pendingAvatarDataUrl || getStoredAccountAvatar();
+        if (!source) return;
+        openAvatarCropModal(source);
     }
 
     function buildCroppedAvatarDataUrl(dataUrl) {
@@ -1734,6 +1738,10 @@ async function initEditor() {
 
     accountAvatarCropCloseBtn?.addEventListener('click', () => {
         closeAvatarCropModal();
+    });
+
+    accountAvatarCropBtn?.addEventListener('click', () => {
+        openAvatarCropForSelectedImage();
     });
 
     accountAvatarConfirmBtn?.addEventListener('click', () => {
