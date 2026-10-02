@@ -1388,6 +1388,11 @@ async function initEditor() {
         setSettingsOpen(true);
     });
 
+    document.querySelector('.account-btn')?.addEventListener('click', () => {
+        setSettingsOpen(false);
+        setRoute('account');
+    });
+
     languageBackBtn?.addEventListener('click', () => {
         setRoute('editor');
         setSettingsOpen(true);

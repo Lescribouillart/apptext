@@ -479,9 +479,9 @@ body.editor-page .sidebar.open {
     z-index: 1;
 }
 
-.settings-btn {
+.settings-btn,
+.account-btn {
     position: absolute;
-    right: 0.25rem;
     top: 50%;
     transform: translateY(-50%);
     width: 42px;
@@ -497,7 +497,24 @@ body.editor-page .sidebar.open {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
-.settings-btn:focus-visible {
+.settings-btn {
+    right: 0.25rem;
+}
+
+.account-btn {
+    left: 0.25rem;
+    padding: 0;
+}
+
+.account-btn img {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    display: block;
+}
+
+.settings-btn:focus-visible,
+.account-btn:focus-visible {
     outline: 2px solid rgba(255, 255, 255, 0.9);
     outline-offset: 2px;
 }
