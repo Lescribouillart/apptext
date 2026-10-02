@@ -3247,20 +3247,48 @@ async function initEditor() {
     }
 
     async function saveExportToDevice(blob, filename, mimeType) {
-        const filesystem = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Filesystem;
-        if (filesystem) {
-            try {
-                const data = mimeType && mimeType.startsWith('text/') ? await blob.text() : await blob.arrayBuffer();
+        const capacitor = window.Capacitor;
+        const filesystem = capacitor && (capacitor.Plugins?.Filesystem || capacitor.Filesystem);
+        const isNative = !!(capacitor && capacitor.isNativePlatform && capacitor.isNativePlatform());
+
+        if (!isNative || !filesystem) {
+            return false;
+        }
+
+        try {
+            if (filesystem.checkPermissions) {
+                const status = await filesystem.checkPermissions();
+                if (status && status.publicStorage === 'denied' && filesystem.requestPermissions) {
+                    await filesystem.requestPermissions();
+                }
+            }
+
+            if (mimeType && mimeType.startsWith('text/')) {
                 await filesystem.writeFile({
                     path: filename,
-                    data,
+                    data: await blob.text(),
+                    directory: 'DOCUMENTS',
+                    encoding: 'utf8'
+                });
+            } else {
+                const arrayBuffer = await blob.arrayBuffer();
+                const bytes = new Uint8Array(arrayBuffer);
+                let binary = '';
+                bytes.forEach((byte) => {
+                    binary += String.fromCharCode(byte);
+                });
+
+                await filesystem.writeFile({
+                    path: filename,
+                    data: btoa(binary),
                     directory: 'DOCUMENTS'
                 });
-                showStatus(`✓ Fichier enregistré dans Documents/${filename}`, 'success');
-                return true;
-            } catch (err) {
-                console.warn('Filesystem export failed, fallback to browser download', err);
             }
+
+            showStatus(`✓ Fichier enregistré dans Documents/${filename}`, 'success');
+            return true;
+        } catch (err) {
+            console.warn('Filesystem export failed, fallback to browser download', err);
         }
 
         return false;
