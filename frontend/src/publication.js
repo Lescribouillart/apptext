@@ -1624,22 +1624,32 @@ async function initEditor() {
                         return;
                     }
 
-                    const sourceSide = Math.min(image.naturalWidth, image.naturalHeight);
-                    const zoomFactor = Number(cropAvatarState.zoom) || 1;
+                    const stageSize = size;
+                    const naturalWidth = image.naturalWidth || size;
+                    const naturalHeight = image.naturalHeight || size;
+                    const zoom = Number(cropAvatarState.zoom) || 1;
                     const panX = clamp(Number(cropAvatarState.panX) || 0, -120, 120);
                     const panY = clamp(Number(cropAvatarState.panY) || 0, -120, 120);
-                    const cropSize = sourceSide / zoomFactor;
-                    const offsetX = ((image.naturalWidth - cropSize) / 2) + (panX / 120) * (image.naturalWidth - cropSize);
-                    const offsetY = ((image.naturalHeight - cropSize) / 2) + (panY / 120) * (image.naturalHeight - cropSize);
+
+                    const baseScale = Math.min(stageSize / naturalWidth, stageSize / naturalHeight);
+                    const renderWidth = naturalWidth * baseScale * zoom;
+                    const renderHeight = naturalHeight * baseScale * zoom;
+                    const offsetX = (stageSize - renderWidth) / 2 + panX;
+                    const offsetY = (stageSize - renderHeight) / 2 + panY;
+
+                    const sourceX = clamp(((-offsetX) / Math.max(renderWidth, 1)) * naturalWidth, 0, naturalWidth);
+                    const sourceY = clamp(((-offsetY) / Math.max(renderHeight, 1)) * naturalHeight, 0, naturalHeight);
+                    const sourceWidth = clamp((stageSize / Math.max(renderWidth, 1)) * naturalWidth, 0, naturalWidth - sourceX);
+                    const sourceHeight = clamp((stageSize / Math.max(renderHeight, 1)) * naturalHeight, 0, naturalHeight - sourceY);
 
                     context.fillStyle = '#000000';
                     context.fillRect(0, 0, size, size);
                     context.drawImage(
                         image,
-                        clamp(offsetX, 0, Math.max(image.naturalWidth - cropSize, 0)),
-                        clamp(offsetY, 0, Math.max(image.naturalHeight - cropSize, 0)),
-                        cropSize,
-                        cropSize,
+                        sourceX,
+                        sourceY,
+                        sourceWidth,
+                        sourceHeight,
                         0,
                         0,
                         size,
