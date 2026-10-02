@@ -1990,6 +1990,13 @@ async function initEditor() {
         updateAccountSessionButtons(nextMode, false);
     }
 
+    function clearAccountBoundLocalContent() {
+        pendingAvatarDataUrl = '';
+        saveStoredAccountAvatar('');
+        applyStoredAccountAvatar();
+        window.clearLocalMediaCache?.();
+    }
+
     async function deleteCurrentAccount() {
         if (!supabaseClient) {
             window.alert(t('supabaseNotReady', 'Supabase is not initialized.'));
@@ -2036,6 +2043,7 @@ async function initEditor() {
 
             await supabaseClient.auth.signOut();
             await syncAccountSessionState();
+            clearAccountBoundLocalContent();
             window.alert(t('deleteAccountSuccess', 'Your account has been deleted successfully.'));
         } catch (error) {
             const isTimeout = error.name === 'AbortError';
@@ -2064,6 +2072,7 @@ async function initEditor() {
             accountForm?.reset();
             accountLoginForm?.reset();
             await syncAccountSessionState();
+            clearAccountBoundLocalContent();
             window.alert(t('signOutSuccess', 'Disconnection successful.'));
         });
     }

@@ -152,9 +152,9 @@ async function restoreUserTracksFromAccount() {
             throw new Error(error.message || 'Impossible de restaurer les pistes.');
         }
 
-        if (!Array.isArray(data) || data.length === 0) return;
+        var rows = Array.isArray(data) ? data : [];
 
-        var restored = data
+        var restored = rows
             .filter(function(row) { return row && row.payload; })
             .map(function(row) {
                 var payload = row.payload || {};
@@ -171,8 +171,8 @@ async function restoreUserTracksFromAccount() {
             })
             .filter(function(track) { return track && track.id; });
 
-        if (!restored.length) return;
-
+        // Le compte Supabase est la seule source de vérité : on reflète exactement
+        // son contenu, y compris l'absence totale de piste.
         tracks = restored;
         currentTrackIndex = 0;
         _saveTracks();
@@ -182,8 +182,37 @@ async function restoreUserTracksFromAccount() {
     }
 }
 
+function clearLocalMediaCache() {
+    try {
+        if (ytPlayer && ytPlayerReady && typeof ytPlayer.pauseVideo === 'function') {
+            ytPlayer.pauseVideo();
+        }
+    } catch (e) {}
+
+    if (localAudioPlayer) {
+        try { localAudioPlayer.pause(); } catch (e) {}
+    }
+
+    tracks = [];
+    currentTrackIndex = 0;
+
+    try {
+        localStorage.removeItem('scribouillart_tracks');
+    } catch (e) {}
+
+    _openLocalTracksDB().then(function(db) {
+        if (!db) return;
+        var tx = db.transaction('tracks', 'readwrite');
+        tx.objectStore('tracks').clear();
+    }).catch(function() {});
+
+    updateTrackTitle();
+    updateMusicUI(false);
+}
+
 window.syncUserTracksToAccountIfLoggedIn = syncUserTracksToAccountIfLoggedIn;
 window.restoreUserTracksFromAccount = restoreUserTracksFromAccount;
+window.clearLocalMediaCache = clearLocalMediaCache;
 
 function readFileAsDataUrl(file) {
     return new Promise(function(resolve, reject) {
