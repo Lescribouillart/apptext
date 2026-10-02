@@ -425,6 +425,15 @@
                             <input id="accountDisplayName" name="displayName" type="text" maxlength="24" placeholder="Votre pseudo" aria-label="Pseudo" />
                         </label>
 
+                        <label id="accountAvatarField" class="account-field hidden">
+                            <span>Photo de profil</span>
+                            <input id="accountAvatarInput" name="avatar" type="file" accept="image/*" aria-label="Ajouter une photo de profil" />
+                            <div class="account-avatar-preview" aria-live="polite">
+                                <img id="accountAvatarPreview" src="assets/icons/profil.png" alt="Aperçu de la photo de profil" />
+                                <span id="accountAvatarName">Aucune image sélectionnée</span>
+                            </div>
+                        </label>
+
                         <div id="accountSessionStatus" class="account-session-status" data-i18n="notConnected">Vous n'êtes pas connecté.</div>
 
                         <form id="accountForm" class="account-form" data-mode="signup">

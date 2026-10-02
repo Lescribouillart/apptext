@@ -1443,11 +1443,16 @@ async function initEditor() {
     const accountSessionStatus = document.getElementById('accountSessionStatus');
     const accountDisplayNameField = document.getElementById('accountDisplayNameField');
     const accountDisplayName = document.getElementById('accountDisplayName');
+    const accountAvatarField = document.getElementById('accountAvatarField');
+    const accountAvatarInput = document.getElementById('accountAvatarInput');
+    const accountAvatarPreview = document.getElementById('accountAvatarPreview');
+    const accountAvatarName = document.getElementById('accountAvatarName');
     const accountSignOutBtn = document.getElementById('accountSignOutBtn');
     const accountDeleteBtn = document.getElementById('accountDeleteBtn');
     const accountGuestBtn = document.getElementById('accountGuestBtn');
     const supabaseClient = window.noteSupabase;
     const ACCOUNT_NICKNAME_STORAGE_KEY = 'note.account.displayName';
+    const ACCOUNT_AVATAR_STORAGE_KEY = 'note.account.avatar';
     let currentAccountSession = null;
     let currentAccountMode = 'signup';
 
@@ -1468,6 +1473,43 @@ async function initEditor() {
             }
         } catch (error) {
             console.warn('Impossible d’enregistrer le pseudo du compte', error);
+        }
+    }
+
+    function getStoredAccountAvatar() {
+        try {
+            return localStorage.getItem(ACCOUNT_AVATAR_STORAGE_KEY) || '';
+        } catch (error) {
+            return '';
+        }
+    }
+
+    function saveStoredAccountAvatar(dataUrl) {
+        try {
+            if (dataUrl) {
+                localStorage.setItem(ACCOUNT_AVATAR_STORAGE_KEY, dataUrl);
+            } else {
+                localStorage.removeItem(ACCOUNT_AVATAR_STORAGE_KEY);
+            }
+        } catch (error) {
+            console.warn('Impossible d’enregistrer la photo de profil', error);
+        }
+    }
+
+    function applyStoredAccountAvatar() {
+        const avatar = getStoredAccountAvatar();
+        const accountBtnImg = document.querySelector('.account-btn img');
+
+        if (accountBtnImg) {
+            accountBtnImg.src = avatar || 'assets/icons/profil.png';
+        }
+
+        if (accountAvatarPreview) {
+            accountAvatarPreview.src = avatar || 'assets/icons/profil.png';
+        }
+
+        if (accountAvatarName) {
+            accountAvatarName.textContent = avatar ? 'Image sélectionnée' : 'Aucune image sélectionnée';
         }
     }
 
@@ -1497,6 +1539,23 @@ async function initEditor() {
             });
         } catch (error) {
             console.warn('Impossible de sauvegarder le pseudo dans le compte Supabase', error);
+        }
+    });
+
+    accountAvatarInput?.addEventListener('change', (event) => {
+        const file = event.target.files && event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = () => {
+            const dataUrl = String(reader.result || '');
+            saveStoredAccountAvatar(dataUrl);
+            applyStoredAccountAvatar();
+        };
+        reader.readAsDataURL(file);
+
+        if (accountAvatarName) {
+            accountAvatarName.textContent = file.name || 'Image sélectionnée';
         }
     });
 
@@ -1658,6 +1717,12 @@ async function initEditor() {
         if (accountDisplayNameField && accountDisplayName) {
             updateConnectedDisplayName(session);
         }
+
+        if (accountAvatarField) {
+            accountAvatarField.classList.toggle('hidden', !session);
+        }
+
+        applyStoredAccountAvatar();
 
         const isSignedIn = Boolean(session);
 
