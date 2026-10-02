@@ -2111,6 +2111,132 @@ body.startup-locked .main {
     background: rgba(255,255,255,0.08);
 }
 
+.account-avatar-crop-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 12, 16, 0.78);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    padding: 1rem;
+}
+
+.account-avatar-crop-modal.hidden {
+    display: none;
+}
+
+.account-avatar-crop-panel {
+    width: min(90vw, 420px);
+    background: #1b2330;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 18px;
+    padding: 1rem;
+    box-shadow: 0 18px 42px rgba(0,0,0,0.3);
+}
+
+.account-avatar-crop-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.9rem;
+}
+
+.account-avatar-crop-header h3 {
+    margin: 0;
+    font-size: 1.05rem;
+    color: #f4f7fb;
+}
+
+.account-avatar-crop-close {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: rgba(255,255,255,0.06);
+    color: #f4f7fb;
+    border-radius: 8px;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.account-avatar-crop-stage {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.02);
+    cursor: grab;
+    touch-action: none;
+}
+
+.account-avatar-crop-stage:active {
+    cursor: grabbing;
+}
+
+.account-avatar-crop-stage img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform-origin: center;
+    user-select: none;
+    pointer-events: none;
+}
+
+.account-avatar-crop-frame {
+    position: absolute;
+    inset: 0;
+    border: 2px solid rgba(255,255,255,0.8);
+    border-radius: 16px;
+    box-shadow: inset 0 0 0 9999px rgba(10, 12, 16, 0.22);
+    pointer-events: none;
+}
+
+.account-avatar-crop-controls {
+    margin-top: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: #edf3fa;
+    font-size: 0.8rem;
+}
+
+.account-avatar-crop-controls input {
+    flex: 1;
+}
+
+.account-avatar-crop-actions {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
+
+.account-avatar-crop-secondary,
+.account-avatar-crop-primary {
+    border: none;
+    border-radius: 10px;
+    padding: 0.7rem 0.9rem;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 600;
+}
+
+.account-avatar-crop-secondary {
+    background: rgba(255,255,255,0.08);
+    color: #edf3fa;
+}
+
+.account-avatar-crop-primary {
+    background: linear-gradient(180deg, #5aa3dd, #3e7fb7);
+    color: #fff;
+}
+
 .account-field input::placeholder {
     color: rgba(255,255,255,0.4);
 }

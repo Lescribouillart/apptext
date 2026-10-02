@@ -1449,6 +1449,13 @@ async function initEditor() {
     const accountAvatarName = document.getElementById('accountAvatarName');
     const accountAvatarConfirmBtn = document.getElementById('accountAvatarConfirmBtn');
     const accountAvatarDeleteBtn = document.getElementById('accountAvatarDeleteBtn');
+    const accountAvatarCropModal = document.getElementById('accountAvatarCropModal');
+    const accountAvatarCropImage = document.getElementById('accountAvatarCropImage');
+    const accountAvatarCropStage = document.getElementById('accountAvatarCropStage');
+    const accountAvatarZoom = document.getElementById('accountAvatarZoom');
+    const accountAvatarCropApplyBtn = document.getElementById('accountAvatarCropApplyBtn');
+    const accountAvatarCropCancelBtn = document.getElementById('accountAvatarCropCancelBtn');
+    const accountAvatarCropCloseBtn = document.getElementById('accountAvatarCropCloseBtn');
     const accountSignOutBtn = document.getElementById('accountSignOutBtn');
     const accountDeleteBtn = document.getElementById('accountDeleteBtn');
     const accountGuestBtn = document.getElementById('accountGuestBtn');
@@ -1545,6 +1552,109 @@ async function initEditor() {
     });
 
     let pendingAvatarDataUrl = '';
+    let cropAvatarSource = '';
+    const cropAvatarState = {
+        zoom: 1,
+        panX: 0,
+        panY: 0,
+        dragging: false,
+        startX: 0,
+        startY: 0,
+        startPanX: 0,
+        startPanY: 0
+    };
+
+    function clamp(value, min, max) {
+        return Math.min(Math.max(value, min), max);
+    }
+
+    function applyCropAvatarTransform() {
+        if (!accountAvatarCropImage) return;
+        const nextScale = Number(cropAvatarState.zoom) || 1;
+        const nextX = clamp(Number(cropAvatarState.panX) || 0, -120, 120);
+        const nextY = clamp(Number(cropAvatarState.panY) || 0, -120, 120);
+        accountAvatarCropImage.style.transform = `translate(${nextX}px, ${nextY}px) scale(${nextScale})`;
+    }
+
+    function openAvatarCropModal(dataUrl) {
+        cropAvatarSource = dataUrl || '';
+        cropAvatarState.zoom = 1;
+        cropAvatarState.panX = 0;
+        cropAvatarState.panY = 0;
+        cropAvatarState.dragging = false;
+
+        if (accountAvatarCropImage) {
+            accountAvatarCropImage.src = cropAvatarSource;
+        }
+
+        if (accountAvatarZoom) {
+            accountAvatarZoom.value = String(cropAvatarState.zoom);
+        }
+
+        applyCropAvatarTransform();
+
+        if (accountAvatarCropModal) {
+            accountAvatarCropModal.classList.remove('hidden');
+        }
+    }
+
+    function closeAvatarCropModal() {
+        if (accountAvatarCropModal) {
+            accountAvatarCropModal.classList.add('hidden');
+        }
+        cropAvatarSource = '';
+        if (accountAvatarInput) {
+            accountAvatarInput.value = '';
+        }
+    }
+
+    function buildCroppedAvatarDataUrl(dataUrl) {
+        return new Promise((resolve, reject) => {
+            const image = new Image();
+            image.onload = () => {
+                try {
+                    const size = 512;
+                    const canvas = document.createElement('canvas');
+                    canvas.width = size;
+                    canvas.height = size;
+                    const context = canvas.getContext('2d');
+
+                    if (!context) {
+                        resolve(dataUrl);
+                        return;
+                    }
+
+                    const sourceSide = Math.min(image.naturalWidth, image.naturalHeight);
+                    const zoomFactor = Number(cropAvatarState.zoom) || 1;
+                    const panX = clamp(Number(cropAvatarState.panX) || 0, -120, 120);
+                    const panY = clamp(Number(cropAvatarState.panY) || 0, -120, 120);
+                    const cropSize = sourceSide / zoomFactor;
+                    const offsetX = ((image.naturalWidth - cropSize) / 2) + (panX / 120) * (image.naturalWidth - cropSize);
+                    const offsetY = ((image.naturalHeight - cropSize) / 2) + (panY / 120) * (image.naturalHeight - cropSize);
+
+                    context.fillStyle = '#000000';
+                    context.fillRect(0, 0, size, size);
+                    context.drawImage(
+                        image,
+                        clamp(offsetX, 0, Math.max(image.naturalWidth - cropSize, 0)),
+                        clamp(offsetY, 0, Math.max(image.naturalHeight - cropSize, 0)),
+                        cropSize,
+                        cropSize,
+                        0,
+                        0,
+                        size,
+                        size
+                    );
+
+                    resolve(canvas.toDataURL('image/jpeg', 0.92));
+                } catch (error) {
+                    reject(error);
+                }
+            };
+            image.onerror = () => reject(new Error('Impossible de traiter l’image.'));
+            image.src = dataUrl;
+        });
+    }
 
     accountAvatarInput?.addEventListener('change', (event) => {
         const file = event.target.files && event.target.files[0];
@@ -1552,15 +1662,68 @@ async function initEditor() {
 
         const reader = new FileReader();
         reader.onload = () => {
-            pendingAvatarDataUrl = String(reader.result || '');
-            if (accountAvatarPreview) {
-                accountAvatarPreview.src = pendingAvatarDataUrl || 'assets/icons/profil.png';
-            }
-            if (accountAvatarName) {
-                accountAvatarName.textContent = pendingAvatarDataUrl ? 'Image sélectionnée' : 'Aucune image sélectionnée';
-            }
+            const dataUrl = String(reader.result || '');
+            if (!dataUrl) return;
+            openAvatarCropModal(dataUrl);
         };
         reader.readAsDataURL(file);
+    });
+
+    accountAvatarZoom?.addEventListener('input', (event) => {
+        cropAvatarState.zoom = Number(event.target.value) || 1;
+        applyCropAvatarTransform();
+    });
+
+    accountAvatarCropStage?.addEventListener('pointerdown', (event) => {
+        cropAvatarState.dragging = true;
+        cropAvatarState.startX = event.clientX;
+        cropAvatarState.startY = event.clientY;
+        cropAvatarState.startPanX = cropAvatarState.panX;
+        cropAvatarState.startPanY = cropAvatarState.panY;
+        accountAvatarCropStage.setPointerCapture?.(event.pointerId);
+    });
+
+    accountAvatarCropStage?.addEventListener('pointermove', (event) => {
+        if (!cropAvatarState.dragging) return;
+        const deltaX = event.clientX - cropAvatarState.startX;
+        const deltaY = event.clientY - cropAvatarState.startY;
+        cropAvatarState.panX = clamp(cropAvatarState.startPanX + deltaX * 0.8, -120, 120);
+        cropAvatarState.panY = clamp(cropAvatarState.startPanY + deltaY * 0.8, -120, 120);
+        applyCropAvatarTransform();
+    });
+
+    accountAvatarCropStage?.addEventListener('pointerup', () => {
+        cropAvatarState.dragging = false;
+    });
+
+    accountAvatarCropStage?.addEventListener('pointerleave', () => {
+        cropAvatarState.dragging = false;
+    });
+
+    accountAvatarCropApplyBtn?.addEventListener('click', async () => {
+        if (!cropAvatarSource) return;
+
+        try {
+            const croppedDataUrl = await buildCroppedAvatarDataUrl(cropAvatarSource);
+            pendingAvatarDataUrl = croppedDataUrl;
+            if (accountAvatarPreview) {
+                accountAvatarPreview.src = pendingAvatarDataUrl;
+            }
+            if (accountAvatarName) {
+                accountAvatarName.textContent = 'Image sélectionnée';
+            }
+            closeAvatarCropModal();
+        } catch (error) {
+            console.warn('Impossible de recadrer l’image', error);
+        }
+    });
+
+    accountAvatarCropCancelBtn?.addEventListener('click', () => {
+        closeAvatarCropModal();
+    });
+
+    accountAvatarCropCloseBtn?.addEventListener('click', () => {
+        closeAvatarCropModal();
     });
 
     accountAvatarConfirmBtn?.addEventListener('click', () => {
