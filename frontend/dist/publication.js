@@ -1447,6 +1447,8 @@ async function initEditor() {
     const accountAvatarInput = document.getElementById('accountAvatarInput');
     const accountAvatarPreview = document.getElementById('accountAvatarPreview');
     const accountAvatarName = document.getElementById('accountAvatarName');
+    const accountAvatarConfirmBtn = document.getElementById('accountAvatarConfirmBtn');
+    const accountAvatarDeleteBtn = document.getElementById('accountAvatarDeleteBtn');
     const accountSignOutBtn = document.getElementById('accountSignOutBtn');
     const accountDeleteBtn = document.getElementById('accountDeleteBtn');
     const accountGuestBtn = document.getElementById('accountGuestBtn');
@@ -1542,20 +1544,40 @@ async function initEditor() {
         }
     });
 
+    let pendingAvatarDataUrl = '';
+
     accountAvatarInput?.addEventListener('change', (event) => {
         const file = event.target.files && event.target.files[0];
         if (!file) return;
 
         const reader = new FileReader();
         reader.onload = () => {
-            const dataUrl = String(reader.result || '');
-            saveStoredAccountAvatar(dataUrl);
-            applyStoredAccountAvatar();
+            pendingAvatarDataUrl = String(reader.result || '');
+            if (accountAvatarPreview) {
+                accountAvatarPreview.src = pendingAvatarDataUrl || 'assets/icons/profil.png';
+            }
+            if (accountAvatarName) {
+                accountAvatarName.textContent = pendingAvatarDataUrl ? 'Image sélectionnée' : 'Aucune image sélectionnée';
+            }
         };
         reader.readAsDataURL(file);
+    });
 
-        if (accountAvatarName) {
-            accountAvatarName.textContent = file.name || 'Image sélectionnée';
+    accountAvatarConfirmBtn?.addEventListener('click', () => {
+        if (!pendingAvatarDataUrl) {
+            return;
+        }
+
+        saveStoredAccountAvatar(pendingAvatarDataUrl);
+        applyStoredAccountAvatar();
+    });
+
+    accountAvatarDeleteBtn?.addEventListener('click', () => {
+        pendingAvatarDataUrl = '';
+        saveStoredAccountAvatar('');
+        applyStoredAccountAvatar();
+        if (accountAvatarInput) {
+            accountAvatarInput.value = '';
         }
     });
 

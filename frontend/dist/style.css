@@ -2070,6 +2070,43 @@ body.startup-locked .main {
 .account-avatar-preview span {
     color: var(--editor-text-muted);
     font-size: 0.76rem;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
+}
+
+.account-avatar-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.account-avatar-action {
+    width: 28px;
+    height: 28px;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: rgba(255,255,255,0.04);
+    color: #ffffff;
+    padding: 0;
+}
+
+.account-avatar-action.confirm {
+    color: #7fe3a8;
+}
+
+.account-avatar-action.delete {
+    color: #ff8d8d;
+}
+
+.account-avatar-action:hover {
+    background: rgba(255,255,255,0.08);
 }
 
 .account-field input::placeholder {
