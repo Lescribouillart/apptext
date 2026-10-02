@@ -2079,13 +2079,15 @@ async function initEditor() {
         const { data: { session } } = await supabaseClient.auth.getSession();
 
         if (!session && !isGuest) {
-            setAccountGateActive(true);
-            setRoute('account');
-        } else {
-            setAccountGateActive(false);
-            setRoute('editor');
+            try {
+                localStorage.setItem(GUEST_MODE_STORAGE_KEY, 'true');
+            } catch (error) {
+                console.warn('Impossible d’initialiser le mode invité par défaut', error);
+            }
         }
 
+        setAccountGateActive(false);
+        setRoute('editor');
         clearStartupLock();
     }
 
