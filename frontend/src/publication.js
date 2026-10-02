@@ -3207,6 +3207,14 @@ async function initEditor() {
      * directement vers l'enregistrement sur le bureau du téléphone.
      */
     function publishArticle() {
+        const capacitor = window.Capacitor;
+        const isNativeMobile = !!(capacitor && capacitor.isNativePlatform && capacitor.isNativePlatform());
+
+        if (!isNativeMobile) {
+            showStatus('L’export est réservé au mobile Android.', 'error');
+            return;
+        }
+
         const subject = articleSubject.value.trim();
         const exportSubject = subject || t('untitledDocument', 'Document');
         const plainText = editor.innerText;
@@ -3215,53 +3223,38 @@ async function initEditor() {
     }
 
     async function saveExportToDevice(blob, filename, mimeType) {
-        // 1) Comme pour Importer, on passe par la boîte de dialogue native d'Android
-        //    (ici le "partage") pour que l'utilisateur choisisse où déposer le fichier.
-        try {
-            const file = new File([blob], filename, { type: mimeType || 'application/octet-stream' });
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                await navigator.share({ files: [file] });
-                showStatus(`✓ Fichier "${filename}" prêt à être enregistré`, 'success');
-                return true;
-            }
-        } catch (error) {
-            if (error && error.name === 'AbortError') {
-                // L'utilisateur a fermé la boîte de dialogue : on ne tente pas de repli.
-                return true;
-            }
-            console.warn('Partage natif indisponible, repli sur le stockage de l\'application', error);
-        }
-
-        // 2) Repli garanti : écriture directe dans le stockage propre à l'application,
-        //    accessible sans permission sur toutes les versions d'Android.
         const capacitor = window.Capacitor;
-        const filesystem = capacitor && (capacitor.Plugins?.Filesystem || capacitor.Filesystem);
-        const isNative = !!(capacitor && capacitor.isNativePlatform && capacitor.isNativePlatform());
+        const isNativeMobile = !!(capacitor && capacitor.isNativePlatform && capacitor.isNativePlatform());
 
-        if (!isNative || !filesystem) {
+        if (!isNativeMobile) {
+            showStatus('L’export est réservé au mobile Android.', 'error');
             return false;
         }
 
-        const isTextMime = !mimeType || mimeType.startsWith('text/');
-        const data = isTextMime ? await blob.text() : await blobToBase64(blob);
-
-        const directoriesToTry = ['EXTERNAL_STORAGE', 'DOCUMENTS', 'EXTERNAL'];
-        for (const directory of directoriesToTry) {
-            try {
-                const result = await filesystem.writeFile({
-                    path: filename,
-                    data,
-                    directory,
-                    ...(isTextMime ? { encoding: 'utf8' } : {})
-                });
-                showStatus(`✓ Fichier enregistré : ${result?.uri || filename}`, 'success');
-                return true;
-            } catch (error) {
-                console.warn(`Écriture dans ${directory} impossible`, error);
-            }
+        const filesystem = capacitor && (capacitor.Plugins?.Filesystem || capacitor.Filesystem);
+        if (!filesystem) {
+            showStatus('Le système de fichiers mobile n’est pas disponible.', 'error');
+            return false;
         }
 
-        return false;
+        try {
+            const isTextMime = !mimeType || mimeType.startsWith('text/');
+            const data = isTextMime ? await blob.text() : await blobToBase64(blob);
+
+            const result = await filesystem.writeFile({
+                path: filename,
+                data,
+                directory: 'DOCUMENTS',
+                ...(isTextMime ? { encoding: 'utf8' } : {})
+            });
+
+            showStatus(`✓ Fichier enregistré : ${result?.uri || filename}`, 'success');
+            return true;
+        } catch (error) {
+            console.warn('Écriture native mobile impossible', error);
+            showStatus('Export mobile : l’écriture du fichier a échoué.', 'error');
+            return false;
+        }
     }
 
     function blobToBase64(blob) {
@@ -3271,24 +3264,6 @@ async function initEditor() {
             reader.onerror = reject;
             reader.readAsDataURL(blob);
         });
-    }
-
-    function triggerDirectDownload(blob, filename) {
-        const link = document.createElement('a');
-        const url = URL.createObjectURL(blob);
-        const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '') || !!window.Capacitor;
-
-        link.href = url;
-        link.download = filename;
-        link.rel = 'noopener';
-        if (isMobile) {
-            link.target = '_blank';
-        }
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        setTimeout(() => URL.revokeObjectURL(url), 1000);
-        showStatus(t('fileDownloadedToDownloads', 'File downloaded to Downloads'), 'success');
     }
 
     /**
@@ -3305,31 +3280,10 @@ async function initEditor() {
             .substring(0, 50);
         const filename = `${cleanSubject}-${timestamp}.txt`;
         const blob = new Blob([plainText], { type: 'text/plain;charset=utf-8' });
-        const canUseNativePicker = 'showSaveFilePicker' in window && !/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '') && !window.Capacitor;
-
-        if (canUseNativePicker) {
-            try {
-                const handle = await window.showSaveFilePicker({
-                    suggestedName: filename,
-                    types: [{ description: 'Fichier texte', accept: { 'text/plain': ['.txt'] } }]
-                });
-                const writable = await handle.createWritable();
-                await writable.write(blob);
-                await writable.close();
-                showStatus(t('fileDownloadSuccess', 'File "{filename}" saved successfully!').replace('{filename}', filename), 'success');
-            } catch (err) {
-                if (err.name === 'AbortError') {
-                    showStatus(t('fileDownloadCancelled', 'Save cancelled'), 'error');
-                } else {
-                    showStatus(t('fileDownloadError', 'Error: {message}').replace('{message}', err.message), 'error');
-                }
-            }
-            return;
-        }
 
         const saved = await saveExportToDevice(blob, filename, 'text/plain;charset=utf-8');
         if (!saved) {
-            triggerDirectDownload(blob, filename);
+            showStatus('L’export mobile n’a pas pu être finalisé.', 'error');
         }
     }
 
@@ -3363,34 +3317,9 @@ async function initEditor() {
 </style></head><body>${htmlContent}</body></html>`;
 
         const blob = htmlDocx.asBlob(fullHtml);
-        const canUseNativePicker = 'showSaveFilePicker' in window && !/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '') && !window.Capacitor;
-
-        if (canUseNativePicker) {
-            try {
-                const handle = await window.showSaveFilePicker({
-                    suggestedName: filename,
-                    types: [{
-                        description: 'Document Word',
-                        accept: { 'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'] }
-                    }]
-                });
-                const writable = await handle.createWritable();
-                await writable.write(blob);
-                await writable.close();
-                showStatus(t('fileDownloadSuccess', 'File "{filename}" saved successfully!').replace('{filename}', filename), 'success');
-            } catch (err) {
-                if (err.name === 'AbortError') {
-                    showStatus(t('fileDownloadCancelled', 'Save cancelled'), 'error');
-                } else {
-                    showStatus(t('fileDownloadError', 'Error: {message}').replace('{message}', err.message), 'error');
-                }
-            }
-            return;
-        }
-
         const saved = await saveExportToDevice(blob, filename, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
         if (!saved) {
-            triggerDirectDownload(blob, filename);
+            showStatus('L’export mobile Word n’a pas pu être finalisé.', 'error');
         }
     }
 
